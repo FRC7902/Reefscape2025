@@ -165,6 +165,13 @@ public class RobotContainer {
         m_operatorController.b().onTrue(new ElevatorReefSetpoint(ElevatorConstants.kLevel2));
         m_operatorController.y().onTrue(new ElevatorReefSetpoint(ElevatorConstants.kLevel3));
         m_operatorController.x().onTrue(new ElevatorReefSetpoint(ElevatorConstants.kElevatorMinHeightMeters));
+
+        // runs the climb motors up when the up button is pressed on the POV buttons of
+        // the controller.
+        m_operatorController.povUp().whileTrue(new MoveClimbUp(m_ClimbSubsystem));
+        // runs the climb motors down when the down button is pressed on the POV buttons
+        // of the controller.
+        m_operatorController.povDown().whileTrue(new MoveClimbDown(m_ClimbSubsystem));
     }
 
     /**
