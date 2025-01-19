@@ -9,8 +9,12 @@
     "id": 51,
     "canbus": null
   },
+  "inverted": {
+    "drive": true,
+    "angle": false
+  },
   "angle": {
-    "type": "sparkmax",
+    "type": "sparkmax_neo",
     "id": 39,
     "canbus": null
   },
@@ -18,10 +22,6 @@
     "type": "thrifty",
     "id": 3,
     "canbus": null
-  },
-  "inverted": {
-    "drive": true,
-    "angle": false
   },
   "absoluteEncoderInverted": false
 }

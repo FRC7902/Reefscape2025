@@ -132,9 +132,7 @@ public class RobotContainer {
     Command driveFieldOrientedDirectAngleKeyboard = drivebase.driveFieldOriented(driveDirectAngleKeyboard);
     Command driveFieldOrientedAnglularVelocityKeyboard = drivebase.driveFieldOriented(driveAngularVelocityKeyboard);
 
-    // Command driveRobotOrientedDirectedAngle = drivebase.drive();
-
-    drivebase.setDefaultCommand(driveRobotOrientedAngularVelocity);
+    drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
 
     m_driverController.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
 
