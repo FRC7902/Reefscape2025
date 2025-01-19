@@ -30,17 +30,23 @@ public final class Constants {
   public static final double MAX_SPEED = Units.feetToMeters(15);
 
   public static class ClimbConstants {
+    //CAN ID of the primary motor
     public static final int kClimbLeaderMotorCANID = 0;
+    //CAN ID of the secondary motor
     public static final int kClimbFollowerMotorCANID = 0;
+    //port ID of the limit switch 
     public static final int kLimitSwitchPin = 0;
+    //current limit when motor rpm is at 0 (in amps)
     public static final int kMotorStallCurrent = 0;
+    //current limit when motor rpm is greater than 5700 rpm (since we are using neo motors) (in amps)
     public static final int kMotorFreeSpeedCurrent = 0;
+    //rpm limit, where any rpm values that are below the limit you set will be set to the stall current.
+    //rpm greater than the set rpm limit will linearly increase to the free current limit.
     public static final int kMotorRPMLimit = 0;
-
-    public static final int kClimbUpMotorSpeed = 0;
-    public static final int kClimbDownMotorSpeed = 0;
-
-
+    //speed of motors when moving up
+    public static final double kClimbUpMotorSpeed = 0.5;
+    //speed of motors when moving down
+    public static final double kClimbDownMotorSpeed = 0.5;
   }
 
   public static class OperatorConstants {
