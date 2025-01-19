@@ -12,10 +12,10 @@ public class MoveClimbUp extends Command {
 
   private ClimbSubsystem m_climb;
 
-  /** Creates a new ClimbUp. */
   public MoveClimbUp(ClimbSubsystem climb) {
     m_climb = climb;
-    // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(getRequirements());
+
   }
 
   // Called when the command is initially scheduled.
