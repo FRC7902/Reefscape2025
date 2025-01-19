@@ -22,10 +22,15 @@ public final class Constants {
     public static final int kMotorFreeSpeedCurrent = 0;
     public static final int kMotorRPMLimit = 0;
 
+    public static final int kClimbUpMotorSpeed = 0;
+    public static final int kClimbDownMotorSpeed = 0;
+
 
   }
 
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
+    public static final int kOperatorControllerPort = 0;
+
   }
 }
