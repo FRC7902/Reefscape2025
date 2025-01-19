@@ -26,11 +26,14 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
+  //creates an object of the climb subsystem
   private final ClimbSubsystem m_ClimbSubsystem = new ClimbSubsystem();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
+  //driver controller
   private final CommandXboxController m_driverController =
       new CommandXboxController(OperatorConstants.kDriverControllerPort);
+  //operator controller
   private final CommandXboxController m_operatorController =
       new CommandXboxController(OperatorConstants.kOperatorControllerPort);    
 
@@ -58,8 +61,10 @@ public class RobotContainer {
     // cancelling on release.
     m_driverController.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
 
-    //new POVButton(m_operatorController, 0).whileTrue(new MoveClimbUp(m_ClimbSubsystem));
-    //new POVButton(m_operatorController, 180).whileTrue(new MoveClimbDown(m_ClimbSubsystem));
+    //runs the climb motors up when the up button is pressed on the POV buttons of the controller.
+    m_operatorController.povUp().whileTrue(new MoveClimbUp(m_ClimbSubsystem));
+    //runs the climb motors down when the down button is pressed on the POV buttons of the controller.    
+    m_operatorController.povDown().whileTrue(new MoveClimbDown(m_ClimbSubsystem));
   }
 
   /**
