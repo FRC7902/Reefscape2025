@@ -12,9 +12,9 @@ public class MoveClimbDown extends Command {
 
   private ClimbSubsystem m_climb;
 
-  /** Creates a new ClimbUp. */
   public MoveClimbDown(ClimbSubsystem climb) {
     m_climb = climb;
+    addRequirements(getRequirements());
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
