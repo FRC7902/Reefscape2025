@@ -7,10 +7,19 @@ package frc.robot;
 import java.io.File;
 
 import edu.wpi.first.wpilibj.Filesystem;
+import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.Autos;
+import frc.robot.commands.ExampleCommand;
+import frc.robot.commands.teleopCommands.climb.MoveClimbDown;
+import frc.robot.commands.teleopCommands.climb.MoveClimbUp;
+import frc.robot.subsystems.ClimbSubsystem;
+import frc.robot.subsystems.ExampleSubsystem;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.OperatorConstants;
@@ -40,6 +49,7 @@ public class RobotContainer {
     public static final AlgaeElevatorManipulatorSubsystem m_algaeElevatorManipulatorSubsystem = new AlgaeElevatorManipulatorSubsystem();
     // The robot's subsystems and commands are defined here...
     public static final ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
+    private final ClimbSubsystem m_ClimbSubsystem = new ClimbSubsystem();
 
     public static final IndexSubsystem m_indexSubsystem = new IndexSubsystem();
 
@@ -146,7 +156,8 @@ public class RobotContainer {
         m_driverController.rightBumper().whileTrue(new OuttakeAlgaeCommand());
 
         m_indexSubsystem.setDefaultCommand(
-                new ConditionalCommand(new IntakeCoralCommand(), new NullCommand(), m_indexSubsystem::isBeamBroken));
+                new ConditionalCommand(new IntakeCoralCommand(), new NullCommand(),
+                        m_indexSubsystem::isBeamBroken));
 
         m_driverController.rightTrigger().whileTrue(new SetShootSpeed());
 

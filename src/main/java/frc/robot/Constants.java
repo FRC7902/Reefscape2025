@@ -37,6 +37,10 @@ public final class Constants {
     public static final int kMotorFreeSpeedCurrent = 0;
     public static final int kMotorRPMLimit = 0;
 
+    public static final int kClimbUpMotorSpeed = 0;
+    public static final int kClimbDownMotorSpeed = 0;
+
+
   }
 
   public static class OperatorConstants {
@@ -110,6 +114,7 @@ public final class Constants {
     // Control Parameters
     public static final double kElevatorTargetError = 0.005;
     public static final double kElevatorMotorResistance = 0.002; // Assume 2mOhm resistance for voltage drop calculation
+    public static final int kOperatorControllerPort = 0;
 
   }
 }
