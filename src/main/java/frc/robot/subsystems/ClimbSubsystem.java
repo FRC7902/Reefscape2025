@@ -1,13 +1,17 @@
 package frc.robot.subsystems;
+import com.revrobotics.AbsoluteEncoder;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.AbsoluteEncoderConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -26,7 +30,13 @@ public class ClimbSubsystem extends SubsystemBase {
     private final SparkMaxConfig m_climbLeaderMotorConfig = new SparkMaxConfig();
     private final SparkMaxConfig m_climbFollowerMotorConfig = new SparkMaxConfig();
 
+    private final RelativeEncoder m_relativeEncoder = m_climbLeaderMotor.getEncoder();
+    private final AbsoluteEncoder m_absoluteEncoder = m_climbLeaderMotor.getAbsoluteEncoder();
+
+    private final AbsoluteEncoderConfig m_absoluteEncoderConfig = new AbsoluteEncoderConfig();
+
     public ClimbSubsystem() {
+
 
         //clears any previous faults on motors
         //do this so that any errors from previous usage are cleared
@@ -56,8 +66,16 @@ public class ClimbSubsystem extends SubsystemBase {
         //sets all configuration to the motors.
         //any previous parameters are reset here to be overwritten with new parameters.
         //these parameters will persist. This is incredibly important as without this, all parameters are wiped on reboot.
+
+        m_absoluteEncoderConfig.setSparkMaxDataPortConfig();
+        m_absoluteEncoderConfig.positionConversionFactor(0);
+        m_absoluteEncoderConfig.zeroOffset(0);
+        m_absoluteEncoderConfig.inverted(false);
+
+
         m_climbLeaderMotor.configure(m_climbLeaderMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         m_climbFollowerMotor.configure(m_climbLeaderMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
     }
 
     //Returns the value of the limit switch state.
@@ -90,7 +108,6 @@ public class ClimbSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Follower Motor Voltage", m_climbFollowerMotor.getBusVoltage());
         SmartDashboard.putNumber("Follower Motor Current", m_climbFollowerMotor.getOutputCurrent());
         SmartDashboard.putNumber("Follower Motor Temperature", m_climbFollowerMotor.getMotorTemperature());
-
 
         //Checks to see if motors are going downwards and if the limit switch has been triggered.
         if (m_climbLeaderMotor.get() < 0 && limitSwitchHasBeenTrigged()) {
