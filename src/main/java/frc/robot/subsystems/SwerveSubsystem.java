@@ -24,6 +24,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -43,6 +44,8 @@ public class SwerveSubsystem extends SubsystemBase {
   private final SwerveDrive swerveDrive;
 
   private RobotConfig robotConfig;
+  private final Field2d field2d = new Field2d();
+
 
 
   /** Creates a new SwerveSubsystem. */
@@ -50,6 +53,8 @@ public class SwerveSubsystem extends SubsystemBase {
     // Configure the Telemetry before creating the SwerveDrive to avoid unnecessary
     // objects being created.
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
+    SmartDashboard.putData("Field", field2d);
+
 
     try {
       swerveDrive = new SwerveParser(directory).createSwerveDrive(Constants.MAX_SPEED,
@@ -112,6 +117,12 @@ public class SwerveSubsystem extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     SmartDashboard.putNumber("Gyro angle rotation (rad)", swerveDrive.getGyro().getRotation3d().getAngle());
+    Pose2d pose = getPose();
+    SmartDashboard.putNumber("Robot X", pose.getX());
+    SmartDashboard.putNumber("Robot Y", pose.getY());
+    SmartDashboard.putNumber("Robot Heading (Degrees)", pose.getRotation().getDegrees());
+  
+    field2d.setRobotPose(pose);
   }
 
   /**
