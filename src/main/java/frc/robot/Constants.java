@@ -53,5 +53,34 @@ public final class Constants {
     public static double kV = 1;
     public static final int kBeamSensorPort = 9; 
   }
+
+  public static class ElevatorConstants {
+    public static final int kElevatorLeaderCAN = 0;
+    public static final int kElevatorFollowerCAN = 1;
+
+    public static final double kElevatorkP = 0.0;
+    public static final double kElevatorkI = 0.0;
+    public static final double kElevatorkD = 0.0;
+
+    public static final double kGearRatio = 0.0;
+    public static final double kCarriageMass = 0.0;
+    public static final double kDrumRadius = 0.0;
+
+    public static final double kElevatorHeightMeters = 0.0;
+    public static final double kElevatorMinHeightMeters = 0.0;
+    public static final double kElevatorMaxHeightMeters = 0.0;
+
+    public static final double kElevatorkS = 0.0;
+    public static final double kElevatorkG = 0.0;
+    public static final double kElevatorkV = 0.0;
+    public static final double kElevatorkA = 0.0;
+    public static final double kT = 18.17;  // mNm/A
+
+    public static final int kEncoderCPR = 2048;
+    // distance per pulse = (distance per revolution) / (pulses per revolution)
+    //  = (Pi * D) / ppr
+    public static final double kElevatorDistPerPulse = 0.0;
+
+  }
 }
 
