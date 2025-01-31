@@ -31,6 +31,17 @@ public final class Constants {
 
     public static final double MAX_SPEED = Units.feetToMeters(12);
 
+    public static class PathPlanner {
+        public static final double kPDrive = 0;
+        public static final double kIDrive = 0;
+        public static final double kDDrive = 0;
+
+        public static final double kPAngle = 0;
+        public static final double kIAngle = 0;
+        public static final double kDAngle = 0;
+    }
+
+
     public static class ClimbConstants {
         // CAN ID of the primary motor
         public static final int kClimbLeaderMotorCANID = 41;
