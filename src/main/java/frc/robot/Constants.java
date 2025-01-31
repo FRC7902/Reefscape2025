@@ -29,6 +29,16 @@ public final class Constants {
                                                // correct
   public static final double MAX_SPEED = Units.feetToMeters(5);
 
+  public static class PIDValues {
+    public static final double kPDrive = 0;
+    public static final double kIDrive = 0;
+    public static final double kDDrive = 0;
+
+    public static final double kPAngle = 0;
+    public static final double kIAngle = 0;
+    public static final double kDAngle = 0;
+  }
+
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
 
