@@ -5,9 +5,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkRelativeEncoder;
 
 
@@ -34,6 +34,14 @@ public class IndexSubsystem extends SubsystemBase {
 
     public double getSpeed() {
         return indexSpeed;
+    }
+
+    public void coast() {
+        indexMotorConfig.idleMode(IdleMode.kCoast);
+    }
+    
+      public void brake() {
+        indexMotorConfig.idleMode(IdleMode.kBrake);
     }
 
     @Override
