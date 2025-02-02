@@ -45,42 +45,47 @@ public final class Constants {
     public static final int kIntakeVoltage = 12;
     public static final int kOuttakeVoltage = -12;
   }
+
   public static class IndexConstants {
     public static int kIndexMotorCAN = 38;
     public static final double kRampRate = 0;
     public static final double kShootSpeed = 40;
     public static double kS = 1;
     public static double kV = 1;
-    public static final int kBeamSensorPort = 9; 
+    public static final int kBeamSensorPort = 9;
   }
 
   public static class ElevatorConstants {
     public static final int kElevatorLeaderCAN = 0;
     public static final int kElevatorFollowerCAN = 1;
 
-    public static final double kElevatorkP = 0.0;
-    public static final double kElevatorkI = 0.0;
-    public static final double kElevatorkD = 0.0;
-
-    public static final double kGearRatio = 0.0;
-    public static final double kCarriageMass = 0.0;
-    public static final double kDrumRadius = 0.0;
+    public static final double kGearRatio = 7.5;
+    public static final double kCarriageMass = Units.lbsToKilograms(3.8);
+    public static final double kDrumRadius = Units.inchesToMeters(1.625);
 
     public static final double kElevatorHeightMeters = 0.0;
     public static final double kElevatorMinHeightMeters = 0.0;
-    public static final double kElevatorMaxHeightMeters = 0.0;
+    public static final double kElevatorMaxHeightMeters = Units.inchesToMeters(39.75);
 
-    public static final double kElevatorkS = 0.0;
-    public static final double kElevatorkG = 0.0;
-    public static final double kElevatorkV = 0.0;
-    public static final double kElevatorkA = 0.0;
-    public static final double kT = 18.17;  // mNm/A
+    public static final double kMaxVelocity = 1.70; // m/s
+    public static final double kMaxAcceleration = 1.0; // TODO: modify
+
+    public static final double kP = 0.0;
+    public static final double kI = 0.0;
+    public static final double kD = 0.0;
+
+    public static final double kMaxV = 10.0;
+
+    public static final double kS = 0.0; // negligible
+    public static final double kG = 0.23;
+    public static final double kV = 6.85;
+    public static final double kA = 0.04;
+    // public static final double kT = 18.17; // motor torque constant (mNm/A)
 
     public static final int kEncoderCPR = 2048;
-    // distance per pulse = (distance per revolution) / (pulses per revolution)
-    //  = (Pi * D) / ppr
-    public static final double kElevatorDistPerPulse = 0.0;
+    // distance per pulse = (distance per revolution) / (pulses per revolution) =
+    // (Pi * D) / ppr
+    public static final double kElevatorDistPerPulse = (2 * Math.PI * kDrumRadius) / (kEncoderCPR / 4);
 
   }
 }
-
