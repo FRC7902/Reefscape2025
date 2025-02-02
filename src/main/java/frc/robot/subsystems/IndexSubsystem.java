@@ -3,6 +3,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.IndexConstants;
 
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
@@ -18,7 +19,7 @@ public class IndexSubsystem extends SubsystemBase {
 
     public IndexSubsystem() {
         indexMotorConfig.idleMode(IdleMode.kBrake);
-        indexMotorConfig.openLoopRampRate(0.5);
+        indexMotorConfig.openLoopRampRate(IndexConstants.kRampRate);
         indexMotorConfig.smartCurrentLimit(20); // 20 Amps
     }
 
