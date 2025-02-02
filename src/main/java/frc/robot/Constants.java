@@ -46,6 +46,7 @@ public final class Constants {
     public static final int kOuttakeVoltage = -12;
   }
   public static class IndexConstants {
+    public static final double kRampRate = 0;
     public static int kIndexMotorCAN = 0;
   }
 }
