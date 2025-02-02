@@ -7,24 +7,19 @@ import frc.robot.Constants;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.SparkRelativeEncoder;
 
 
 public class IndexSubsystem extends SubsystemBase {
     public SparkMax indexMotor = new SparkMax(Constants.IndexConstants.kIndexMotorCAN, SparkMax.MotorType.kBrushless);
-    SparkMaxConfig indexMotorConfig = new SparkMaxConfig();
-
-
-    // public SparkPIDController speedPID = indexMotor.getPIDController();
-
+    public SparkMaxConfig indexMotorConfig = new SparkMaxConfig();
+    
     public double indexSpeed = 0;
 
 
     public IndexSubsystem() {
         indexMotorConfig.idleMode(IdleMode.kBrake);
-        // speedPID.setReference(0, CANSparkBase.ControlType.kVelocity);
-        // speedPID.setOutputRange(0, 1);
+        indexMotorConfig.openLoopRampRate(0.5);
+        indexMotorConfig.smartCurrentLimit(20); // 20 Amps
     }
 
     public void setSpeed(double speed) {
@@ -34,6 +29,10 @@ public class IndexSubsystem extends SubsystemBase {
 
     public double getSpeed() {
         return indexSpeed;
+    }
+
+    public void stop() {
+        indexMotor.stopMotor();
     }
 
     public void coast() {
