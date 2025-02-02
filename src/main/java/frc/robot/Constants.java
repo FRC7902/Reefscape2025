@@ -17,6 +17,7 @@ public final class Constants {
     public static final int kDriverControllerPort = 0;
   }
   public static class IndexConstants {
+    public static final double kRampRate = 0;
     public static int kIndexMotorCAN = 0;
   }
 }
