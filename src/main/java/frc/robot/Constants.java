@@ -15,5 +15,9 @@ package frc.robot;
 public final class Constants {
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
+    public static final int motorCurrentLimit=40; 
+    public static final int intakeVoltage=7;
+    public static final int outtakeVoltage=-7;
+    public static final int beamBreakPort=-1;
   }
 }
