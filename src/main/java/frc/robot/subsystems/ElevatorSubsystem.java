@@ -13,6 +13,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -33,6 +34,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -40,7 +42,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.FirebirdUtils;
 import frc.robot.Constants.ElevatorConstants;
 
-public class ElevatorSubsystem extends SubsystemBase {
+public class ElevatorSubsystem extends SubsystemBase implements AutoCloseable {
 
   // Declare motor controllers
   private final TalonFX m_elevatorLeaderMotor = new TalonFX(ElevatorConstants.kElevatorLeaderCAN);
@@ -72,7 +74,9 @@ public class ElevatorSubsystem extends SubsystemBase {
       ElevatorConstants.kElevatorMaxHeightMeters,
       true,
       ElevatorConstants.kElevatorHeightMeters,
-      0);
+      0,
+      0
+      );
 
   private final ElevatorFeedforward m_elevatorFeedForward = new ElevatorFeedforward(
       ElevatorConstants.kS,
@@ -90,7 +94,7 @@ public class ElevatorSubsystem extends SubsystemBase {
   private final MechanismRoot2d m_mech2dRoot = m_mech2d.getRoot("Elevator Root", Units.inchesToMeters(5),
       Units.inchesToMeters(0.5));
   private final MechanismLigament2d m_elevatorMech2d = m_mech2dRoot.append(
-      new MechanismLigament2d("Elevator", m_elevatorSim.getPositionMeters(), 90));
+      new MechanismLigament2d("Elevator", m_elevatorSim.getPositionMeters(), 90, 7, new Color8Bit(Color.kAntiqueWhite)));
 
   // private final SysIdRoutine m_sysId =
   // new SysidRoutine.Config()
@@ -103,6 +107,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     if (RobotBase.isSimulation()) {
       SmartDashboard.putData("Elevator Sim", m_mech2d);
+      m_elevatorMech2d.setColor(new Color8Bit(Color.kAntiqueWhite));
     }
 
     // // Base Motor configuration
@@ -175,16 +180,20 @@ public class ElevatorSubsystem extends SubsystemBase {
    * @param goal the position to maintain
    */
   public void reachGoal(double goal) {
+    // Create goal state
     var goalState = new ExponentialProfile.State(goal, 0);
 
+    // Calculate next state
     var next = m_profile.calculate(0.020, m_setpoint, goalState);
 
-    // With the setpoint value we run PID control like normal
+    // Calculate feedforward and feedback outputs
     double pidOutput = m_pidController.calculate(m_encoder.getDistance(), m_setpoint.position);
     double feedforwardOutput = m_elevatorFeedForward.calculateWithVelocities(m_setpoint.velocity, next.velocity);
 
+    // Set motor output
     m_elevatorLeaderMotor.setVoltage(pidOutput + feedforwardOutput);
 
+    // Update setpoint
     m_setpoint = next;
   }
 
@@ -194,12 +203,12 @@ public class ElevatorSubsystem extends SubsystemBase {
     m_elevatorMech2d.setLength(m_encoder.getDistance());
   }
 
-  // @Override
-  // public void close() {
-  //   m_encoder.close();
-  //   m_motor.close();
-  //   m_mech2d.close();
-  // }
+  @Override
+  public void close() {
+    m_encoder.close();
+    m_motor.close();
+    m_mech2d.close();
+  }
 
   /** Sets the height of the elevator */
   public void setHeight(double setpoint) {
@@ -235,9 +244,11 @@ public class ElevatorSubsystem extends SubsystemBase {
   // return m_sysIdRoutine.dynamic(direction);
   // }
 
-  // @Override
-  // public void periodic() {
-  // }
+  @Override
+  public void periodic() {
+    
+
+  }
 
   @Override
   public void simulationPeriodic() {

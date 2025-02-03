@@ -31,6 +31,7 @@ public final class Constants {
 
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
+    public static final int kOperatorControllerPort = 1;
 
     // Joystick Deadband
     public static final double DEADBAND = 0.5;
@@ -53,6 +54,7 @@ public final class Constants {
     public static double kS = 1;
     public static double kV = 1;
     public static final int kBeamSensorPort = 9;
+
   }
 
   public static class ElevatorConstants {
@@ -74,8 +76,7 @@ public final class Constants {
     public static final double kI = 0.0;
     public static final double kD = 0.0;
 
-    public static final double kMaxV = 10.0;
-
+    public static final double kMaxV = 10.0; // volts
     public static final double kS = 0.0; // negligible
     public static final double kG = 0.23;
     public static final double kV = 6.85;
@@ -85,6 +86,12 @@ public final class Constants {
     public static final int kEncoderCPR = 2048;
     // distance per pulse = (distance per revolution) / (pulses per revolution) =
     // (Pi * D) / ppr
+
+    // Elevator setpoints
+    public static final double kLevel1 = Units.inchesToMeters(31.875);
+    public static final double kLevel2 = Units.inchesToMeters(47.625);
+    public static final double kLevel3 = Units.inchesToMeters(72.0);
+
     public static final double kElevatorDistPerPulse = (2 * Math.PI * kDrumRadius) / (kEncoderCPR / 4);
 
   }
