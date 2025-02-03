@@ -17,6 +17,7 @@ import edu.wpi.first.math.util.Units;
 public final class Constants {
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
+    public static final int kOperatorControllerPort = 1;
   }
 
   public static class ElevatorConstants {
@@ -31,25 +32,26 @@ public final class Constants {
     public static final double kElevatorMinHeightMeters = 0.0;
     public static final double kElevatorMaxHeightMeters = Units.inchesToMeters(39.75);
 
-    public static final double kMaxVelocity = 1.70; // m/s
+    public static final double kMaxVelocity = 1.70;
     public static final double kMaxAcceleration = 1.0;  // TODO: modify
 
     public static final double kP = 0.0;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
 
-    public static final double kMaxV = 10.0;
-
+    public static final double kMaxV = 10.0; // volts 
     public static final double kS = 0.0; // negligible
     public static final double kG = 0.23;
     public static final double kV = 6.85;
     public static final double kA = 0.04;
-    // public static final double kT = 18.17;  // motor torque constant (mNm/A)
+
+    // Elevator setpoints
+    public static final double kLevel1 = Units.inchesToMeters(31.875);
+    public static final double kLevel2 = Units.inchesToMeters(47.625);
+    public static final double kLevel3 = Units.inchesToMeters(72.0);
 
     public static final int kEncoderCPR = 2048;
-    // distance per pulse = (distance per revolution) / (pulses per revolution) = (Pi * D) / ppr
-    public static final double kElevatorDistPerPulse
-      = (2 * Math.PI * kDrumRadius) / (kEncoderCPR / 4);
+    public static final double kElevatorDistPerPulse = (2 * Math.PI * kDrumRadius) / (kEncoderCPR / 4);
 
   }
 }
