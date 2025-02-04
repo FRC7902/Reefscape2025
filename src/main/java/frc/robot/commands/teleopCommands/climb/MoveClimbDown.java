@@ -27,10 +27,10 @@ public class MoveClimbDown extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (!(m_climb.limitSwitchHasBeenTrigged())) {
+    if (m_climb.getEncoderDistance() < ClimbConstants.kClimbEncoderLimit) {
         m_climb.setMotorPower(ClimbConstants.kClimbDownMotorSpeed);
     }
-    else if (m_climb.limitSwitchHasBeenTrigged()) {
+    else if (m_climb.getEncoderDistance() >= ClimbConstants.kClimbEncoderLimit) {
         m_climb.stopMotors();        
     }
   }
