@@ -31,10 +31,10 @@ public class RobotContainer {
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   //driver controller
-  private final CommandXboxController m_driverController =
+  public final CommandXboxController m_driverController =
       new CommandXboxController(OperatorConstants.kDriverControllerPort);
   //operator controller
-  private final CommandXboxController m_operatorController =
+  public final CommandXboxController m_operatorController =
       new CommandXboxController(OperatorConstants.kOperatorControllerPort);    
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
