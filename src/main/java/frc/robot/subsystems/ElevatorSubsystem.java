@@ -49,6 +49,9 @@ public class ElevatorSubsystem extends SubsystemBase implements AutoCloseable {
   private final TalonFX m_elevatorFollowerMotor = new TalonFX(ElevatorConstants.kElevatorFollowerCAN);
 
   private TalonFXConfiguration m_elevatorConfig = new TalonFXConfiguration();
+  
+  private final MotionMagicVoltage m_motionMagicRequest = new MotionMagicVoltage(0).withSlot(0);
+
 
   private final Encoder m_encoder = new Encoder(0, 1);
   private final PWMSparkMax m_motor = new PWMSparkMax(0);
@@ -74,7 +77,7 @@ public class ElevatorSubsystem extends SubsystemBase implements AutoCloseable {
       ElevatorConstants.kElevatorMaxHeightMeters,
       true,
       ElevatorConstants.kElevatorHeightMeters,
-      0,
+      0.01, // add noise
       0
       );
 
@@ -88,18 +91,13 @@ public class ElevatorSubsystem extends SubsystemBase implements AutoCloseable {
       ElevatorConstants.kP,
       ElevatorConstants.kI,
       ElevatorConstants.kD,
-      new TrapezoidProfile.Constraints(0, 0));
+      new TrapezoidProfile.Constraints(ElevatorConstants.kMaxVelocity, ElevatorConstants.kMaxAcceleration));
 
-  private final Mechanism2d m_mech2d = new Mechanism2d(Units.inchesToMeters(10), Units.inchesToMeters(51));
+  private final Mechanism2d m_mech2d = new Mechanism2d(Units.inchesToMeters(10), Units.inchesToMeters(50));
   private final MechanismRoot2d m_mech2dRoot = m_mech2d.getRoot("Elevator Root", Units.inchesToMeters(5),
       Units.inchesToMeters(0.5));
   private final MechanismLigament2d m_elevatorMech2d = m_mech2dRoot.append(
       new MechanismLigament2d("Elevator", m_elevatorSim.getPositionMeters(), 90, 7, new Color8Bit(Color.kAntiqueWhite)));
-
-  // private final SysIdRoutine m_sysId =
-  // new SysidRoutine.Config()
-
-  private final MotionMagicVoltage m_motionMagicRequest = new MotionMagicVoltage(0).withSlot(0);
 
   /** Creates a new ElevatorSubsystem */
   public ElevatorSubsystem() {
@@ -166,7 +164,10 @@ public class ElevatorSubsystem extends SubsystemBase implements AutoCloseable {
   public void stop() {
     m_elevatorLeaderMotor.stopMotor();
     m_elevatorFollowerMotor.stopMotor();
-    ;
+
+    if (RobotBase.isSimulation()) {
+      m_motor.set(0);
+    }
   }
 
   /** Reset Exponential profile to begin on current position on enable */
@@ -186,12 +187,12 @@ public class ElevatorSubsystem extends SubsystemBase implements AutoCloseable {
     // Calculate next state
     var next = m_profile.calculate(0.020, m_setpoint, goalState);
 
-    // Calculate feedforward and feedback outputs
+    // With the setpoint value, run PID like normal
     double pidOutput = m_pidController.calculate(m_encoder.getDistance(), m_setpoint.position);
     double feedforwardOutput = m_elevatorFeedForward.calculateWithVelocities(m_setpoint.velocity, next.velocity);
 
     // Set motor output
-    m_elevatorLeaderMotor.setVoltage(pidOutput + feedforwardOutput);
+    m_motor.setVoltage(pidOutput + feedforwardOutput);
 
     // Update setpoint
     m_setpoint = next;
@@ -246,8 +247,10 @@ public class ElevatorSubsystem extends SubsystemBase implements AutoCloseable {
 
   @Override
   public void periodic() {
-    
-
+    SmartDashboard.putNumber("Elevator position", m_encoder.getDistance());
+    SmartDashboard.putNumber("Elevator setpoint position", m_setpoint.position);
+    // SmartDashboard.putNumber("Elevator Goal Position", );
+    SmartDashboard.putNumber("Elevator setpoint velocity", m_setpoint.velocity);
   }
 
   @Override

@@ -28,7 +28,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
-  private final CommandXboxController m_operatorController = new CommandXboxController(OperatorConstants.kOperatorControllerPort);
+
+  private final Joystick m_joystick = new Joystick(0);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -53,9 +54,14 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-    m_operatorController.a().onTrue(new InstantCommand(() -> m_elevatorSubsystem.reachGoal(ElevatorConstants.kLevel1)));
-    m_operatorController.b().onTrue(new InstantCommand(() -> m_elevatorSubsystem.reachGoal(ElevatorConstants.kLevel2)));
-    m_operatorController.y().onTrue(new InstantCommand(() -> m_elevatorSubsystem.reachGoal(ElevatorConstants.kLevel3)));
+      JoystickButton aButton = new JoystickButton(m_joystick, XboxController.Button.kA.value); // 1
+      JoystickButton bButton = new JoystickButton(m_joystick, XboxController.Button.kB.value); // 2
+      JoystickButton yButton = new JoystickButton(m_joystick, XboxController.Button.kY.value); // 4
+
+      aButton.onTrue(new InstantCommand(() -> m_elevatorSubsystem.setHeight(ElevatorConstants.kLevel1)));
+      bButton.onTrue(new InstantCommand(() -> m_elevatorSubsystem.setHeight(ElevatorConstants.kLevel2)));
+      yButton.onTrue(new InstantCommand(() -> m_elevatorSubsystem.setHeight(ElevatorConstants.kLevel3)));
+
   }
 
   /**
