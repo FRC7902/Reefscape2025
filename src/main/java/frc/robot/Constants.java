@@ -47,6 +47,10 @@ public final class Constants {
   }
   public static class IndexConstants {
     public static final double kRampRate = 0;
+    public static final double indexkP = 0;
+    public static final double indexkI = 0;
+    public static final double indexkD = 0;
+    public static final double indexkFF = 0;
     public static int kIndexMotorCAN = 0;
   }
 }
