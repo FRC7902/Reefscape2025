@@ -69,25 +69,20 @@ public class ClimbSubsystem extends SubsystemBase {
         m_climbLeaderMotorConfig.smartCurrentLimit(ClimbConstants.kMotorStallCurrent, ClimbConstants.kMotorFreeSpeedCurrent, ClimbConstants.kMotorRPMLimit);
         m_climbFollowerMotorConfig.smartCurrentLimit(ClimbConstants.kMotorStallCurrent, ClimbConstants.kMotorFreeSpeedCurrent, ClimbConstants.kMotorRPMLimit);
 
-
-        //sets all configuration to the motors.
-        //any previous parameters are reset here to be overwritten with new parameters.
-        //these parameters will persist. This is incredibly important as without this, all parameters are wiped on reboot.
-
         m_absoluteEncoder.reset();
         m_absoluteEncoder.setDistancePerPulse(0);
         m_absoluteEncoder.setMinRate(0);
         m_absoluteEncoder.setSamplesToAverage(0);
         
 
+        //sets all configuration to the motors.
+        //any previous parameters are reset here to be overwritten with new parameters.
+        //these parameters will persist. This is incredibly important as without this, all parameters are wiped on reboot.        
         m_climbLeaderMotor.configure(m_climbLeaderMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         m_climbFollowerMotor.configure(m_climbLeaderMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
-    //Returns the value of the limit switch state.
-    //If true, the limit switch has been triggered, motors should stop.
-    //If false, the limit switch hasn't been triggered, motors should continue.
-
+    //Returns the reading of the encoder.
     public double getEncoderDistance() {
         return m_absoluteEncoder.getDistance();
     }
@@ -108,6 +103,7 @@ public class ClimbSubsystem extends SubsystemBase {
     public void periodic() {
         //Displays live motor and limit switch metrics on SmartDashboard 
         SmartDashboard.putNumber("Encoder reading", getEncoderDistance());
+        SmartDashboard.putBoolean("Climb stopped", m_absoluteEncoder.getStopped());
 
         SmartDashboard.putNumber("Leader Motor Voltage", m_climbLeaderMotor.getBusVoltage());
         SmartDashboard.putNumber("Leader Motor Current", m_climbLeaderMotor.getOutputCurrent());
@@ -117,7 +113,7 @@ public class ClimbSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Follower Motor Current", m_climbFollowerMotor.getOutputCurrent());
         SmartDashboard.putNumber("Follower Motor Temperature", m_climbFollowerMotor.getMotorTemperature());
 
-        //Checks to see if motors are going upwards and if the limit switch has been triggered.
+        //Checks to see if motors are going upwards and if the encoder has reached the set limit
         if (m_climbLeaderMotor.get() > 0 && getEncoderDistance() > ClimbConstants.kClimbDownMotorSpeed) {
             stopMotors();
         }

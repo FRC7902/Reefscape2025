@@ -6,6 +6,7 @@ package frc.robot.commands.teleopCommands.climb;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.ClimbConstants;
+import frc.robot.RobotContainer;
 import frc.robot.subsystems.ClimbSubsystem;
 
 public class MoveClimbDown extends Command {
@@ -31,7 +32,7 @@ public class MoveClimbDown extends Command {
         m_climb.setMotorPower(ClimbConstants.kClimbDownMotorSpeed);
     }
     else if (m_climb.getEncoderDistance() >= ClimbConstants.kClimbEncoderLimit) {
-        m_climb.stopMotors();        
+        m_climb.stopMotors();
     }
   }
 
