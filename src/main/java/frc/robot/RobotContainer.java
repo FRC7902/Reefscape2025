@@ -38,9 +38,10 @@ import swervelib.SwerveInputStream;
 public class RobotContainer {
     // The robot's subsystems and commands are defined here...
     public static final AlgaeElevatorManipulatorSubsystem m_algaeElevatorManipulatorSubsystem = new AlgaeElevatorManipulatorSubsystem();
+    // The robot's subsystems and commands are defined here...
+    private final ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
 
     public static final IndexSubsystem m_indexSubsystem = new IndexSubsystem();
-    private final ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
 
     private final CommandXboxController m_driverController = new CommandXboxController(
             OperatorConstants.kDriverControllerPort);
@@ -154,6 +155,13 @@ public class RobotContainer {
                 .onTrue(new InstantCommand(() -> m_elevatorSubsystem.reachGoal(ElevatorConstants.kLevel2)));
         m_operatorController.y()
                 .onTrue(new InstantCommand(() -> m_elevatorSubsystem.reachGoal(ElevatorConstants.kLevel3)));
+
+        m_operatorController.a()
+                .onTrue(new InstantCommand(() -> m_elevatorSubsystem.setHeight(ElevatorConstants.kLevel1)));
+        m_operatorController.b()
+                .onTrue(new InstantCommand(() -> m_elevatorSubsystem.setHeight(ElevatorConstants.kLevel2)));
+        m_operatorController.y()
+                .onTrue(new InstantCommand(() -> m_elevatorSubsystem.setHeight(ElevatorConstants.kLevel3)));
     }
 
     /**
