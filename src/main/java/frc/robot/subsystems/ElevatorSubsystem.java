@@ -20,6 +20,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.ExponentialProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
@@ -51,7 +52,6 @@ public class ElevatorSubsystem extends SubsystemBase implements AutoCloseable {
   private TalonFXConfiguration m_elevatorConfig = new TalonFXConfiguration();
   
   private final MotionMagicVoltage m_motionMagicRequest = new MotionMagicVoltage(0).withSlot(0);
-
 
   private final Encoder m_encoder = new Encoder(0, 1);
   private final PWMSparkMax m_motor = new PWMSparkMax(0);
@@ -212,7 +212,7 @@ public class ElevatorSubsystem extends SubsystemBase implements AutoCloseable {
   }
 
   /** Sets the height of the elevator */
-  public void setHeight(double setpoint) {
+  public void setHeight(double position) {
     // deprecated
     // final MotionMagicVoltage request = new MotionMagicVoltage(setpoint)
     // .withSlot(0)
@@ -226,35 +226,34 @@ public class ElevatorSubsystem extends SubsystemBase implements AutoCloseable {
     return m_elevatorLeaderMotor.getPosition().getValueAsDouble();
   }
 
-  // /**
-  // * Returns a command that will execute a quasistatic test in the given
-  // * direction
-  // *
-  // * @param direction The direction (forward or reverse) to run the test in
-  // */
-  // public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
-  // return m_sysIdRoutine.quasistatic(direction);
-  // }
+  /** Zero the elevator */
+  public void zero() {
+    m_elevatorLeaderMotor.setPosition(0, 10);
+  }
 
-  // /**
-  // * Returns a command that will execute a dynamic test in the given direction
-  // *
-  // * @param direction The direction (forward or reverse) to run the test in
-  // */
-  // public Command sysIdDynamic(SysIdRoutine.Direction direction) {
-  // return m_sysIdRoutine.dynamic(direction);
-  // }
+  /** Returns whether the elevator is at the setpoint */
+  public boolean isFinished() {
+    if (Math.abs(getHeight() - m_setpoint.position) < ElevatorConstants.kTargetError) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Elevator position", m_encoder.getDistance());
-    SmartDashboard.putNumber("Elevator setpoint position", m_setpoint.position);
-    // SmartDashboard.putNumber("Elevator Goal Position", );
-    SmartDashboard.putNumber("Elevator setpoint velocity", m_setpoint.velocity);
+    // SmartDashboard.putNumber("Elevator position", m_encoder.getDistance());
+    // SmartDashboard.putNumber("Elevator setpoint position", m_setpoint.position);
+    // // SmartDashboard.putNumber("Elevator Goal Position", );
+    // SmartDashboard.putNumber("Elevator setpoint velocity", m_setpoint.velocity);
   }
 
   @Override
   public void simulationPeriodic() {
+    SmartDashboard.putNumber("Elevator position", m_encoder.getDistance());
+    SmartDashboard.putNumber("Elevator setpoint position", m_setpoint.position);
+    // SmartDashboard.putNumber("Elevator Goal Position", );
+    SmartDashboard.putNumber("Elevator setpoint velocity", m_setpoint.velocity);
 
     m_elevatorSim.setInput(m_motorSim.getSpeed() * RobotController.getBatteryVoltage());
 

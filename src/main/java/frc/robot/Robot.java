@@ -37,12 +37,14 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
-    if (m_joystick.getTrigger()) {
-      // Here, we set the constant setpoint
-      m_elevator.reachGoal(ElevatorConstants.kLevel2);
-    } else {
-      // Otherwise, we update the setpoint to 1 meter
+    if (m_joystick.getRawButton(1)) {
       m_elevator.reachGoal(ElevatorConstants.kLevel1);
+    } else if (m_joystick.getRawButton(2)) {
+      m_elevator.reachGoal(ElevatorConstants.kLevel2);
+    } else if (m_joystick.getRawButton(3)) {
+      m_elevator.reachGoal(ElevatorConstants.kLevel3);
+    } else if (m_joystick.getRawButton(4)) {
+      m_elevator.reachGoal(ElevatorConstants.kElevatorMinHeightMeters);
     }
   }
 

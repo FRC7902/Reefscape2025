@@ -92,6 +92,8 @@ public final class Constants {
     public static final double kLevel2 = Units.inchesToMeters(47.625);
     public static final double kLevel3 = Units.inchesToMeters(72.0);
 
+    public static final double kTargetError = 2;
+
     public static final double kElevatorDistPerPulse = (2 * Math.PI * kDrumRadius) / (kEncoderCPR / 4);
 
   }
