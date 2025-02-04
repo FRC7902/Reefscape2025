@@ -1,20 +1,26 @@
 package frc.robot.subsystems;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
+
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.IndexConstants;
 
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.SparkMaxConfig;
-
 
 public class IndexSubsystem extends SubsystemBase {
     public SparkMax indexMotor = new SparkMax(Constants.IndexConstants.kIndexMotorCAN, SparkMax.MotorType.kBrushless);
     public SparkMaxConfig indexMotorConfig = new SparkMaxConfig();
     
-    public double indexSpeed = 0;
+    private SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(
+    IndexConstants.kS, 
+    IndexConstants.kV
+    );
+
+    public double indexSpeed = 0;  
 
 
     public IndexSubsystem() {
@@ -25,7 +31,9 @@ public class IndexSubsystem extends SubsystemBase {
 
     public void setSpeed(double speed) {
         indexSpeed = speed;
-        indexMotor.set(speed);
+        double feedforwardVoltage = feedforward.calculate(speed);
+        indexMotor.setVoltage(feedforwardVoltage); 
+        //indexMotor.set(speed);
     }
 
     public double getSpeed() {
