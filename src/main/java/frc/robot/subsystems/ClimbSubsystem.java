@@ -1,14 +1,12 @@
 package frc.robot.subsystems;
-import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
+import edu.wpi.first.math.controller.BangBangController;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -21,33 +19,15 @@ public class ClimbSubsystem extends SubsystemBase {
     private final SparkMax m_climbFollowerMotor = new SparkMax(ClimbConstants.kClimbLeaderMotorCANID, MotorType.kBrushless);
 
     //object creation of motor configuration
-    private final SparkMaxConfig config = new SparkMaxConfig();
-
     private final SparkMaxConfig m_climbLeaderMotorConfig = new SparkMaxConfig();
     private final SparkMaxConfig m_climbFollowerMotorConfig = new SparkMaxConfig();
 
-    private final SparkClosedLoopController m_climbPIDController;
-
     private final Encoder m_absoluteEncoder = new Encoder(1, 0, false);
+
+    private final BangBangController m_bangBang = new BangBangController();
 
     public ClimbSubsystem() {
     
-        m_climbLeaderMotorConfig.closedLoop
-            .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
-            // Set PID values for position control. We don't need to pass a closed loop
-            // slot, as it will default to slot 0.
-            .p(0.1)
-            .i(0)
-            .d(0)
-            .outputRange(-1, 1)
-            // Set PID values for velocity control in slot 1
-            .p(0.0001, ClosedLoopSlot.kSlot1)
-            .i(0, ClosedLoopSlot.kSlot1)
-            .d(0, ClosedLoopSlot.kSlot1)
-            .velocityFF(1.0 / 5767, ClosedLoopSlot.kSlot1)
-            .outputRange(-1, 1, ClosedLoopSlot.kSlot1);
-
-        m_climbPIDController = m_climbLeaderMotor.getClosedLoopController();
         //clears any previous faults on motors
         //do this so that any errors from previous usage are cleared
         //if any errors persist, then we know there's an issue with the motors
@@ -65,8 +45,8 @@ public class ClimbSubsystem extends SubsystemBase {
 
         //ensures motors stay at their current position when no power is being applied to them.
         //we don't want the motors moving downwards when we want to it to stay up!
-        m_climbLeaderMotorConfig.idleMode(IdleMode.kBrake);
-        m_climbFollowerMotorConfig.idleMode(IdleMode.kBrake);       
+        m_climbLeaderMotorConfig.idleMode(IdleMode.kCoast);
+        m_climbFollowerMotorConfig.idleMode(IdleMode.kCoast);       
 
         //sets current limits to motors to ensure they do not exceed a set current limit
         //prevents damage towards motors from pulling too much current -- VERY IMPORTANT!
@@ -78,7 +58,6 @@ public class ClimbSubsystem extends SubsystemBase {
         m_absoluteEncoder.setMinRate(0);
         m_absoluteEncoder.setSamplesToAverage(0);
         
-
         //sets all configuration to the motors.
         //any previous parameters are reset here to be overwritten with new parameters.
         //these parameters will persist. This is incredibly important as without this, all parameters are wiped on reboot.        
@@ -97,8 +76,8 @@ public class ClimbSubsystem extends SubsystemBase {
     }
 
     //Sets powers to motors.
-    public void setMotorPower(double power) {
-        m_climbLeaderMotor.set(power);
+    public void runMotors() {
+        m_climbLeaderMotor.set(m_bangBang.calculate(m_absoluteEncoder.getRate(), ClimbConstants.kClimbRaisedPosition));
     }
     
 
@@ -118,7 +97,7 @@ public class ClimbSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Follower Motor Temperature", m_climbFollowerMotor.getMotorTemperature());
 
         //Checks to see if motors are going upwards and if the encoder has reached the set limit
-        if (m_climbLeaderMotor.get() > 0 && getEncoderDistance() > ClimbConstants.kClimbDownMotorSpeed) {
+        if (m_climbLeaderMotor.get() > 0 && getEncoderDistance() >= ClimbConstants.kClimbRaisedPosition) {
             stopMotors();
         }
 

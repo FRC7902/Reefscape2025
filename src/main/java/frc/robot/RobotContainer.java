@@ -7,19 +7,10 @@ package frc.robot;
 import java.io.File;
 
 import edu.wpi.first.wpilibj.Filesystem;
-import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.Autos;
-import frc.robot.commands.ExampleCommand;
-import frc.robot.commands.teleopCommands.climb.MoveClimbDown;
-import frc.robot.commands.teleopCommands.climb.MoveClimbUp;
-import frc.robot.subsystems.ClimbSubsystem;
-import frc.robot.subsystems.ExampleSubsystem;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.OperatorConstants;
@@ -29,7 +20,9 @@ import frc.robot.commands.teleop.IntakeAlgaeCommand;
 import frc.robot.commands.teleop.IntakeCoralCommand;
 import frc.robot.commands.teleop.NullCommand;
 import frc.robot.commands.teleop.OuttakeAlgaeCommand;
+import frc.robot.commands.teleopCommands.climb.MoveClimbUp;
 import frc.robot.subsystems.AlgaeElevatorManipulatorSubsystem;
+import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.IndexSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
@@ -168,10 +161,10 @@ public class RobotContainer {
 
         // runs the climb motors up when the up button is pressed on the POV buttons of
         // the controller.
-        m_operatorController.povUp().whileTrue(new MoveClimbUp(m_ClimbSubsystem));
+        m_operatorController.povUp().whileTrue(new MoveClimbUp(m_ClimbSubsystem, this));
         // runs the climb motors down when the down button is pressed on the POV buttons
         // of the controller.
-        m_operatorController.povDown().whileTrue(new MoveClimbDown(m_ClimbSubsystem));
+        m_operatorController.povDown().whileTrue(new MoveClimbDown(m_ClimbSubsystem, this));
     }
 
     /**
