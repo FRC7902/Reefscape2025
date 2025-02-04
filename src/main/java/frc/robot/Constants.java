@@ -47,6 +47,9 @@ public final class Constants {
     public static final double kClimbUpMotorSpeed = 0.5;
     //speed of motors when moving down
     public static final double kClimbDownMotorSpeed = 0.5;
+
+    public static final double kClimbEncoderLimit = 0.5;
+
   }
 
   public static class OperatorConstants {
