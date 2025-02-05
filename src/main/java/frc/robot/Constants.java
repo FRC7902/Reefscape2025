@@ -71,4 +71,3 @@ public final class Constants {
     public static final double kElevatorDistPerPulse = (2 * Math.PI * kDrumRadius) / (kEncoderCPR / 4);
   }
 }
-}
