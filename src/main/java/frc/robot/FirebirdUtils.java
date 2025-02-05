@@ -9,10 +9,10 @@ import frc.robot.Constants.*;
 public class FirebirdUtils {
 
     public double metersToRotations(double meters) {
-        return meters / (2 * Math.PI * Constants.ElevatorConstants.kDrumRadius);
+        return meters / (2 * Math.PI * Constants.ElevatorConstants.kDrumRadius) * ElevatorConstants.kGearRatio;
     }
 
     public double rotationsToMeters(double rotations) {
-        return rotations * (2 * Math.PI * Constants.ElevatorConstants.kDrumRadius);
+        return rotations * (2 * Math.PI * Constants.ElevatorConstants.kDrumRadius)  / ElevatorConstants.kGearRatio;
     }
 }
