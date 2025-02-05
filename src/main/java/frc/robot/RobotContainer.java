@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ElevatorConstants;
@@ -18,10 +17,9 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.SetShootSpeed;
 import frc.robot.commands.teleop.IntakeAlgaeCommand;
 import frc.robot.commands.teleop.IntakeCoralCommand;
-import frc.robot.commands.teleop.NullCommand;
 import frc.robot.commands.teleop.OuttakeAlgaeCommand;
+import frc.robot.commands.teleop.NullCommand;
 import frc.robot.subsystems.AlgaeElevatorManipulatorSubsystem;
-import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.IndexSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import swervelib.SwerveInputStream;
@@ -38,11 +36,10 @@ import swervelib.SwerveInputStream;
 public class RobotContainer {
     // The robot's subsystems and commands are defined here...
     public static final AlgaeElevatorManipulatorSubsystem m_algaeElevatorManipulatorSubsystem = new AlgaeElevatorManipulatorSubsystem();
-    // The robot's subsystems and commands are defined here...
-    private final ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
 
     public static final IndexSubsystem m_indexSubsystem = new IndexSubsystem();
 
+    // Replace with CommandPS4Controller or CommandJoystick if needed
     private final CommandXboxController m_driverController = new CommandXboxController(
             OperatorConstants.kDriverControllerPort);
     private final CommandXboxController m_operatorController = new CommandXboxController(
@@ -148,20 +145,6 @@ public class RobotContainer {
                 new ConditionalCommand(new IntakeCoralCommand(), new NullCommand(), m_indexSubsystem::isBeamBroken));
 
         m_driverController.rightTrigger().whileTrue(new SetShootSpeed());
-
-        m_operatorController.a()
-                .onTrue(new InstantCommand(() -> m_elevatorSubsystem.reachGoal(ElevatorConstants.kLevel1)));
-        m_operatorController.b()
-                .onTrue(new InstantCommand(() -> m_elevatorSubsystem.reachGoal(ElevatorConstants.kLevel2)));
-        m_operatorController.y()
-                .onTrue(new InstantCommand(() -> m_elevatorSubsystem.reachGoal(ElevatorConstants.kLevel3)));
-
-        m_operatorController.a()
-                .onTrue(new InstantCommand(() -> m_elevatorSubsystem.setHeight(ElevatorConstants.kLevel1)));
-        m_operatorController.b()
-                .onTrue(new InstantCommand(() -> m_elevatorSubsystem.setHeight(ElevatorConstants.kLevel2)));
-        m_operatorController.y()
-                .onTrue(new InstantCommand(() -> m_elevatorSubsystem.setHeight(ElevatorConstants.kLevel3)));
     }
 
     /**

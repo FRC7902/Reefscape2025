@@ -93,6 +93,8 @@ public final class Constants {
     public static final double kLevel3 = Units.inchesToMeters(72.0);
 
     public static final double kTargetError = 2;
+    public static final double kMotorResistance = 0.002; // Assume 2mOhm resistance for voltage drop calculation
+    public static final double kMotorMetresPerRotation = 2 * Math.PI * kDrumRadius / kGearRatio;
 
     public static final double kElevatorDistPerPulse = (2 * Math.PI * kDrumRadius) / (kEncoderCPR / 4);
 
