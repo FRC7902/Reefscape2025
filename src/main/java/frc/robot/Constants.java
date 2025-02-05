@@ -102,4 +102,5 @@ public final class Constants {
     public static final double kElevatorMotorResistance = 0.002; // Assume 2mOhm resistance for voltage drop calculation
 
   }
+
 }
