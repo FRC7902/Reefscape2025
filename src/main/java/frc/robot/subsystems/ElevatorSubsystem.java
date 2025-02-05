@@ -9,6 +9,7 @@ import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -43,21 +44,15 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.FirebirdUtils;
 import frc.robot.Constants.ElevatorConstants;
 
-public class ElevatorSubsystem extends SubsystemBase implements AutoCloseable {
+public class ElevatorSubsystem extends SubsystemBase {
 
   // Declare motor controllers
   private final TalonFX m_elevatorLeaderMotor = new TalonFX(ElevatorConstants.kElevatorLeaderCAN);
   private final TalonFX m_elevatorFollowerMotor = new TalonFX(ElevatorConstants.kElevatorFollowerCAN);
 
-  private TalonFXConfiguration m_elevatorConfig = new TalonFXConfiguration();
-  
-  private final MotionMagicVoltage m_motionMagicRequest = new MotionMagicVoltage(0).withSlot(0);
+  private MotionMagicVoltage m_request = new MotionMagicVoltage(0).withSlot(0);
 
-  private final Encoder m_encoder = new Encoder(0, 1);
-  private final PWMSparkMax m_motor = new PWMSparkMax(0);
-
-  private final EncoderSim m_encoderSim = new EncoderSim(m_encoder);
-  private final PWMSim m_motorSim = new PWMSim(m_motor);
+  private static final FirebirdUtils util = new FirebirdUtils();
 
   private final ExponentialProfile m_profile = new ExponentialProfile(
       ExponentialProfile.Constraints.fromCharacteristics(
@@ -67,7 +62,7 @@ public class ElevatorSubsystem extends SubsystemBase implements AutoCloseable {
 
   private ExponentialProfile.State m_setpoint = new ExponentialProfile.State(0, 0);
 
-  /** Object of a simualted elevator */
+  /** Object of a simulated elevator */
   private final ElevatorSim m_elevatorSim = new ElevatorSim(
       DCMotor.getFalcon500(2),
       ElevatorConstants.kGearRatio,
@@ -77,9 +72,8 @@ public class ElevatorSubsystem extends SubsystemBase implements AutoCloseable {
       ElevatorConstants.kElevatorMaxHeightMeters,
       true,
       ElevatorConstants.kElevatorHeightMeters,
-      0.01, // add noise
-      0
-      );
+      0.01, // add some noise
+      0);
 
   private final ElevatorFeedforward m_elevatorFeedForward = new ElevatorFeedforward(
       ElevatorConstants.kS,
@@ -97,16 +91,43 @@ public class ElevatorSubsystem extends SubsystemBase implements AutoCloseable {
   private final MechanismRoot2d m_mech2dRoot = m_mech2d.getRoot("Elevator Root", Units.inchesToMeters(5),
       Units.inchesToMeters(0.5));
   private final MechanismLigament2d m_elevatorMech2d = m_mech2dRoot.append(
-      new MechanismLigament2d("Elevator", m_elevatorSim.getPositionMeters(), 90, 7, new Color8Bit(Color.kAntiqueWhite)));
+      new MechanismLigament2d("Elevator", m_elevatorSim.getPositionMeters(), 90, 7,
+          new Color8Bit(Color.kAntiqueWhite)));
 
   /** Creates a new ElevatorSubsystem */
   public ElevatorSubsystem() {
-    m_encoder.setDistancePerPulse(ElevatorConstants.kElevatorDistPerPulse);
-
     if (RobotBase.isSimulation()) {
       SmartDashboard.putData("Elevator Sim", m_mech2d);
       m_elevatorMech2d.setColor(new Color8Bit(Color.kAntiqueWhite));
     }
+
+    TalonFXConfiguration config = new TalonFXConfiguration();
+
+    config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+
+    // Set slot
+    config.Slot0.kP = ElevatorConstants.kP;
+    config.Slot0.kI = ElevatorConstants.kI;
+    config.Slot0.kD = ElevatorConstants.kD;
+    config.Slot0.kS = ElevatorConstants.kS;
+    config.Slot0.kV = ElevatorConstants.kV;
+    config.Slot0.kA = ElevatorConstants.kA;
+    config.Slot0.kG = ElevatorConstants.kG;
+
+    config.MotionMagic.MotionMagicCruiseVelocity = 80;
+    config.MotionMagic.MotionMagicAcceleration = 160;
+    config.MotionMagic.MotionMagicJerk = 1600;
+
+    config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+    config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = util.metersToRotations(ElevatorConstants.kElevatorMaxHeightMeters);
+    config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+    config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0;
+
+    m_elevatorLeaderMotor.getConfigurator().apply(config);
+    m_elevatorFollowerMotor.getConfigurator().apply(config);
+
+    m_elevatorFollowerMotor.setControl(new Follower(m_elevatorLeaderMotor.getDeviceID(), true));
 
     // // Base Motor configuration
     // m_elevatorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
@@ -129,24 +150,6 @@ public class ElevatorSubsystem extends SubsystemBase implements AutoCloseable {
     // m_elevatorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
     // m_elevatorConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 1.25;
 
-    // // Gains and PID configuration
-    // m_elevatorConfig.Slot0.kP = ElevatorConstants.kP;
-    // m_elevatorConfig.Slot0.kI = ElevatorConstants.kI;
-    // m_elevatorConfig.Slot0.kD = ElevatorConstants.kD;
-    // m_elevatorConfig.Slot0.kS = ElevatorConstants.kS;
-    // m_elevatorConfig.Slot0.kV = ElevatorConstants.kV;
-    // m_elevatorConfig.Slot0.kA = ElevatorConstants.kA;
-    // m_elevatorConfig.Slot0.kG = ElevatorConstants.kG;
-
-    // // Motion Magic configuration
-    // m_elevatorConfig.MotionMagic.MotionMagicCruiseVelocity = 80; // Adjust as
-    // needed
-    // m_elevatorConfig.MotionMagic.MotionMagicAcceleration = 160; // Adjust as
-    // needed
-    // m_elevatorConfig.MotionMagic.MotionMagicJerk = 1600; // Adjust as needed
-
-    // m_elevatorLeaderMotor.getConfigurator().apply(m_elevatorConfig);
-
     // // Set update frequencies
     // m_elevatorLeaderMotor.getPosition().setUpdateFrequency(50);
     // m_elevatorLeaderMotor.getVelocity().setUpdateFrequency(50);
@@ -155,24 +158,17 @@ public class ElevatorSubsystem extends SubsystemBase implements AutoCloseable {
     // m_elevatorLeaderMotor.getTorqueCurrent().setUpdateFrequency(50);
     // m_elevatorLeaderMotor.optimizeBusUtilization();
 
-    // // Initialize elevator state
-    // m_homed = false;
-
   }
 
-  /** Stop motor output */
+  /** Stop the motors */
   public void stop() {
     m_elevatorLeaderMotor.stopMotor();
     m_elevatorFollowerMotor.stopMotor();
-
-    if (RobotBase.isSimulation()) {
-      m_motor.set(0);
-    }
   }
 
   /** Reset Exponential profile to begin on current position on enable */
   public void reset() {
-    m_setpoint = new ExponentialProfile.State(m_encoder.getDistance(), 0);
+    m_setpoint = new ExponentialProfile.State(m_elevatorLeaderMotor.getPosition().getValueAsDouble(), 0);
   }
 
   /**
@@ -180,88 +176,98 @@ public class ElevatorSubsystem extends SubsystemBase implements AutoCloseable {
    * 
    * @param goal the position to maintain
    */
-  public void reachGoal(double goal) {
-    // Create goal state
-    var goalState = new ExponentialProfile.State(goal, 0);
+  // public void reachGoal(double goal) {
+  // // Create goal state
+  // var goalState = new ExponentialProfile.State(goal, 0);
 
-    // Calculate next state
-    var next = m_profile.calculate(0.020, m_setpoint, goalState);
+  // // Calculate next state
+  // var next = m_profile.calculate(0.020, m_setpoint, goalState);
 
-    // With the setpoint value, run PID like normal
-    double pidOutput = m_pidController.calculate(m_encoder.getDistance(), m_setpoint.position);
-    double feedforwardOutput = m_elevatorFeedForward.calculateWithVelocities(m_setpoint.velocity, next.velocity);
+  // // With the setpoint value, run PID like normal
+  // double pidOutput =
+  // m_pidController.calculate(m_elevatorLeaderMotor.getPosition().getValueAsDouble(),
+  // m_setpoint.position);
+  // double feedforwardOutput =
+  // m_elevatorFeedForward.calculateWithVelocities(m_setpoint.velocity,
+  // next.velocity);
 
-    // Set motor output
-    m_motor.setVoltage(pidOutput + feedforwardOutput);
+  // // Set motor output
+  // m_elevatorLeaderMotor.setVoltage(pidOutput + feedforwardOutput);
 
-    // Update setpoint
-    m_setpoint = next;
-  }
+  // // Update setpoint
+  // m_setpoint = next;
+  // }
 
   /** Update telemetry, including the mechanism visualization */
   public void updateTelemetry() {
-    // Update elevator visualization with position
-    m_elevatorMech2d.setLength(m_encoder.getDistance());
+    m_elevatorMech2d.setLength(getPosition());
   }
 
-  @Override
-  public void close() {
-    m_encoder.close();
-    m_motor.close();
-    m_mech2d.close();
+  /**
+   * Set the position of the elevator
+   * 
+   * @param position of elevator
+   */
+  public void setPosition(double position) {
+    // Use Motion Magic for smooth trajectory following
+    m_elevatorLeaderMotor.setControl(m_request.withPosition(position)
+        .withSlot(0)
+        .withFeedForward(m_elevatorFeedForward.calculate(position)));
+
+    // Update internal state
+    m_setpoint = new ExponentialProfile.State(position, 0);
   }
 
-  /** Sets the height of the elevator */
-  public void setHeight(double position) {
-    // deprecated
-    // final MotionMagicVoltage request = new MotionMagicVoltage(setpoint)
-    // .withSlot(0)
-    // .withFeedForward(m_elevatorFeedForward.calculate(setpoint,
-    // m_elevatorSim.getVelocityMetersPerSecond()));
-    // m_elevatorLeaderMotor.setControl(request.withPosition(setpoint));
-  }
-
-  /** Gets the current height of the elevator */
-  public double getHeight() {
+  /** Gets the current position of the elevator */
+  public double getPosition() {
     return m_elevatorLeaderMotor.getPosition().getValueAsDouble();
   }
 
   /** Zero the elevator */
   public void zero() {
-    m_elevatorLeaderMotor.setPosition(0, 10);
+    setPosition(0);
+    m_elevatorLeaderMotor.setPosition(0);
+    setSetpoint(0);
   }
 
   /** Returns whether the elevator is at the setpoint */
   public boolean isFinished() {
-    if (Math.abs(getHeight() - m_setpoint.position) < ElevatorConstants.kTargetError) {
-      return true;
-    } else {
-      return false;
-    }
+    return Math.abs(getPosition() - m_setpoint.position) < ElevatorConstants.kTargetError;
+  }
+
+  public void setSetpoint(double setpoint) {
+    m_setpoint = new ExponentialProfile.State(setpoint, 0);
   }
 
   @Override
   public void periodic() {
-    // SmartDashboard.putNumber("Elevator position", m_encoder.getDistance());
-    // SmartDashboard.putNumber("Elevator setpoint position", m_setpoint.position);
-    // // SmartDashboard.putNumber("Elevator Goal Position", );
-    // SmartDashboard.putNumber("Elevator setpoint velocity", m_setpoint.velocity);
+
+    SmartDashboard.putNumber("Elevator position", util.rotationsToMeters(getPosition()));
+    SmartDashboard.putNumber("Elevator setpoint position", util.rotationsToMeters(m_setpoint.position));
+
+    SmartDashboard.putNumber("Elevator velocity", m_elevatorLeaderMotor.get());
+    SmartDashboard.putNumber("Elevator setpoint velocity", m_setpoint.velocity);
+
+    updateTelemetry();
   }
 
   @Override
   public void simulationPeriodic() {
-    SmartDashboard.putNumber("Elevator position", m_encoder.getDistance());
-    SmartDashboard.putNumber("Elevator setpoint position", m_setpoint.position);
-    // SmartDashboard.putNumber("Elevator Goal Position", );
-    SmartDashboard.putNumber("Elevator setpoint velocity", m_setpoint.velocity);
-
-    m_elevatorSim.setInput(m_motorSim.getSpeed() * RobotController.getBatteryVoltage());
-
+    // Use TalonFXSimState for proper simulation integration
+    m_elevatorSim.setInputVoltage(m_elevatorLeaderMotor.get() * RobotController.getBatteryVoltage());
     m_elevatorSim.update(0.020);
 
-    m_encoderSim.setDistance(m_elevatorSim.getPositionMeters());
+    // Update simulated motor position/velocity
+    final double positionRot = util.metersToRotations(m_elevatorSim.getPositionMeters());
+    final double velocityRps = util.metersToRotations(m_elevatorSim.getVelocityMetersPerSecond());
 
+    // Use TalonFXSimState for accurate simulation updates
+    m_elevatorLeaderMotor.getSimState().setRawRotorPosition(positionRot);
+    m_elevatorLeaderMotor.getSimState().setRotorVelocity(velocityRps);
+
+    // Update battery simulation
     RoboRioSim.setVInVoltage(
         BatterySim.calculateDefaultBatteryLoadedVoltage(m_elevatorSim.getCurrentDrawAmps()));
   }
+
 }

@@ -8,6 +8,7 @@ import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.ElevatorSubsystem;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -30,6 +31,8 @@ public class RobotContainer {
   private final ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
 
   private final Joystick m_joystick = new Joystick(0);
+
+  FirebirdUtils util = new FirebirdUtils();
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -54,14 +57,23 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-      JoystickButton aButton = new JoystickButton(m_joystick, XboxController.Button.kA.value); // 1
-      JoystickButton bButton = new JoystickButton(m_joystick, XboxController.Button.kB.value); // 2
-      JoystickButton yButton = new JoystickButton(m_joystick, XboxController.Button.kY.value); // 4
 
-      aButton.onTrue(new InstantCommand(() -> m_elevatorSubsystem.setHeight(ElevatorConstants.kLevel1)));
-      bButton.onTrue(new InstantCommand(() -> m_elevatorSubsystem.setHeight(ElevatorConstants.kLevel2)));
-      yButton.onTrue(new InstantCommand(() -> m_elevatorSubsystem.setHeight(ElevatorConstants.kLevel3)));
+    // test setpoints one at a time
+    new JoystickButton(m_joystick, 1)
+        .onTrue(new InstantCommand(() -> m_elevatorSubsystem.setPosition(
+            util.metersToRotations(ElevatorConstants.kLevel1))));
 
+    // new JoystickButton(m_joystick, 2)
+    // .onTrue(new InstantCommand(() -> m_elevatorSubsystem.setPosition(
+    // util.metersToRotations(ElevatorConstants.kLevel2))));
+
+    // new JoystickButton(m_joystick, 3)
+    //     .onTrue(new InstantCommand(() -> m_elevatorSubsystem.setPosition(
+    //         util.metersToRotations(ElevatorConstants.kLevel3))));
+
+    // manually reset the elevator
+    new JoystickButton(m_joystick, 4)
+        .onTrue(new InstantCommand(() -> m_elevatorSubsystem.zero()));
   }
 
   /**
