@@ -24,44 +24,51 @@ public final class Constants {
     public static final int kOperatorControllerPort = 1;
   }
 
-  public static class ElevatorConstants {
+  public static final class ElevatorConstants {
+    // CAN IDs
     public static final int kElevatorLeaderCAN = 0;
     public static final int kElevatorFollowerCAN = 1;
 
+    // Physical Constants
     public static final double kGearRatio = 7.5;
     public static final double kCarriageMass = Units.lbsToKilograms(20);
-    public static final double kDrumRadius = Units.inchesToMeters(1.625/2);
+    public static final double kDrumRadius = Units.inchesToMeters(1.625 / 2);
     public static final double kElevatorMetersPerMotorRotation = (kDrumRadius * 2 * Math.PI) / kGearRatio;
+    public static final double kMotorMetresPerRotation = 2 * Math.PI * kDrumRadius / kGearRatio;
 
+    // Elevator Dimensions
     public static final double kElevatorHeightMeters = 0.0;
     public static final double kElevatorMinHeightMeters = 0.0;
     public static final double kElevatorMaxHeightMeters = Units.inchesToMeters(39.75);
 
+    // Motion Constraints
     public static final double kMaxVelocity = 1.70;
     public static final double kMaxAcceleration = 1.0; // TODO: modify
 
+    // PID Constants
     public static final double kP = 1;
     public static final double kI = 0.0;
     public static final double kD = 0.01;
 
+    // Feedforward Constants
     public static final double kMaxV = 10.0; // volts
     public static final double kS = 0.0; // negligible
     public static final double kG = 0.2;
     public static final double kV = 6.85 * kElevatorMetersPerMotorRotation;
     public static final double kA = 0.04 * kElevatorMetersPerMotorRotation;
 
-    // Elevator setpoints
+    // Elevator Setpoints
     public static final double kLevel1 = Units.inchesToMeters(31.875);
     public static final double kLevel2 = Units.inchesToMeters(47.625);
     public static final double kLevel3 = Units.inchesToMeters(72.0);
 
+    // Control Parameters
     public static final double kTargetError = 2;
     public static final double kMotorResistance = 0.002; // Assume 2mOhm resistance for voltage drop calculation
-    public static final double kMotorMetresPerRotation = 2 * Math.PI * kDrumRadius / kGearRatio;
 
+    // Encoder Constants
     public static final int kEncoderCPR = 2048;
     public static final double kElevatorDistPerPulse = (2 * Math.PI * kDrumRadius) / (kEncoderCPR / 4);
-    
-
   }
+}
 }

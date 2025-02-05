@@ -61,15 +61,15 @@ public class RobotContainer {
     // test setpoints one at a time
     new JoystickButton(m_joystick, 1)
         .onTrue(new InstantCommand(() -> m_elevatorSubsystem.setPosition(
-            util.metersToRotations(ElevatorConstants.kLevel1))));
+            ElevatorConstants.kLevel1 * ElevatorConstants.kElevatorMetersPerMotorRotation)));
 
     // new JoystickButton(m_joystick, 2)
     // .onTrue(new InstantCommand(() -> m_elevatorSubsystem.setPosition(
-    // util.metersToRotations(ElevatorConstants.kLevel2))));
+    //         ElevatorConstants.kLevel2 * ElevatorConstants.kElevatorMetersPerMotorRotation)));
 
     // new JoystickButton(m_joystick, 3)
     //     .onTrue(new InstantCommand(() -> m_elevatorSubsystem.setPosition(
-    //         util.metersToRotations(ElevatorConstants.kLevel3))));
+    //         ElevatorConstants.kLevel3 * ElevatorConstants.kElevatorMetersPerMotorRotation)));
 
     // manually reset the elevator
     new JoystickButton(m_joystick, 4)
