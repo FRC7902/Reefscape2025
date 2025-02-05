@@ -211,8 +211,7 @@ public class ElevatorSubsystem extends SubsystemBase {
   public void setPosition(double position) {
     // Use Motion Magic for smooth trajectory following
     m_elevatorLeaderMotor.setControl(m_request.withPosition(position)
-        .withSlot(0)
-        .withFeedForward(m_elevatorFeedForward.calculate(position)));
+        .withSlot(0));
 
     // Update internal state
     m_setpoint = new ExponentialProfile.State(position, 0);
@@ -243,7 +242,7 @@ public class ElevatorSubsystem extends SubsystemBase {
   public void periodic() {
 
     SmartDashboard.putNumber("Elevator position", util.rotationsToMeters(getPosition()));
-    SmartDashboard.putNumber("Elevator setpoint position", util.rotationsToMeters(m_setpoint.position));
+    SmartDashboard.putNumber("Elevator setpoint position", util.rotationsToMeters(m_elevatorLeaderMotor.getClosedLoopReference().getValueAsDouble()));
 
     SmartDashboard.putNumber("Elevator velocity", m_elevatorLeaderMotor.get());
     SmartDashboard.putNumber("Elevator setpoint velocity", m_setpoint.velocity);
@@ -254,7 +253,7 @@ public class ElevatorSubsystem extends SubsystemBase {
   @Override
   public void simulationPeriodic() {
     // Use TalonFXSimState for proper simulation integration
-    m_elevatorSim.setInputVoltage(m_elevatorLeaderMotor.get() * RobotController.getBatteryVoltage());
+    m_elevatorSim.setInputVoltage(m_elevatorLeaderMotor.getMotorVoltage().getValueAsDouble());
     m_elevatorSim.update(0.020);
 
     // Update simulated motor position/velocity
