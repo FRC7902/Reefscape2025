@@ -1,13 +1,10 @@
 package frc.robot.subsystems;
-
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
-
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.OperatorConstants;
-
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 
@@ -24,7 +21,7 @@ public class AlgaeEffectorSubsystem extends SubsystemBase {
     
     //constructor
     public AlgaeEffectorSubsystem() { 
-
+        
 
         //Set the current limit for the intake motor 
         intakeMotorConfig.smartCurrentLimit(OperatorConstants.motorCurrentLimit,OperatorConstants.motorCurrentLimit); 
@@ -56,6 +53,11 @@ public class AlgaeEffectorSubsystem extends SubsystemBase {
         intakeMotor.setVoltage(0);
     }
 
+    //Move to a certain angle using PID method
+
+    public void goToHeight(){
+        
+    }
 
 }
 
