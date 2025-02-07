@@ -27,7 +27,7 @@ public class RobotContainer {
 
   private final XboxController m_operatorStick = new XboxController (IOConstants.kOperatorStick);
 
-  private final IntakeSubsystem m_intake = new IntakeSubsystem(m_operatorStick);
+  private final AlgaeEffectorSubsystem m_intake = new AlgaeEffectorSubsystem(m_operatorStick);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {

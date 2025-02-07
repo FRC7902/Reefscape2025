@@ -14,6 +14,8 @@ public class AlgaeEffectorSubsystem extends SubsystemBase {
     //The beam break sensor 
     private DigitalInput beamBreakSensor = new DigitalInput(OperatorConstants.beamBreakPort); 
 
+
+ 
     //The intake motor
     private SparkMax groundIntakeRoller = new SparkMax(0, MotorType.kBrushless); 
 
@@ -26,6 +28,8 @@ public class AlgaeEffectorSubsystem extends SubsystemBase {
     //
     private final SparkMax  elevatorManipulator = new SparkMax(1, MotorType.kBrushless);
     private final SparkMaxConfig elevatorManipulatorConfig = new SparkMaxConfig();
+
+
 
     //constructor
     public AlgaeEffectorSubsystem() { 
@@ -59,6 +63,18 @@ public class AlgaeEffectorSubsystem extends SubsystemBase {
     //Stop the algae intake motor 
     public void algaeStop() {
         groundIntakeRoller.setVoltage(0);
+    }
+
+    public void startElevatorManipulator(){
+           elevatorManipulator.setVoltage(7);
+    }
+
+    public void stopElevatorManipulator(){
+        elevatorManipulator.setVoltage(0);
+    }
+
+    public void reverseElevatorManipulator(){
+        elevatorManipulator.setVoltage(-7);
     }
 
     //Move to a certain angle using PID method

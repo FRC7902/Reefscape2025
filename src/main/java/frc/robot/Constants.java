@@ -23,7 +23,11 @@ public final class Constants {
     public static final int motorCurrentLimit=40; 
     public static final int intakeVoltage=7;
     public static final int outtakeVoltage=-7;
+    public static final int elevatorManipulatorVoltage=7;
+    public static final int elevatorManipulatorReverseVoltage=-7;
     public static final int beamBreakPort=-1;
+    public static final int elevatorManipulatorPort=7;//idk
+
   }
 
   public static class IntakeConstants {
@@ -36,7 +40,7 @@ public final class Constants {
     public static final double kSFeedForward = 0;
     public static final double kVFeedForward = 0;
     public static final double kAFeedForward = 0;
-    public static final int intakeCurrentLimit = 15;
+    public static final int intakeCurrentLimit = 40;
     public static final double intakeTargetSpeed = 1;
     public static final double pullingSpeed = -0.1;
   }
