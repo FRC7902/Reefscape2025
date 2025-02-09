@@ -50,7 +50,7 @@ public class Vision extends SubsystemBase {
       AprilTagFields.k2025Reefscape);
   private final       double              maximumAmbiguity                = 0.25;
   public              VisionSystemSim     visionSim;
-  private             double              longDistangePoseEstimationCount = 0;
+  private             double              longDistancePoseEstimationCount = 0;
   private             Supplier<Pose2d>    currentPose;
   private             Field2d             field2d;
 
