@@ -21,17 +21,20 @@ public class ClimbSubsystem extends SubsystemBase {
     private final SparkMax  m_climbLeaderMotor = new SparkMax(ClimbConstants.kClimbLeaderMotorCANID, MotorType.kBrushless);
     private final SparkMax m_climbFollowerMotor = new SparkMax(ClimbConstants.kClimbLeaderMotorCANID, MotorType.kBrushless);
 
-    //object creation of motor configuration
+    //object creation of motor configuration (used to configure tbe motors)
     private final SparkMaxConfig m_climbLeaderMotorConfig = new SparkMaxConfig();
     private final SparkMaxConfig m_climbFollowerMotorConfig = new SparkMaxConfig();
 
+    //object creation of absolute encoder. The REV Through bore encoder is used for climb
     private final AnalogEncoder m_absoluteEncoder = new AnalogEncoder(0, 0, 0);
 
+    //object creation of bangbang controller
+    //bang-bang controllers are used in high-inertia system. Considering the climb will be carrying the whole robot, it falls under "high inertia".
+    //bang-bang controllers have faster recovery times than pid controllers, resulting in the control effort in the front direction to be as large as possible
+    //we want this as the climb should move as fast as possible (as you will generally be climbing in the last few seconds of the match)
+    //BE SURE TO SET THE MOTORS TO COAST INSTEAD OF BRAKE FOR IDLE ACTION!!! BRAKE CAN CAUSE DESTRUCTIVE OSCILLATION and a very upset argoon
+    //ariana grande would love this controller
     private final BangBangController m_bangBang = new BangBangController();
-
-    private Faults m_climbLeaderMotorFaults;
-    private Faults m_climbFollowerMotorFaults;
-
 
     public ClimbSubsystem() {
     
@@ -60,7 +63,10 @@ public class ClimbSubsystem extends SubsystemBase {
         m_climbLeaderMotorConfig.smartCurrentLimit(ClimbConstants.kMotorStallCurrent, ClimbConstants.kMotorFreeSpeedCurrent, ClimbConstants.kMotorRPMLimit);
         m_climbFollowerMotorConfig.smartCurrentLimit(ClimbConstants.kMotorStallCurrent, ClimbConstants.kMotorFreeSpeedCurrent, ClimbConstants.kMotorRPMLimit);
 
+        //inverts the encoder on true (if motor is spinning counter-clockwise)
         m_absoluteEncoder.setInverted(false);
+        //similar to controller deadband, reduces sensitivity of inputs
+        //in this case, it is when the absolute encoder reaches the end of its range, which can result in instability.
         m_absoluteEncoder.setVoltagePercentageRange(0, 0);
         
         //sets all configuration to the motors.
@@ -85,6 +91,7 @@ public class ClimbSubsystem extends SubsystemBase {
         m_climbLeaderMotor.set(m_bangBang.calculate(m_absoluteEncoder.get(), ClimbConstants.kClimbRaisedPosition));
     }
     
+    //This function returns the type of error the motor is experiencing should it have an error.
     public String reportMotorError(SparkMax motor) {
         Faults motorFault = motor.getFaults();
         if (motorFault.can) {
@@ -131,6 +138,7 @@ public class ClimbSubsystem extends SubsystemBase {
             stopMotors();
         }
 
+        //Checks to see if any of the motors have any faults, and if so, reports it to DriverStation
         if (m_climbLeaderMotor.hasActiveFault()) {
             DriverStation.reportWarning("MOTOR WARNING: SparkMax ID " + ClimbConstants.kClimbLeaderMotorCANID + " is currently reporting an error with: \"" + reportMotorError(m_climbLeaderMotor) + "\"", true);
         }
