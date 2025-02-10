@@ -43,7 +43,7 @@ public class MoveClimbUp extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_climb.stopSimMotors();
+    m_climb.stopMotors();
   }
 
   // Returns true when the command should end.
