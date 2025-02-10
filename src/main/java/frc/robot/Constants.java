@@ -18,9 +18,7 @@ public final class Constants {
     //CAN ID of the primary motor
     public static final int kClimbLeaderMotorCANID = 0;
     //CAN ID of the secondary motor
-    public static final int kClimbFollowerMotorCANID = 0;
-    //port ID of the limit switch 
-    public static final int kLimitSwitchPin = 0;
+    public static final int kClimbFollowerMotorCANID = 1;
     //current limit when motor rpm is at 0 (in amps)
     public static final int kMotorStallCurrent = 0;
     //current limit when motor rpm is greater than 5700 rpm (since we are using neo motors) (in amps)
@@ -39,7 +37,7 @@ public final class Constants {
 
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
-    public static final int kOperatorControllerPort = 0;
+    public static final int kOperatorControllerPort = 1;
 
   }
 }

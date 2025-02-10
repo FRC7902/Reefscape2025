@@ -10,9 +10,14 @@ import frc.robot.commands.ExampleCommand;
 import frc.robot.commands.teleopCommands.climb.MoveClimbUp;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.ExampleSubsystem;
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.event.BooleanEvent;
+import edu.wpi.first.wpilibj.simulation.JoystickSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -25,15 +30,15 @@ public class RobotContainer {
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   //creates an object of the climb subsystem
   private final ClimbSubsystem m_ClimbSubsystem = new ClimbSubsystem();
-
   // Replace with CommandPS4Controller or CommandJoystick if needed
   //driver controller
+  public final Joystick m_simJoystick = new Joystick(0);
+
   public final CommandXboxController m_driverController =
       new CommandXboxController(OperatorConstants.kDriverControllerPort);
   //operator controller
   public final CommandXboxController m_operatorController =
       new CommandXboxController(OperatorConstants.kOperatorControllerPort);    
-
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the trigger bindings
