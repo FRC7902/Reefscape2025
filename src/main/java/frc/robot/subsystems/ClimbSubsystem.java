@@ -132,10 +132,10 @@ public class ClimbSubsystem extends SubsystemBase {
         }
 
         if (m_climbLeaderMotor.hasActiveFault()) {
-            DriverStation.reportWarning("MOTOR WARNING: The leader motor is currently reporting an error with: \"" + reportMotorError(m_climbLeaderMotor) + "\"", true);
+            DriverStation.reportWarning("MOTOR WARNING: Motor ID " + ClimbConstants.kClimbLeaderMotorCANID + " is currently reporting an error with: \"" + reportMotorError(m_climbLeaderMotor) + "\"", true);
         }
         if (m_climbFollowerMotor.hasActiveFault()) {
-            DriverStation.reportWarning("MOTOR WARNING: The follower motor is currently reporting an error with: \"" + reportMotorError(m_climbFollowerMotor) + "\"", true);
+            DriverStation.reportWarning("MOTOR WARNING: Motor ID " + ClimbConstants.kClimbFollowerMotorCANID + " is currently reporting an error with: \"" + reportMotorError(m_climbFollowerMotor) + "\"", true);
         }
 
     }
