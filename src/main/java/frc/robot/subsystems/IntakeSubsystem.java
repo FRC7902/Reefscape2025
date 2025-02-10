@@ -23,7 +23,6 @@ public class IntakeSubsystem extends SubsystemBase {
   public boolean beamBrakeOverride = false;
   
   /** Creates a new IntakeSubsystem. */
-  //testing
   public IntakeSubsystem(XboxController operatorStick) {
     m_operatorStick = operatorStick;
     stopMotor();
