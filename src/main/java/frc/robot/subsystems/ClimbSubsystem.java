@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.sim.SparkMaxSim;
 import com.revrobotics.spark.SparkBase.Faults;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -8,9 +9,17 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.BangBangController;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.AnalogEncoder;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.simulation.AnalogEncoderSim;
+import edu.wpi.first.wpilibj.simulation.AnalogGyroSim;
+import edu.wpi.first.wpilibj.simulation.BatterySim;
+import edu.wpi.first.wpilibj.simulation.ElevatorSim;
+import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ClimbConstants;
@@ -19,14 +28,22 @@ public class ClimbSubsystem extends SubsystemBase {
 
     //object creation of motors
     private final SparkMax  m_climbLeaderMotor = new SparkMax(ClimbConstants.kClimbLeaderMotorCANID, MotorType.kBrushless);
-    private final SparkMax m_climbFollowerMotor = new SparkMax(ClimbConstants.kClimbLeaderMotorCANID, MotorType.kBrushless);
+    private final SparkMax m_climbFollowerMotor = new SparkMax(ClimbConstants.kClimbFollowerMotorCANID, MotorType.kBrushless);
 
+    private final SparkMaxSim s_climbLeaderMotor = new SparkMaxSim(m_climbLeaderMotor, DCMotor.getNeo550(2));
+
+    
     //object creation of motor configuration (used to configure tbe motors)
     private final SparkMaxConfig m_climbLeaderMotorConfig = new SparkMaxConfig();
     private final SparkMaxConfig m_climbFollowerMotorConfig = new SparkMaxConfig();
 
     //object creation of absolute encoder. The REV Through bore encoder is used for climb
     private final AnalogEncoder m_absoluteEncoder = new AnalogEncoder(0, 0, 0);
+    private final AnalogEncoderSim s_absoluteEncoder = new AnalogEncoderSim(m_absoluteEncoder);
+
+
+    private final ElevatorSim m_climbSim =
+        new ElevatorSim(LinearSystemId.createElevatorSystem(DCMotor.getNeo550(2), 0, 0, 0), DCMotor.getNeo550(2), 0, 0, true, 0, 0);
 
     //object creation of bangbang controller
     //bang-bang controllers are used in high-inertia system. Considering the climb will be carrying the whole robot, it falls under "high inertia".
@@ -76,19 +93,25 @@ public class ClimbSubsystem extends SubsystemBase {
         m_climbFollowerMotor.configure(m_climbLeaderMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
+
+    public void reachGoal (double goal) {
+        m_bangBang.setSetpoint(goal);
+        double bangBangOutput = m_bangBang.calculate(m_absoluteEncoder.get());
+        m_climbLeaderMotor.setVoltage(bangBangOutput);
+    }
+
     //Returns the reading of the encoder.
     public double getEncoderDistance() {
         return m_absoluteEncoder.get();
     }
 
+    public double getSimEncoderDistance() {
+        return s_absoluteEncoder.get();
+    }
+
     //Stops outputting to motors.
     public void stopMotors() {
         m_climbLeaderMotor.stopMotor();
-    }
-
-    //Sets powers to motors.
-    public void runMotors() {
-        m_climbLeaderMotor.set(m_bangBang.calculate(m_absoluteEncoder.get(), ClimbConstants.kClimbRaisedPosition));
     }
     
     //This function returns the type of error the motor is experiencing should it have an error.
@@ -146,5 +169,27 @@ public class ClimbSubsystem extends SubsystemBase {
             DriverStation.reportWarning("MOTOR WARNING: SparkMax ID " + ClimbConstants.kClimbFollowerMotorCANID + " is currently reporting an error with: \"" + reportMotorError(m_climbFollowerMotor) + "\"", true);
         }
 
+    }
+
+    @Override
+    public void simulationPeriodic() {
+        //Displays live motor and limit switch metrics on SmartDashboard 
+        SmartDashboard.putNumber("Encoder reading", getEncoderDistance());
+        SmartDashboard.putBoolean("Climb stopped", s_climbLeaderMotor.getAppliedOutput() == 0);
+
+        SmartDashboard.putNumber("Motor Voltage", s_climbLeaderMotor.getBusVoltage());
+        SmartDashboard.putNumber("Motor Current", s_climbLeaderMotor.getMotorCurrent());
+        SmartDashboard.putNumber("Climb Setpoint", s_climbLeaderMotor.getSetpoint());
+        SmartDashboard.putNumber("Applied Output", s_climbLeaderMotor.getAppliedOutput());
+        SmartDashboard.putNumber("Climb Velocity", s_climbLeaderMotor.getVelocity());
+        SmartDashboard.putNumber("Climb Position", s_climbLeaderMotor.getPosition());
+
+
+        //Checks to see if motors are going upwards and if the encoder has reached the set limit
+        m_climbSim.setInput(s_climbLeaderMotor.getVelocity(), RobotController.getBatteryVoltage());
+        m_climbSim.update(0.020);
+        s_absoluteEncoder.set(m_climbSim.getPositionMeters());
+        RoboRioSim.setVInVoltage(
+                    BatterySim.calculateDefaultBatteryLoadedVoltage(m_climbSim.getCurrentDrawAmps()));
     }
 }

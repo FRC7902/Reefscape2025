@@ -32,19 +32,18 @@ public class MoveClimbUp extends Command {
   @Override
   public void execute() {
     if (m_climb.getEncoderDistance() < ClimbConstants.kClimbRaisedPosition) {
-      m_climb.runMotors();
-  }
-  else if (m_climb.getEncoderDistance() >= ClimbConstants.kClimbRaisedPosition) {
+      m_climb.reachGoal(0);
+    }
+    else if (m_climb.getEncoderDistance() >= ClimbConstants.kClimbRaisedPosition) {
       m_climb.stopMotors();
       m_robotContainer.m_operatorController.setRumble(RumbleType.kBothRumble, 1);
-
-  }
+    }
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_climb.stopMotors();
+    m_climb.stopSimMotors();
   }
 
   // Returns true when the command should end.
