@@ -107,7 +107,6 @@ public class Vision extends SubsystemBase {
     if (Robot.isSimulation())
     {
       Field2d debugField = visionSim.getDebugField();
-      // Uncomment to enable outputting of vision targets in sim.
       poseEst.ifPresentOrElse(
           est ->
               debugField

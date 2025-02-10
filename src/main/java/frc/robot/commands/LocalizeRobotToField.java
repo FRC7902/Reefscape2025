@@ -5,17 +5,27 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.Vision;
+import frc.robot.RobotContainer;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class LocalizeRobotToField extends Command {
   /** Creates a new LocalizeRobotToField. */
-  public LocalizeRobotToField() {
+  private Vision m_Vision;
+  private RobotContainer m_RobotContainer;
+  public LocalizeRobotToField(Vision vision, RobotContainer RobotContainer) {
     // Use addRequirements() here to declare subsystem dependencies.
+    m_Vision = vision;
+    m_RobotContainer = RobotContainer;
+    addRequirements(getRequirements());
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() 
+  {
+      //Add Multitagpnp
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
