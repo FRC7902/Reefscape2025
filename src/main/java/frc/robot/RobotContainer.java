@@ -32,8 +32,6 @@ public class RobotContainer {
   private final ClimbSubsystem m_ClimbSubsystem = new ClimbSubsystem();
   // Replace with CommandPS4Controller or CommandJoystick if needed
   //driver controller
-  public final Joystick m_simJoystick = new Joystick(0);
-
   public final CommandXboxController m_driverController =
       new CommandXboxController(OperatorConstants.kDriverControllerPort);
   //operator controller

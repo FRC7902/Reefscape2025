@@ -9,6 +9,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.BangBangController;
+import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.AnalogEncoder;
@@ -28,7 +29,9 @@ public class ClimbSubsystem extends SubsystemBase {
     private final SparkMax  m_climbLeaderMotor = new SparkMax(ClimbConstants.kClimbLeaderMotorCANID, MotorType.kBrushless);
     private final SparkMax m_climbFollowerMotor = new SparkMax(ClimbConstants.kClimbFollowerMotorCANID, MotorType.kBrushless);
 
-    private final SparkMaxSim s_climbLeaderMotor = new SparkMaxSim(m_climbLeaderMotor, DCMotor.getNeo550(2));
+    private final DCMotor motorSim = DCMotor.getNeo550(2);
+
+    private final SparkMaxSim s_climbLeaderMotor = new SparkMaxSim(m_climbLeaderMotor, motorSim);
 
     
     //object creation of motor configuration (used to configure tbe motors)
@@ -41,7 +44,17 @@ public class ClimbSubsystem extends SubsystemBase {
 
 
     private final ElevatorSim m_climbSim =
-        new ElevatorSim(LinearSystemId.createElevatorSystem(DCMotor.getNeo550(2), 0, 0, 0), DCMotor.getNeo550(2), 0, 0, true, 0, 0);
+    new ElevatorSim(
+        motorSim,
+        5,
+        70,
+        6,
+        0,
+        100,
+        true,
+        0.0, 
+        0.01,
+        0);
 
     //object creation of bangbang controller
     //bang-bang controllers are used in high-inertia system. Considering the climb will be carrying the whole robot, it falls under "high inertia".
@@ -101,7 +114,7 @@ public class ClimbSubsystem extends SubsystemBase {
     //Returns the reading of the encoder.
     public double getEncoderDistance() {
         return m_absoluteEncoder.get();
-    }
+    } 
 
     public double getSimEncoderDistance() {
         return s_absoluteEncoder.get();
@@ -184,7 +197,9 @@ public class ClimbSubsystem extends SubsystemBase {
 
 
         //Checks to see if motors are going upwards and if the encoder has reached the set limit
-        m_climbSim.setInput(s_climbLeaderMotor.getVelocity(), RobotController.getBatteryVoltage());
+
+        s_climbLeaderMotor.iterate(m_climbLeaderMotor.getAppliedOutput(), 12, 0.02);
+        m_climbSim.setInput(s_climbLeaderMotor.getVelocity() * RobotController.getBatteryVoltage());
         m_climbSim.update(0.020);
         s_absoluteEncoder.set(m_climbSim.getPositionMeters());
         RoboRioSim.setVInVoltage(

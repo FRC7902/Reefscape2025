@@ -32,7 +32,7 @@ public class MoveClimbUp extends Command {
   @Override
   public void execute() {
     if (m_climb.getEncoderDistance() < ClimbConstants.kClimbRaisedPosition) {
-      m_climb.reachGoal(0);
+      m_climb.reachGoal(ClimbConstants.kClimbRaisedPosition);
     }
     else if (m_climb.getEncoderDistance() >= ClimbConstants.kClimbRaisedPosition) {
       m_climb.stopMotors();
