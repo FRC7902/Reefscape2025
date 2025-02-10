@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkBase.Faults;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
@@ -7,6 +8,8 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.BangBangController;
+import edu.wpi.first.wpilibj.AnalogEncoder;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -22,9 +25,13 @@ public class ClimbSubsystem extends SubsystemBase {
     private final SparkMaxConfig m_climbLeaderMotorConfig = new SparkMaxConfig();
     private final SparkMaxConfig m_climbFollowerMotorConfig = new SparkMaxConfig();
 
-    private final Encoder m_absoluteEncoder = new Encoder(1, 0, false);
+    private final AnalogEncoder m_absoluteEncoder = new AnalogEncoder(0, 0, 0);
 
     private final BangBangController m_bangBang = new BangBangController();
+
+    private Faults m_climbLeaderMotorFaults;
+    private Faults m_climbFollowerMotorFaults;
+
 
     public ClimbSubsystem() {
     
@@ -53,10 +60,8 @@ public class ClimbSubsystem extends SubsystemBase {
         m_climbLeaderMotorConfig.smartCurrentLimit(ClimbConstants.kMotorStallCurrent, ClimbConstants.kMotorFreeSpeedCurrent, ClimbConstants.kMotorRPMLimit);
         m_climbFollowerMotorConfig.smartCurrentLimit(ClimbConstants.kMotorStallCurrent, ClimbConstants.kMotorFreeSpeedCurrent, ClimbConstants.kMotorRPMLimit);
 
-        m_absoluteEncoder.reset();
-        m_absoluteEncoder.setDistancePerPulse(0);
-        m_absoluteEncoder.setMinRate(0);
-        m_absoluteEncoder.setSamplesToAverage(0);
+        m_absoluteEncoder.setInverted(false);
+        m_absoluteEncoder.setVoltagePercentageRange(0, 0);
         
         //sets all configuration to the motors.
         //any previous parameters are reset here to be overwritten with new parameters.
@@ -67,7 +72,7 @@ public class ClimbSubsystem extends SubsystemBase {
 
     //Returns the reading of the encoder.
     public double getEncoderDistance() {
-        return m_absoluteEncoder.getDistance();
+        return m_absoluteEncoder.get();
     }
 
     //Stops outputting to motors.
@@ -77,16 +82,41 @@ public class ClimbSubsystem extends SubsystemBase {
 
     //Sets powers to motors.
     public void runMotors() {
-        m_climbLeaderMotor.set(m_bangBang.calculate(m_absoluteEncoder.getRate(), ClimbConstants.kClimbRaisedPosition));
+        m_climbLeaderMotor.set(m_bangBang.calculate(m_absoluteEncoder.get(), ClimbConstants.kClimbRaisedPosition));
     }
     
+    public String reportMotorError(SparkMax motor) {
+        Faults motorFault = motor.getFaults();
+        if (motorFault.can) {
+            return "CAN";
+        }
+        else if (motorFault.escEeprom) {
+            return "ESC_EEPROM";
+        }
+        else if (motorFault.firmware) {
+            return "FIRMWARE";
+        }
+        else if (motorFault.gateDriver) {
+            return "GATE_DRIVER";
+        }
+        else if (motorFault.motorType) {
+            return "MOTOR_TYPE";
+        }
+        else if (motorFault.sensor) {
+            return "SENSOR";
+        } 
+        else if (motorFault.temperature) {
+            return "TEMPERATURE";
+        }
+        return null;        
+    }
 
     //function that is constantly run in code every 20 ms.
     @Override
     public void periodic() {
         //Displays live motor and limit switch metrics on SmartDashboard 
         SmartDashboard.putNumber("Encoder reading", getEncoderDistance());
-        SmartDashboard.putBoolean("Climb stopped", m_absoluteEncoder.getStopped());
+        SmartDashboard.putBoolean("Climb stopped", m_climbLeaderMotor.get() == 0);
 
         SmartDashboard.putNumber("Leader Motor Voltage", m_climbLeaderMotor.getBusVoltage());
         SmartDashboard.putNumber("Leader Motor Current", m_climbLeaderMotor.getOutputCurrent());
@@ -99,6 +129,13 @@ public class ClimbSubsystem extends SubsystemBase {
         //Checks to see if motors are going upwards and if the encoder has reached the set limit
         if (m_climbLeaderMotor.get() > 0 && getEncoderDistance() >= ClimbConstants.kClimbRaisedPosition) {
             stopMotors();
+        }
+
+        if (m_climbLeaderMotor.hasActiveFault()) {
+            DriverStation.reportWarning("MOTOR WARNING: The leader motor is currently reporting an error with: \"" + reportMotorError(m_climbLeaderMotor) + "\"", true);
+        }
+        if (m_climbFollowerMotor.hasActiveFault()) {
+            DriverStation.reportWarning("MOTOR WARNING: The follower motor is currently reporting an error with: \"" + reportMotorError(m_climbFollowerMotor) + "\"", true);
         }
 
     }
