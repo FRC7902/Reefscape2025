@@ -27,6 +27,9 @@ public final class Constants {
     public static final int elevatorManipulatorReverseVoltage=-7;
     public static final int beamBreakPort=-1;
     public static final int elevatorManipulatorPort=7;//idk
+    public static final int horizontalArmAngleSetpoint=90;
+    public static final int FullyUpArmAngleSetpoint=180;
+    public static final int FullyDownArmAngleSetpoint=0;
 
   }
 

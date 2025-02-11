@@ -22,15 +22,22 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
+
+
   // The robot's subsystems and commands are defined here...
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
 
-  private final XboxController m_operatorStick = new XboxController (IOConstants.kOperatorStick);
-
-  private final AlgaeEffectorSubsystem m_intake = new AlgaeEffectorSubsystem(m_operatorStick);
+  public static XboxController m_operatorStick = new XboxController (IOConstants.kOperatorStick);
+  //private final AlgaeEffectorSubsystem m_intake = new AlgaeEffectorSubsystem(m_operatorStick);
+  public static AlgaeEffectorSubsystem m_intake = new AlgaeEffectorSubsystem();
+  
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+
+   
+
+
     // Configure the trigger bindings
     configureBindings();
   }
