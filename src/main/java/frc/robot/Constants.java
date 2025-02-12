@@ -23,13 +23,22 @@ public final class Constants {
     public static final int motorCurrentLimit=40; 
     public static final int intakeVoltage=7;
     public static final int outtakeVoltage=-7;
-    public static final int elevatorManipulatorVoltage=7;
-    public static final int elevatorManipulatorReverseVoltage=-7;
+    public static final int elevatorManipulatorForward=7;
+    public static final int elevatorManipulatorReverse=-7;
     public static final int beamBreakPort=-1;
     public static final int elevatorManipulatorPort=7;//idk
-    public static final int horizontalArmAngleSetpoint=90;
-    public static final int FullyUpArmAngleSetpoint=180;
+    
+    public static final int FullyUpArmAngleSetpoint=80;
     public static final int FullyDownArmAngleSetpoint=0;
+    public static final int groundIntakeRollerID=0;
+    public static final int elevatorManipulatorID=1;
+    public static final double algaeArmControllerKp=0.01;
+    public static final double algaeArmControllerKi=0.01;
+    public static final double algaeArmControllerKd=0.01;
+    public static final int armPivotEncoderPin=1;
+    public static final int groundIntakePivotLimit=20;
+    public static final int armUpVoltage=7;
+    public static final double armDownVoltage=-7;
 
   }
 

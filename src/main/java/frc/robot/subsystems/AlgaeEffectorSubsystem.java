@@ -8,9 +8,12 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.OperatorConstants;
+
+import java.util.Hashtable;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.PersistMode;
@@ -23,21 +26,21 @@ public class AlgaeEffectorSubsystem extends SubsystemBase {
 
     // all the motors, and their configs, are here 
     //The intake motor
-    private SparkMax groundIntakeRoller = new SparkMax(0, MotorType.kBrushless); 
+    private SparkMax groundIntakeRoller = new SparkMax(OperatorConstants.groundIntakeRollerID, MotorType.kBrushless); 
     private final SparkMaxConfig groundIntakeRollerConfig = new SparkMaxConfig(); 
 
     private final SparkMax groundIntakePivot= new SparkMax(IntakeConstants.intakeCANid,MotorType.kBrushless); 
     private final SparkMaxConfig groundIntakePivotConfig = new SparkMaxConfig(); 
 
-    private final SparkMax  elevatorManipulator = new SparkMax(1, MotorType.kBrushless);
+    private final SparkMax  elevatorManipulator = new SparkMax(OperatorConstants.elevatorManipulatorID, MotorType.kBrushless);
     private final SparkMaxConfig elevatorManipulatorConfig = new SparkMaxConfig();
 
 
     // the pid controller 
-    private final PIDController algaeArmController = new PIDController(0.02, 0, 0);
+    private final PIDController algaeArmController = new PIDController(OperatorConstants.algaeArmControllerKp,OperatorConstants.algaeArmControllerKi, OperatorConstants.algaeArmControllerKd);
 
     //the encoder 
-    private final DutyCycleEncoder encoder = new DutyCycleEncoder(0);
+    private final DutyCycleEncoder  armPivotEncoder = new DutyCycleEncoder(OperatorConstants.armPivotEncoderPin);
 
     //constructor
     public AlgaeEffectorSubsystem() { 
@@ -56,7 +59,7 @@ public class AlgaeEffectorSubsystem extends SubsystemBase {
         //configs for the ground intake pivot motor
         groundIntakePivotConfig.inverted(false);
 
-        groundIntakePivotConfig.smartCurrentLimit(OperatorConstants.motorCurrentLimit,OperatorConstants.motorCurrentLimit);
+        groundIntakePivotConfig.smartCurrentLimit(OperatorConstants.groundIntakePivotLimit,OperatorConstants.groundIntakePivotLimit);
 
         groundIntakePivot.configure(groundIntakePivotConfig,ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         
@@ -73,82 +76,60 @@ public class AlgaeEffectorSubsystem extends SubsystemBase {
       //  algaeArmController.setContinuous(true);
     }
 
-   //sets the voltage for the algae intake motor, when it's trying to accept the algae 
-    public void algaeIntake() {
+   public void setGroundAlgaeVoltage(int choice){
+    if (choice==1){
         groundIntakeRoller.setVoltage(OperatorConstants.intakeVoltage);
     }
-
-    //sets the voltage for the algae intake motor, when it's trying to shoot the algae 
-    public void algaeOuttake() {
+    else if (choice==2){
         groundIntakeRoller.setVoltage(OperatorConstants.outtakeVoltage);
     }
-
+    else {
+        groundIntakeRoller.stopMotor();
+    }
+   }
     //Check if the beam break sensor detects algae 
     public boolean hasAlgae(){
         return beamBreakSensor.get();
     }
   
-    //Stop the algae intake motor 
-    public void algaeStop() {
-        groundIntakeRoller.stopMotor();
+
+    public void setElevatorManipulator(int choice){
+        if (choice==1){
+            elevatorManipulator.setVoltage(OperatorConstants.elevatorManipulatorForward);
+        }
+        else if (choice==2){
+            elevatorManipulator.setVoltage(OperatorConstants.elevatorManipulatorReverse);
+        }
+        else {
+            elevatorManipulator.stopMotor();
+        }
     }
 
-    public void startElevatorManipulator(){
-           elevatorManipulator.setVoltage(7);
+    @Override
+    public void periodic() {
+            if (hasAlgae()&&(groundIntakeRoller.getOutputCurrent()<0)){
+                groundIntakeRoller.stopMotor();
+            }
     }
 
-    public void stopElevatorManipulator(){
-        elevatorManipulator.stopMotor();
-    }
+    public void armStop(){ //might not need
 
-    public void reverseElevatorManipulator(){
-        elevatorManipulator.setVoltage(-7);
-    }
-
-
-    public void armUp(){
-       groundIntakePivot.setVoltage(-7);
-    }
-
-    public void armDown(){
-        groundIntakePivot.setVoltage(7);
-    }
-
-    public void armStop(){
-
-        if (encoder.get()<=10){
+        if (armPivotEncoder.get()<=10){
 
             groundIntakePivot.stopMotor();
         }
 
     }
 
-
-    
     //Move to a certain angle using PID method
-
-    
-
-    public void pidArmHorizontal(){
-        
-        groundIntakeRoller.set(algaeArmController.calculate(encoder.get(), OperatorConstants.horizontalArmAngleSetpoint));
-
-    }
-
-
-    public void pidArmUp(){
-        
-        groundIntakeRoller.set(algaeArmController.calculate(encoder.get(), OperatorConstants.FullyUpArmAngleSetpoint));
+    public void setArmAngle(int angle){
+        if ((armPivotEncoder.get()-angle)>2||(armPivotEncoder.get()-angle)<-2){
+            groundIntakeRoller.set(algaeArmController.calculate(armPivotEncoder.get(), angle));
+        }
+        else {
+            groundIntakeRoller.stopMotor();
+        }
 
     }
-
-    public void pidArmDown(){
-        
-        groundIntakeRoller.set(algaeArmController.calculate(encoder.get(), OperatorConstants.FullyDownArmAngleSetpoint));
-
-    }
-    
 
 }
-
-  
