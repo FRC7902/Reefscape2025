@@ -107,8 +107,8 @@ public class AlgaeEffectorSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-            if (hasAlgae()&&(groundIntakeRoller.getOutputCurrent()<0)){
-                groundIntakeRoller.stopMotor();
+            if (hasAlgae()&&(groundIntakeRoller.get()<0)){ //groundIntakeRoller.get() returns the rpm value of the motor
+                groundIntakeRoller.stopMotor();            //which can be -1 to +1 depending on the speed and direction of the motor
             }
     }
 
