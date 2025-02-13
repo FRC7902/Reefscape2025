@@ -4,33 +4,20 @@
 
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.DemandType;
+import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
-import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.sim.TalonFXSimState;
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.controller.ElevatorFeedforward;
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.trajectory.ExponentialProfile;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.wpilibj.Encoder;
+import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
-import edu.wpi.first.wpilibj.simulation.EncoderSim;
-import edu.wpi.first.wpilibj.simulation.PWMSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
@@ -41,7 +28,6 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.FirebirdUtils;
 import frc.robot.Constants.ElevatorConstants;
 
 public class ElevatorSubsystem extends SubsystemBase {
@@ -50,15 +36,8 @@ public class ElevatorSubsystem extends SubsystemBase {
   private final TalonFX m_elevatorLeaderMotor = new TalonFX(ElevatorConstants.kElevatorLeaderCAN);
   private final TalonFX m_elevatorFollowerMotor = new TalonFX(ElevatorConstants.kElevatorFollowerCAN);
 
+  private final VoltageOut m_voltReq = new VoltageOut(0.0);
   private MotionMagicVoltage m_request = new MotionMagicVoltage(0).withSlot(0);
-
-  private final ExponentialProfile m_profile = new ExponentialProfile(
-      ExponentialProfile.Constraints.fromCharacteristics(
-          ElevatorConstants.kMaxV,
-          ElevatorConstants.kV,
-          ElevatorConstants.kA));
-
-  private ExponentialProfile.State m_setpoint = new ExponentialProfile.State(0, 0);
 
   /** Object of a simulated elevator */
   private final ElevatorSim m_elevatorSim = new ElevatorSim(
@@ -73,24 +52,28 @@ public class ElevatorSubsystem extends SubsystemBase {
       0.01, // add some noise
       0);
 
-  private final ElevatorFeedforward m_elevatorFeedForward = new ElevatorFeedforward(
-      ElevatorConstants.kS,
-      ElevatorConstants.kG,
-      ElevatorConstants.kV,
-      ElevatorConstants.kA);
-
-  private final ProfiledPIDController m_pidController = new ProfiledPIDController(
-      ElevatorConstants.kP,
-      ElevatorConstants.kI,
-      ElevatorConstants.kD,
-      new TrapezoidProfile.Constraints(ElevatorConstants.kMaxVelocity, ElevatorConstants.kMaxAcceleration));
-
   private final Mechanism2d m_mech2d = new Mechanism2d(Units.inchesToMeters(10), Units.inchesToMeters(50));
   private final MechanismRoot2d m_mech2dRoot = m_mech2d.getRoot("Elevator Root", Units.inchesToMeters(5),
       Units.inchesToMeters(0.5));
   private final MechanismLigament2d m_elevatorMech2d = m_mech2dRoot.append(
       new MechanismLigament2d("Elevator", m_elevatorSim.getPositionMeters(), 90, 7,
           new Color8Bit(Color.kAntiqueWhite)));
+
+  // System identification routine
+  private final SysIdRoutine m_sysIdRoutine = new SysIdRoutine(
+      new SysIdRoutine.Config(
+          null,
+          Volts.of(4),
+          null,
+          (state) -> SignalLogger.writeString("state", state.toString())),
+      new SysIdRoutine.Mechanism(
+          (volts) -> m_elevatorLeaderMotor.setControl(m_voltReq.withOutput(volts.in(Volts))),
+          null,
+          this));
+
+  
+  private double m_setpoint;
+  private boolean m_homed;
 
   /** Creates a new ElevatorSubsystem */
   public ElevatorSubsystem() {
@@ -121,7 +104,8 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     // Set safety limits
     config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-    config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = ElevatorConstants.kElevatorMaxHeightMeters / ElevatorConstants.kElevatorMetersPerMotorRotation;
+    config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = ElevatorConstants.kElevatorMaxHeightMeters
+        / ElevatorConstants.kElevatorMetersPerMotorRotation;
     config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
     config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0;
 
@@ -144,10 +128,10 @@ public class ElevatorSubsystem extends SubsystemBase {
     m_elevatorLeaderMotor.getDutyCycle().setUpdateFrequency(50);
     m_elevatorLeaderMotor.getMotorVoltage().setUpdateFrequency(50);
     m_elevatorLeaderMotor.getTorqueCurrent().setUpdateFrequency(50);
-
-    // Optimize CAN bus usage by disabling unused status signals and reducing update frequencies
     m_elevatorFollowerMotor.optimizeBusUtilization();
     m_elevatorLeaderMotor.optimizeBusUtilization();
+
+    m_homed = false;
   }
 
   /** Stop the motors */
@@ -156,38 +140,6 @@ public class ElevatorSubsystem extends SubsystemBase {
     m_elevatorFollowerMotor.stopMotor();
   }
 
-  /** Reset Exponential profile to begin on current position on enable */
-  public void reset() {
-    m_setpoint = new ExponentialProfile.State(m_elevatorLeaderMotor.getPosition().getValueAsDouble(), 0);
-  }
-
-  // /**
-  // * Run control to reach and maintain goal
-  // *
-  // * @param goal the position to maintain
-  // */
-  // public void reachGoal(double goal) {
-  // // Create goal state
-  // var goalState = new ExponentialProfile.State(goal, 0);
-
-  // // Calculate next state
-  // var next = m_profile.calculate(0.020, m_setpoint, goalState);
-
-  // // With the setpoint value, run PID like normal
-  // double pidOutput =
-  // m_pidController.calculate(m_elevatorLeaderMotor.getPosition().getValueAsDouble(),
-  // m_setpoint.position);
-  // double feedforwardOutput =
-  // m_elevatorFeedForward.calculateWithVelocities(m_setpoint.velocity,
-  // next.velocity);
-
-  // // Set motor output
-  // m_elevatorLeaderMotor.setVoltage(pidOutput + feedforwardOutput);
-
-  // // Update setpoint
-  // m_setpoint = next;
-  // }
-
   /** Update telemetry, including the mechanism visualization */
   public void updateTelemetry() {
     m_elevatorMech2d.setLength(getPosition());
@@ -195,20 +147,27 @@ public class ElevatorSubsystem extends SubsystemBase {
 
   /**
    * Set the position of the elevator
-   * 
+   *
    * @param position of elevator
    */
-  public void setPosition(double position) {
-    m_elevatorLeaderMotor.setControl(m_request.withPosition(position)
-        .withSlot(0));
-
-    // Update internal state
-    m_setpoint = new ExponentialProfile.State(position, 0);
+  public void setPosition(double positionMeters) {
+    double positionRotations = positionMeters / ElevatorConstants.kElevatorMetersPerMotorRotation;
+    m_elevatorLeaderMotor.setControl(m_request.withPosition(positionRotations).withSlot(0));
   }
 
-  /** Gets the current position of the elevator */
+  /** Gets the current position of the elevator in rotations */
   public double getPosition() {
     return m_elevatorLeaderMotor.getPosition().getValueAsDouble();
+  }
+
+  /** Gets the current position of the elevator in meters */
+  public double getPositionMeters() {
+    return getPosition() * ElevatorConstants.kElevatorMetersPerMotorRotation;
+  }
+
+  /** Gets the current velocity of the elevator in m/s */
+  public double getVelocityMetersPerSecond() {
+    return m_elevatorLeaderMotor.getVelocity().getValueAsDouble() * ElevatorConstants.kElevatorMetersPerMotorRotation;
   }
 
   /** Zero the elevator */
@@ -219,22 +178,47 @@ public class ElevatorSubsystem extends SubsystemBase {
   }
 
   /** Returns whether the elevator is at the setpoint */
-  public boolean isFinished() {
-    return Math.abs(getPosition() - m_setpoint.position) < ElevatorConstants.kTargetError;
+  public boolean atHeight() {
+    return Math.abs(getPositionMeters() - m_setpoint) < ElevatorConstants.kTargetError;
   }
 
   /** Set the setpoint of the elevator */
   public void setSetpoint(double setpoint) {
-    m_setpoint = new ExponentialProfile.State(setpoint, 0);
+    m_setpoint = setpoint;
+  }
+
+  /**
+   * Returns a command that will execute a quasistatic test in the given
+   * direction.
+   *
+   * @param direction The direction (forward or reverse) to run the test in
+   */
+  public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+    return m_sysIdRoutine.quasistatic(direction);
+  }
+
+  /**
+   * Returns a command that will execute a dynamic test in the given direction.
+   *
+   * @param direction The direction (forward or reverse) to run the test in
+   */
+  public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+    return m_sysIdRoutine.dynamic(direction);
   }
 
   @Override
   public void periodic() {
+
+    if (!atHeight() && m_homed) {
+      m_elevatorLeaderMotor.setControl(m_request);
+    } else {
+      stop();
+    }
+
     // Update SmartDashboard
-    SmartDashboard.putNumber("Elevator position", getPosition() * ElevatorConstants.kElevatorMetersPerMotorRotation);
-    SmartDashboard.putNumber("Elevator setpoint position",m_elevatorLeaderMotor.getClosedLoopReference().getValueAsDouble() * ElevatorConstants.kElevatorMetersPerMotorRotation);
-    SmartDashboard.putNumber("Elevator velocity", m_elevatorLeaderMotor.get());
-    SmartDashboard.putNumber("Elevator setpoint velocity", m_setpoint.velocity);
+    SmartDashboard.putNumber("Elevator position", getPositionMeters());
+    SmartDashboard.putNumber("Elevator setpoint position", m_elevatorLeaderMotor.getClosedLoopReference().getValueAsDouble() * ElevatorConstants.kElevatorMetersPerMotorRotation);
+    SmartDashboard.putNumber("Elevator velocity", getVelocityMetersPerSecond());
 
     updateTelemetry();
   }

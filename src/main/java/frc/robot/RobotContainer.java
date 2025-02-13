@@ -15,11 +15,13 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.SetShootSpeed;
+import frc.robot.commands.elevator.ElevatorReefSetpoint;
 import frc.robot.commands.teleop.IntakeAlgaeCommand;
 import frc.robot.commands.teleop.IntakeCoralCommand;
-import frc.robot.commands.teleop.OuttakeAlgaeCommand;
 import frc.robot.commands.teleop.NullCommand;
+import frc.robot.commands.teleop.OuttakeAlgaeCommand;
 import frc.robot.subsystems.AlgaeElevatorManipulatorSubsystem;
+import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.IndexSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import swervelib.SwerveInputStream;
@@ -36,6 +38,8 @@ import swervelib.SwerveInputStream;
 public class RobotContainer {
     // The robot's subsystems and commands are defined here...
     public static final AlgaeElevatorManipulatorSubsystem m_algaeElevatorManipulatorSubsystem = new AlgaeElevatorManipulatorSubsystem();
+    // The robot's subsystems and commands are defined here...
+    public static final ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
 
     public static final IndexSubsystem m_indexSubsystem = new IndexSubsystem();
 
@@ -145,6 +149,11 @@ public class RobotContainer {
                 new ConditionalCommand(new IntakeCoralCommand(), new NullCommand(), m_indexSubsystem::isBeamBroken));
 
         m_driverController.rightTrigger().whileTrue(new SetShootSpeed());
+
+        m_operatorController.a().onTrue(new ElevatorReefSetpoint(ElevatorConstants.kLevel1));
+        m_operatorController.b().onTrue(new ElevatorReefSetpoint(ElevatorConstants.kLevel2));
+        m_operatorController.y().onTrue(new ElevatorReefSetpoint(ElevatorConstants.kLevel3));
+        m_operatorController.x().onTrue(new ElevatorReefSetpoint(ElevatorConstants.kElevatorMinHeightMeters));
     }
 
     /**
