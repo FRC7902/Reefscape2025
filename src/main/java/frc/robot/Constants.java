@@ -64,7 +64,7 @@ public final class Constants {
     public static final double kLevel3 = Units.inchesToMeters(72.0);
 
     // Control Parameters
-    public static final double kTargetError = 2;
+    public static final double kTargetError = 0.01; // meters
     public static final double kMotorResistance = 0.002; // Assume 2mOhm resistance for voltage drop calculation
 
     // Encoder Constants
