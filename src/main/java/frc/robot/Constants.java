@@ -42,15 +42,16 @@ public final class Constants {
     public static final double kElevatorMaxHeightMeters = Units.inchesToMeters(39.75);
 
     // Motion Constraints
-    public static final double kMaxVelocity = 1.70;
-    public static final double kMaxAcceleration = 1.0; // TODO: modify
+    public static final double kMaxVelocity = 80.0;
+    public static final double kMaxAcceleration = 160.0; // TODO: modify
 
     // PID Constants
     public static final double kP = 1;
     public static final double kI = 0.0;
     public static final double kD = 0.01;
 
-    // Feedforward Constants
+    // Elevator Gains
+    // set all to 0 during testing
     public static final double kMaxV = 10.0; // volts
     public static final double kS = 0.0; // negligible
     public static final double kG = 0.2;
