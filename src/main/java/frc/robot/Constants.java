@@ -51,7 +51,8 @@ public final class Constants {
     public static final double indexkI = 0;
     public static final double indexkD = 0;
     public static final double indexkFF = 0;
-    public static int kIndexMotorCAN = 0;
+    public static final double kShootSpeed = 0.4;
+    public static int kIndexMotorCAN = -1;
   }
 }
 
