@@ -3,7 +3,6 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot;
-
 import edu.wpi.first.math.util.Units;
 
 /**
@@ -28,6 +27,9 @@ public final class Constants {
     // CAN IDs
     public static final int kElevatorLeaderCAN = 0;
     public static final int kElevatorFollowerCAN = 1;
+
+    // Digital Inputs
+    public static final int kRetractLimitSwitchChannel = 0; // TODO: modify
 
     // Physical Constants
     public static final double kGearRatio = 7.5;
@@ -64,7 +66,7 @@ public final class Constants {
     public static final double kLevel3 = Units.inchesToMeters(72.0);
 
     // Control Parameters
-    public static final double kTargetError = 0.01; // meters
+    public static final double kTargetError = 2;
     public static final double kMotorResistance = 0.002; // Assume 2mOhm resistance for voltage drop calculation
 
     // Encoder Constants

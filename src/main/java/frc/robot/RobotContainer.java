@@ -61,9 +61,9 @@ public class RobotContainer {
   private void configureBindings() {
 
     // test setpoints one at a time
-    new JoystickButton(m_joystick, 1)
-        .onTrue(new InstantCommand(() -> m_elevatorSubsystem.setPosition(
-            ElevatorConstants.kLevel1)));
+    // new JoystickButton(m_joystick, 1)
+    //     .onTrue(new InstantCommand(() -> m_elevatorSubsystem.setPosition(
+    //         ElevatorConstants.kLevel1)));
 
     // new JoystickButton(m_joystick, 2)
     // .onTrue(new InstantCommand(() -> m_elevatorSubsystem.setPosition(
@@ -74,13 +74,14 @@ public class RobotContainer {
     // ElevatorConstants.kLevel3)));
 
     // manually reset the elevator
-    new JoystickButton(m_joystick, 4)
-        .onTrue(new InstantCommand(() -> m_elevatorSubsystem.zero()));
+    // new JoystickButton(m_joystick, 4)
+    //     .onTrue(new InstantCommand(() -> m_elevatorSubsystem.zero()));
 
     m_operatorController.a().onTrue(new ElevatorReefSetpoint(ElevatorConstants.kLevel1));
     m_operatorController.b().onTrue(new ElevatorReefSetpoint(ElevatorConstants.kLevel2));
     m_operatorController.y().onTrue(new ElevatorReefSetpoint(ElevatorConstants.kLevel3));
 
+    // SYSID COMMANDS
     // Run the SignalLogger when the left bumper is pressed, stop when the right bumper is pressed
     m_operatorController.leftBumper().onTrue(Commands.runOnce(SignalLogger::start));
     m_operatorController.rightBumper().onTrue(Commands.runOnce(SignalLogger::stop));
