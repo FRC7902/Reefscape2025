@@ -62,6 +62,9 @@ public final class Constants {
     public static final int kElevatorLeaderCAN = 54;
     public static final int kElevatorFollowerCAN = 55;
 
+    // Digital Inputs
+    public static final int kRetractLimitSwitchChannel = 0; // TODO: modify
+
     // Physical Constants
     public static final double kElevatorGearing = 7.5;
     public static final double kElevatorCarriageMass = Units.lbsToKilograms(20);

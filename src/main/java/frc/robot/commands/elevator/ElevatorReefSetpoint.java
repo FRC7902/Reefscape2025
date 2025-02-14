@@ -20,7 +20,7 @@ public class ElevatorReefSetpoint extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    RobotContainer.m_elevatorSubsystem.setPosition(m_targetHeight);
+    RobotContainer.m_elevatorSubsystem.setSetpoint(m_targetHeight);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
