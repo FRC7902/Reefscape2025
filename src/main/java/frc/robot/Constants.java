@@ -36,7 +36,6 @@ public final class Constants {
     public static final double kCarriageMass = Units.lbsToKilograms(20);
     public static final double kDrumRadius = Units.inchesToMeters(1.625 / 2);
     public static final double kElevatorMetersPerMotorRotation = (kDrumRadius * 2 * Math.PI) / kGearRatio;
-    public static final double kMotorMetresPerRotation = 2 * Math.PI * kDrumRadius / kGearRatio;
 
     // Elevator Dimensions
     public static final double kElevatorHeightMeters = 0.0;
