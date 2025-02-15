@@ -8,8 +8,7 @@ public class SetShootSpeed extends Command {
 
 
     public SetShootSpeed(IndexSubsystem index) {
-        index = m_index;
-        // addRequirements(___);
+        m_index = index;
     }
 
     // Called when the command is initially scheduled.
