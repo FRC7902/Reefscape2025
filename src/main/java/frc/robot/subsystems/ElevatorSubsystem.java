@@ -14,7 +14,6 @@ import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.trajectory.ExponentialProfile;
 import edu.wpi.first.math.util.Units;
 import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -151,18 +150,8 @@ public class ElevatorSubsystem extends SubsystemBase {
 
   /** Update telemetry, including the mechanism visualization */
   public void updateTelemetry() {
-    m_elevatorMech2d.setLength(getPosition());
+    m_elevatorMech2d.setLength(getPositionMeters());
   }
-
-  // /**
-  //  * Set the position of the elevator
-  //  *
-  //  * @param position The position of the elevator
-  //  */
-  // public void setPosition(double positionMeters) {
-  //   double positionRotations = positionMeters / ElevatorConstants.kElevatorMetersPerMotorRotation;
-  //   m_elevatorLeaderMotor.setControl(m_request.withPosition(positionRotations).withSlot(0));
-  // }
 
   /** Gets the current position of the elevator in rotations */
   public double getPosition() {
@@ -199,9 +188,10 @@ public class ElevatorSubsystem extends SubsystemBase {
   }
 
   public void setPosition(double position) {
-    double positionRotations = m_setpoint / ElevatorConstants.kElevatorMetersPerMotorRotation;
-    m_request = m_request.withPosition(positionRotations).withSlot(0);
+    double positionRotations = position / ElevatorConstants.kElevatorMetersPerMotorRotation;
+    // m_request = m_request.withPosition(positionRotations).withSlot(0);
     m_elevatorLeaderMotor.setControl(m_request.withPosition(positionRotations).withSlot(0));
+
     m_setpoint = position;
   }
 
@@ -268,9 +258,6 @@ public class ElevatorSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-
-    m_elevatorLeaderMotor.setControl(m_request);
-
     // if (!m_homed) {
     //   if (isAtRetractLimit()) {
     //     m_homed = true;
@@ -308,7 +295,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     m_elevatorSim.update(0.020);
 
     // Update simulated motor position/velocity
-    final double positionRot = m_elevatorSim.getPositionMeters() * ElevatorConstants.kElevatorMetersPerMotorRotation;
+    final double positionRot = m_elevatorSim.getPositionMeters() / ElevatorConstants.kElevatorMetersPerMotorRotation;
     final double velocityRps = m_elevatorSim.getVelocityMetersPerSecond() / ElevatorConstants.kElevatorMetersPerMotorRotation;
 
     // Use TalonFXSimState for accurate simulation updates
