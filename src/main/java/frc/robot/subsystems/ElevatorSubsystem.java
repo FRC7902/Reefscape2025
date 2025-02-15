@@ -14,6 +14,7 @@ import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.trajectory.ExponentialProfile;
 import edu.wpi.first.math.util.Units;
 import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -104,7 +105,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     m_motorConfig.Slot0.kA = ElevatorConstants.kA;
     m_motorConfig.Slot0.kG = ElevatorConstants.kG;
 
-    m_motorConfig.Slot0.GravityType = GravityTypeValue.Elevator_Static;
+    //m_motorConfig.Slot0.GravityType = GravityTypeValue.Elevator_Static;
 
     // Set motion magic
     m_motorConfig.MotionMagic.MotionMagicCruiseVelocity = 80;// Target cruise velocity of 80 rps
@@ -139,7 +140,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     m_elevatorFollowerMotor.optimizeBusUtilization();
     m_elevatorLeaderMotor.optimizeBusUtilization();
 
-    m_homed = false;
+    m_homed = true;
   }
 
   /** Stop the motors */
@@ -195,6 +196,13 @@ public class ElevatorSubsystem extends SubsystemBase {
    */
   public void setSetpoint(double setpoint) {
     m_setpoint = setpoint;
+  }
+
+  public void setPosition(double position) {
+    double positionRotations = m_setpoint / ElevatorConstants.kElevatorMetersPerMotorRotation;
+    m_request = m_request.withPosition(positionRotations).withSlot(0);
+    m_elevatorLeaderMotor.setControl(m_request.withPosition(positionRotations).withSlot(0));
+    m_setpoint = position;
   }
 
   /** Returns whether the elevator is at the retract limit */
@@ -261,24 +269,26 @@ public class ElevatorSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
 
-    if (!m_homed) {
-      if (isAtRetractLimit()) {
-        m_homed = true;
-        zero();
-      } else {
-        // If not at the retract limit, and not homed, retract slowly until the limit is hit
-        homeCommand().schedule();
-      }
-    } else {
-      // Once homed, then use motion magic
-      if (!atHeight()) {
-        double positionRotations = m_setpoint / ElevatorConstants.kElevatorMetersPerMotorRotation;
-        m_request = m_request.withPosition(positionRotations).withSlot(0);
-        m_elevatorLeaderMotor.setControl(m_request.withPosition(positionRotations).withSlot(0));
-      } else {
-        stop();
-      }
-    }
+    m_elevatorLeaderMotor.setControl(m_request);
+
+    // if (!m_homed) {
+    //   if (isAtRetractLimit()) {
+    //     m_homed = true;
+    //     zero();
+    //   } else {
+    //     // If not at the retract limit, and not homed, retract slowly until the limit is hit
+    //     homeCommand().schedule();
+    //   }
+    // } else {
+    //   // Once homed, then use motion magic
+    //   if (!atHeight()) {
+    //     double positionRotations = m_setpoint / ElevatorConstants.kElevatorMetersPerMotorRotation;
+    //     m_request = m_request.withPosition(positionRotations).withSlot(0);
+    //     m_elevatorLeaderMotor.setControl(m_request.withPosition(positionRotations).withSlot(0));
+    //   } else {
+    //     stop();
+    //   }
+    // }
 
     // Update SmartDashboard
     SmartDashboard.putNumber("Elevator position (m)", getPositionMeters());
