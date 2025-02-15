@@ -50,6 +50,7 @@ public class IndexSubsystem extends SubsystemBase {
     }
 
     public void stop() {
+        setSpeed(0);
         indexMotor.stopMotor();
     }
 
