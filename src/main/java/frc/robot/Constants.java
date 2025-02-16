@@ -51,6 +51,7 @@ public final class Constants {
     public static final double kShootSpeed = 40;
     public static double kS = 1;
     public static double kV = 1;
+    public static final int kBeamSensorPort = 1; 
   }
 }
 

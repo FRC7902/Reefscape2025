@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.IndexConstants;
+import edu.wpi.first.wpilibj.DigitalInput; 
 
 public class IndexSubsystem extends SubsystemBase {
     public SparkMax indexMotor = new SparkMax(Constants.IndexConstants.kIndexMotorCAN, SparkMax.MotorType.kBrushless);
@@ -16,7 +17,8 @@ public class IndexSubsystem extends SubsystemBase {
     public SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(Constants.IndexConstants.kS, Constants.IndexConstants.kV);
 
     private RelativeEncoder m_encoder;
-    
+    private DigitalInput beamSensor;
+
     public double indexSpeed = 0;  
     public double volts = 0; 
     
@@ -31,6 +33,7 @@ public class IndexSubsystem extends SubsystemBase {
         indexMotorConfig.idleMode(IdleMode.kBrake);
         
         m_encoder = indexMotor.getEncoder();
+        beamSensor = new DigitalInput(Constants.IndexConstants.kBeamSensorPort);  
     }
 
     public void setSpeed(double speed) {
@@ -59,12 +62,19 @@ public class IndexSubsystem extends SubsystemBase {
         setSpeed(Constants.IndexConstants.kShootSpeed);
     }
 
+    public boolean isBeamBroken() {
+        return !beamSensor.get(); 
+    }
+
     @Override
     public void periodic() {
         // This code runs in both real and simulation modes.
         SmartDashboard.putNumber("Index Speed", indexSpeed); 
         SmartDashboard.putNumber("Motor Velocity (Encoder)", m_encoder.getVelocity());
+        SmartDashboard.putBoolean("Beam Sensor Broken", isBeamBroken());
+
     }
+
     
     @Override
     public void simulationPeriodic() {
