@@ -46,13 +46,11 @@ public final class Constants {
     public static final int kOuttakeVoltage = -12;
   }
   public static class IndexConstants {
+    public static int kIndexMotorCAN = 38;
     public static final double kRampRate = 0;
-    public static final double indexkP = 0.2;
-    public static final double indexkI = 0;
-    public static final double indexkD = 0;
-    public static final double indexkFF = 1/917;
     public static final double kShootSpeed = 40;
-    public static int kIndexMotorCAN = -1;
+    public static double kS = 1;
+    public static double kV = 1;
   }
 }
 
