@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Robot;
 import frc.robot.Constants.ClimbConstants;
 
 public class ClimbSubsystem extends SubsystemBase {
@@ -155,54 +156,57 @@ public class ClimbSubsystem extends SubsystemBase {
     //function that is constantly run in code every 20 ms.
     @Override
     public void periodic() {
-        //Displays live motor and limit switch metrics on SmartDashboard 
-        SmartDashboard.putNumber("Encoder reading", getEncoderDistance());
-        SmartDashboard.putBoolean("Climb stopped", m_climbLeaderMotor.get() == 0);
+        //Displays live motor and limit switch metrics on SmartDashboard
+        if (!(Robot.isSimulation())) {
+            SmartDashboard.putNumber("Encoder reading", getEncoderDistance());
+            SmartDashboard.putBoolean("Climb stopped", m_climbLeaderMotor.get() == 0);
 
-        SmartDashboard.putNumber("Leader Motor Voltage", m_climbLeaderMotor.getBusVoltage());
-        SmartDashboard.putNumber("Leader Motor Current", m_climbLeaderMotor.getOutputCurrent());
-        SmartDashboard.putNumber("Leader Motor Temperature", m_climbLeaderMotor.getMotorTemperature());
+            SmartDashboard.putNumber("Leader Motor Voltage", m_climbLeaderMotor.getBusVoltage());
+            SmartDashboard.putNumber("Leader Motor Current", m_climbLeaderMotor.getOutputCurrent());
+            SmartDashboard.putNumber("Leader Motor Temperature", m_climbLeaderMotor.getMotorTemperature());
 
-        SmartDashboard.putNumber("Follower Motor Voltage", m_climbFollowerMotor.getBusVoltage());
-        SmartDashboard.putNumber("Follower Motor Current", m_climbFollowerMotor.getOutputCurrent());
-        SmartDashboard.putNumber("Follower Motor Temperature", m_climbFollowerMotor.getMotorTemperature());
+            SmartDashboard.putNumber("Follower Motor Voltage", m_climbFollowerMotor.getBusVoltage());
+            SmartDashboard.putNumber("Follower Motor Current", m_climbFollowerMotor.getOutputCurrent());
+            SmartDashboard.putNumber("Follower Motor Temperature", m_climbFollowerMotor.getMotorTemperature());
 
         //Checks to see if motors are going upwards and if the encoder has reached the set limit
-        if (m_climbLeaderMotor.get() > 0 && getEncoderDistance() >= ClimbConstants.kClimbRaisedPosition) {
-            stopMotors();
-        }
+            if (m_climbLeaderMotor.get() > 0 && getEncoderDistance() >= ClimbConstants.kClimbRaisedPosition) {
+                stopMotors();
+            }
 
         //Checks to see if any of the motors have any faults, and if so, reports it to DriverStation
-        if (m_climbLeaderMotor.hasActiveFault()) {
+            if (m_climbLeaderMotor.hasActiveFault()) {
             DriverStation.reportWarning("MOTOR WARNING: SparkMax ID " + ClimbConstants.kClimbLeaderMotorCANID + " is currently reporting an error with: \"" + reportMotorError(m_climbLeaderMotor) + "\"", true);
-        }
-        if (m_climbFollowerMotor.hasActiveFault()) {
+            }
+            if (m_climbFollowerMotor.hasActiveFault()) {
             DriverStation.reportWarning("MOTOR WARNING: SparkMax ID " + ClimbConstants.kClimbFollowerMotorCANID + " is currently reporting an error with: \"" + reportMotorError(m_climbFollowerMotor) + "\"", true);
+            }
         }
-
     }
 
     @Override
     public void simulationPeriodic() {
-        //Displays live motor and limit switch metrics on SmartDashboard 
-        SmartDashboard.putNumber("Encoder reading", getEncoderDistance());
-        SmartDashboard.putBoolean("Climb stopped", s_climbLeaderMotor.getAppliedOutput() == 0);
+        //Displays live motor and limit switch metrics on SmartDashboard
+        if (Robot.isSimulation()) { 
+            SmartDashboard.putNumber("Encoder reading", getEncoderDistance());
+            SmartDashboard.putBoolean("Climb stopped", s_climbLeaderMotor.getAppliedOutput() == 0);
 
-        SmartDashboard.putNumber("Motor Voltage", s_climbLeaderMotor.getBusVoltage());
-        SmartDashboard.putNumber("Motor Current", s_climbLeaderMotor.getMotorCurrent());
-        SmartDashboard.putNumber("Climb Setpoint", s_climbLeaderMotor.getSetpoint());
-        SmartDashboard.putNumber("Applied Output", s_climbLeaderMotor.getAppliedOutput());
-        SmartDashboard.putNumber("Climb Velocity", s_climbLeaderMotor.getVelocity());
-        SmartDashboard.putNumber("Climb Position", s_climbLeaderMotor.getPosition());
+            SmartDashboard.putNumber("Motor Voltage", s_climbLeaderMotor.getBusVoltage());
+            SmartDashboard.putNumber("Motor Current", s_climbLeaderMotor.getMotorCurrent());
+            SmartDashboard.putNumber("Climb Setpoint", s_climbLeaderMotor.getSetpoint());
+            SmartDashboard.putNumber("Applied Output", s_climbLeaderMotor.getAppliedOutput());
+            SmartDashboard.putNumber("Climb Velocity", s_climbLeaderMotor.getVelocity());
+            SmartDashboard.putNumber("Climb Position", s_climbLeaderMotor.getPosition());
 
 
-        //Checks to see if motors are going upwards and if the encoder has reached the set limit
+            //Checks to see if motors are going upwards and if the encoder has reached the set limit
 
-        s_climbLeaderMotor.iterate(m_climbLeaderMotor.getAppliedOutput(), 12, 0.02);
-        m_climbSim.setInput(s_climbLeaderMotor.getVelocity() * RobotController.getBatteryVoltage());
-        m_climbSim.update(0.020);
-        s_absoluteEncoder.set(m_climbSim.getPositionMeters());
-        RoboRioSim.setVInVoltage(
-                    BatterySim.calculateDefaultBatteryLoadedVoltage(m_climbSim.getCurrentDrawAmps()));
+            s_climbLeaderMotor.iterate(m_climbLeaderMotor.getAppliedOutput(), 12, 0.02);
+            m_climbSim.setInput(s_climbLeaderMotor.getVelocity() * RobotController.getBatteryVoltage());
+            m_climbSim.update(0.020);
+            s_absoluteEncoder.set(m_climbSim.getPositionMeters());
+            RoboRioSim.setVInVoltage(
+                        BatterySim.calculateDefaultBatteryLoadedVoltage(m_climbSim.getCurrentDrawAmps()));
+            }
     }
 }
