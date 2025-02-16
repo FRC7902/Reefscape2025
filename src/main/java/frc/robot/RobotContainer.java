@@ -18,6 +18,7 @@ import frc.robot.commands.SetShootSpeed;
 import frc.robot.commands.teleop.IntakeAlgaeCommand;
 import frc.robot.commands.teleop.OuttakeAlgaeCommand;
 import frc.robot.subsystems.AlgaeElevatorManipulatorSubsystem;
+import frc.robot.commands.RunsIntakeWhenTriggeredForInput;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.IndexSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
