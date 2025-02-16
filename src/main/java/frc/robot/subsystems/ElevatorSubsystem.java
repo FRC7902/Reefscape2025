@@ -21,7 +21,11 @@ import com.ctre.phoenix6.signals.ReverseLimitValue;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import static edu.wpi.first.units.Units.Volts;
+
+import java.lang.reflect.Method;
+
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
@@ -42,6 +46,14 @@ public class ElevatorSubsystem extends SubsystemBase {
   // Declare motor controllers
   private final TalonFX m_elevatorLeaderMotor = new TalonFX(ElevatorConstants.kElevatorLeaderCAN);
   private final TalonFX m_elevatorFollowerMotor = new TalonFX(ElevatorConstants.kElevatorFollowerCAN);
+  
+  // True if funnel is in the up position
+  public boolean m_isFunnelReleased;
+
+  // Servos that releases funnel
+  Servo m_funnelServoleft = new Servo(0);
+  Servo m_funnelServoright = new Servo(1);
+
 
   // Declare motor configuration
   private final TalonFXConfiguration m_motorConfig = new TalonFXConfiguration();
@@ -101,11 +113,12 @@ public class ElevatorSubsystem extends SubsystemBase {
 
   /** Creates a new ElevatorSubsystem */
   public ElevatorSubsystem() {
+    m_isFunnelReleased = false;
     if (RobotBase.isSimulation()) {
       SmartDashboard.putData("Elevator Sim", m_mech2d);
       m_elevatorMech2d.setColor(new Color8Bit(Color.kAntiqueWhite));
     }
-
+    
     TalonFXConfiguration m_motorConfig = new TalonFXConfiguration();
 
     // Set motor configuration
@@ -181,6 +194,13 @@ public class ElevatorSubsystem extends SubsystemBase {
   public void stop() {
     m_elevatorLeaderMotor.stopMotor();
     m_elevatorFollowerMotor.stopMotor();
+  }
+
+  // Releases funnel into up position
+  public void releaseFunnel() {
+      m_isFunnelReleased = true;
+      m_funnelServoleft.setAngle(180);
+      m_funnelServoright.setAngle(180);
   }
 
   /** Update telemetry, including the mechanism visualization */
