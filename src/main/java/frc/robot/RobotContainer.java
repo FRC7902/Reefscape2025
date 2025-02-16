@@ -10,6 +10,7 @@ import frc.robot.commands.elevator.ElevatorReefSetpoint;
 import frc.robot.subsystems.ElevatorSubsystem;
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.StadiaController.Button;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -61,37 +62,37 @@ public class RobotContainer {
   private void configureBindings() {
 
     // test setpoints one at a time
-    new JoystickButton(m_joystick, 1)
-        .onTrue(new InstantCommand(() -> m_elevatorSubsystem.setPosition(
-            ElevatorConstants.kLevel1)));
+    // new JoystickButton(m_joystick, 1)
+    //     .onTrue(new InstantCommand(() -> m_elevatorSubsystem.setPosition(
+    //         ElevatorConstants.kLevel1)));
 
     // new JoystickButton(m_joystick, 2)
-    // .onTrue(new InstantCommand(() -> m_elevatorSubsystem.setPosition(
-    // ElevatorConstants.kLevel2)));
+    //     .onTrue(new InstantCommand(() -> m_elevatorSubsystem.setPosition(
+    //         ElevatorConstants.kLevel2)));
 
     // new JoystickButton(m_joystick, 3)
-    // .onTrue(new InstantCommand(() -> m_elevatorSubsystem.setPosition(
-    // ElevatorConstants.kLevel3)));
+    //     .onTrue(new InstantCommand(() -> m_elevatorSubsystem.setPosition(
+    //         ElevatorConstants.kLevel3)));
 
-    // manually reset the elevator
+    // // manually reset the elevator
     // new JoystickButton(m_joystick, 4)
-    //     .onTrue(new InstantCommand(() -> m_elevatorSubsystem.zero()));
+    //     .onTrue(new InstantCommand(() -> m_elevatorSubsystem.setPosition(0)));
 
-    // m_operatorController.a().onTrue(new ElevatorReefSetpoint(ElevatorConstants.kLevel1));
-    // m_operatorController.b().onTrue(new ElevatorReefSetpoint(ElevatorConstants.kLevel2));
-    // m_operatorController.y().onTrue(new ElevatorReefSetpoint(ElevatorConstants.kLevel3));
+    m_operatorController.a().onTrue(new ElevatorReefSetpoint(ElevatorConstants.kLevel1));
+    m_operatorController.b().onTrue(new ElevatorReefSetpoint(ElevatorConstants.kLevel2));
+    m_operatorController.y().onTrue(new ElevatorReefSetpoint(ElevatorConstants.kLevel3));
 
-    // // SYSID COMMANDS
-    // // Run the SignalLogger when the left bumper is pressed, stop when the right bumper is pressed
-    // m_operatorController.leftBumper().onTrue(Commands.runOnce(SignalLogger::start));
-    // m_operatorController.rightBumper().onTrue(Commands.runOnce(SignalLogger::stop));
+    // Run the SignalLogger when the left bumper is pressed, stop when the right bumper is pressed
+    m_operatorController.leftBumper().onTrue(Commands.runOnce(SignalLogger::start));
+    m_operatorController.rightBumper().onTrue(Commands.runOnce(SignalLogger::stop));
 
-    // /*
-    //  * Joystick Y = quasistatic forward
-    //  * Joystick A = quasistatic reverse
-    //  * Joystick B = dynamic forward
-    //  * Joystick X = dyanmic reverse
-    //  */
+    // UNCOMMENT TO TEST
+    /*
+     * Joystick Y = quasistatic forward
+     * Joystick A = quasistatic reverse
+     * Joystick B = dynamic forward
+     * Joystick X = dyanmic reverse
+     */
     // m_operatorController.y().whileTrue(m_elevatorSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
     // m_operatorController.a().whileTrue(m_elevatorSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
     // m_operatorController.b().whileTrue(m_elevatorSubsystem.sysIdDynamic(SysIdRoutine.Direction.kForward));

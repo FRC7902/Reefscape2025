@@ -28,9 +28,6 @@ public final class Constants {
     public static final int kElevatorLeaderCAN = 0;
     public static final int kElevatorFollowerCAN = 1;
 
-    // Digital Inputs
-    public static final int kRetractLimitSwitchChannel = 0; // TODO: modify
-
     // Physical Constants
     public static final double kGearRatio = 7.5;
     public static final double kCarriageMass = Units.lbsToKilograms(20);
@@ -44,7 +41,7 @@ public final class Constants {
 
     // Motion Constraints
     public static final double kMaxVelocity = 80.0;
-    public static final double kMaxAcceleration = 160.0; // TODO: modify
+    public static final double kMaxAcceleration = 160.0; 
 
     // PID Constants
     public static final double kP = 1;
@@ -55,7 +52,7 @@ public final class Constants {
     // set all to 0 during testing
     public static final double kMaxV = 10.0; // volts
     public static final double kS = 0.0; // negligible
-    public static final double kG = 0.2;
+    public static final double kG = 0.2; 
     public static final double kV = 6.85 * kElevatorMetersPerMotorRotation;
     public static final double kA = 0.04 * kElevatorMetersPerMotorRotation;
 
@@ -70,6 +67,5 @@ public final class Constants {
 
     // Encoder Constants
     public static final int kEncoderCPR = 2048;
-    public static final double kElevatorDistPerPulse = (2 * Math.PI * kDrumRadius) / (kEncoderCPR / 4);
   }
 }
