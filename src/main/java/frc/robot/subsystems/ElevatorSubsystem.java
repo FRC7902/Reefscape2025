@@ -58,9 +58,9 @@ public class ElevatorSubsystem extends SubsystemBase {
   /** Object of a simulated elevator */
   private final ElevatorSim m_elevatorSim = new ElevatorSim(
       DCMotor.getFalcon500(2),
-      ElevatorConstants.kGearRatio,
-      ElevatorConstants.kCarriageMass,
-      ElevatorConstants.kDrumRadius,
+      ElevatorConstants.kElevatorGearing,
+      ElevatorConstants.kElevatorCarriageMass,
+      ElevatorConstants.kElevatorDrumRadius,
       ElevatorConstants.kElevatorMinHeightMeters,
       ElevatorConstants.kElevatorMaxHeightMeters,
       true,
@@ -113,13 +113,13 @@ public class ElevatorSubsystem extends SubsystemBase {
     m_motorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
     // Set slot
-    m_motorConfig.Slot0.kP = ElevatorConstants.kP;
-    m_motorConfig.Slot0.kI = ElevatorConstants.kI;
-    m_motorConfig.Slot0.kD = ElevatorConstants.kD;
-    m_motorConfig.Slot0.kS = ElevatorConstants.kS;
-    m_motorConfig.Slot0.kV = ElevatorConstants.kV;
-    m_motorConfig.Slot0.kA = ElevatorConstants.kA;
-    m_motorConfig.Slot0.kG = ElevatorConstants.kG;
+    m_motorConfig.Slot0.kP = ElevatorConstants.kElevatorP;
+    m_motorConfig.Slot0.kI = ElevatorConstants.kElevatorI;
+    m_motorConfig.Slot0.kD = ElevatorConstants.kElevatorD;
+    m_motorConfig.Slot0.kS = ElevatorConstants.kElevatorS;
+    m_motorConfig.Slot0.kV = ElevatorConstants.kElevatorV;
+    m_motorConfig.Slot0.kA = ElevatorConstants.kElevatorA;
+    m_motorConfig.Slot0.kG = ElevatorConstants.kElevatorG;
 
     // Set gravity type
     m_motorConfig.Slot0.GravityType = GravityTypeValue.Elevator_Static;
@@ -210,7 +210,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
   /** Returns whether the elevator is at the setpoint */
   public boolean atHeight() {
-    return Math.abs(getPositionMeters() - m_setpoint) <= ElevatorConstants.kTargetError;
+    return Math.abs(getPositionMeters() - m_setpoint) <= ElevatorConstants.kElevatorTargetError;
   }
 
   /**
@@ -309,17 +309,15 @@ public class ElevatorSubsystem extends SubsystemBase {
     if (isAtRetractLimit()) {
       zero();
       m_homed = true;
-      m_orchestra.stop();
+      m_orchestra.pause();
+    } else {
+      m_orchestra.loadMusic(m_songs[0]); 
+      m_orchestra.play();
     }
 
     if (!m_homed && !m_homingCommand.isScheduled()) {
         m_homingCommand.schedule();
     }    
-  
-    if (getPositionMeters() != 0) {
-        m_orchestra.loadMusic(m_songs[0]); 
-        m_orchestra.play();
-    } 
    
     // Update SmartDashboard
     SmartDashboard.putNumber("Elevator position (m)", getPositionMeters());
