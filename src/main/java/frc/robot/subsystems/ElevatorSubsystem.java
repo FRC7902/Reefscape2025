@@ -4,7 +4,9 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.SignalLogger;
+import com.ctre.phoenix6.configs.HardwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
@@ -13,10 +15,12 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.signals.ReverseLimitSourceValue;
+import com.ctre.phoenix6.signals.ReverseLimitTypeValue;
+import com.ctre.phoenix6.signals.ReverseLimitValue;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import static edu.wpi.first.units.Units.Volts;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
@@ -42,10 +46,14 @@ public class ElevatorSubsystem extends SubsystemBase {
   // Declare motor configuration
   private final TalonFXConfiguration m_motorConfig = new TalonFXConfiguration();
 
+  // Declare voltage output
   private final VoltageOut m_voltReq = new VoltageOut(0.0);
+
+  // Declare Motion Magic voltage
   private MotionMagicVoltage m_request = new MotionMagicVoltage(0).withSlot(0);
 
-  private final DigitalInput m_retractLimit = new DigitalInput(ElevatorConstants.kRetractLimitSwitchChannel);;
+  // Declare orchestra
+  private Orchestra m_orchestra = new Orchestra();
 
   /** Object of a simulated elevator */
   private final ElevatorSim m_elevatorSim = new ElevatorSim(
@@ -79,8 +87,17 @@ public class ElevatorSubsystem extends SubsystemBase {
           null,
           this));
 
+  // private int slot = 0;
   private double m_setpoint;
   private boolean m_homed;
+  private Command m_homingCommand;
+
+  private String[] m_songs = new String[] {
+    "song1.chrp",
+    "song2.chrp", // under the sea
+    "song3.chrp",
+    "song4.chrp"
+  };
 
   /** Creates a new ElevatorSubsystem */
   public ElevatorSubsystem() {
@@ -104,12 +121,14 @@ public class ElevatorSubsystem extends SubsystemBase {
     m_motorConfig.Slot0.kA = ElevatorConstants.kA;
     m_motorConfig.Slot0.kG = ElevatorConstants.kG;
 
-    //m_motorConfig.Slot0.GravityType = GravityTypeValue.Elevator_Static;
+    // Set gravity type
+    m_motorConfig.Slot0.GravityType = GravityTypeValue.Elevator_Static;
 
     // Set motion magic
-    m_motorConfig.MotionMagic.MotionMagicCruiseVelocity = 80;// Target cruise velocity of 80 rps
+    m_motorConfig.MotionMagic.MotionMagicCruiseVelocity = 80; // Target cruise velocity of 80 rps
     m_motorConfig.MotionMagic.MotionMagicAcceleration = 160; // Target acceleration of 160 rps/s (0.5 seconds)
     m_motorConfig.MotionMagic.MotionMagicJerk = 1600; // Target jerk of 1600 rps/s/s (0.1 seconds)
+
 
     // Set safety limits
     m_motorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
@@ -122,6 +141,17 @@ public class ElevatorSubsystem extends SubsystemBase {
     m_motorConfig.CurrentLimits.SupplyCurrentLimit = 40;
     m_motorConfig.CurrentLimits.StatorCurrentLimitEnable = false;
     m_motorConfig.CurrentLimits.StatorCurrentLimit = 125;
+
+    // Create a new HardwareLimitSwitchConfigs object
+    HardwareLimitSwitchConfigs limitConfigs = new HardwareLimitSwitchConfigs();
+
+    // Configure the reverse limit switch
+    limitConfigs.ReverseLimitType = ReverseLimitTypeValue.NormallyOpen;
+    limitConfigs.ReverseLimitEnable = true;
+    limitConfigs.ReverseLimitSource = ReverseLimitSourceValue.LimitSwitchPin;
+
+    // Apply the configuration to your TalonFX
+    m_elevatorLeaderMotor.getConfigurator().apply(limitConfigs);
 
     // Apply configuration to motors
     m_elevatorLeaderMotor.getConfigurator().apply(m_motorConfig);
@@ -139,7 +169,12 @@ public class ElevatorSubsystem extends SubsystemBase {
     m_elevatorFollowerMotor.optimizeBusUtilization();
     m_elevatorLeaderMotor.optimizeBusUtilization();
 
-    m_homed = true;
+    m_orchestra.addInstrument(m_elevatorLeaderMotor);
+    m_orchestra.addInstrument(m_elevatorFollowerMotor);
+
+    m_homed = false;
+    m_homingCommand = homeCommand(); 
+  
   }
 
   /** Stop the motors */
@@ -175,7 +210,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
   /** Returns whether the elevator is at the setpoint */
   public boolean atHeight() {
-    return Math.abs(getPositionMeters() - m_setpoint) < ElevatorConstants.kTargetError;
+    return Math.abs(getPositionMeters() - m_setpoint) <= ElevatorConstants.kTargetError;
   }
 
   /**
@@ -187,17 +222,27 @@ public class ElevatorSubsystem extends SubsystemBase {
     m_setpoint = setpoint;
   }
 
+  /**
+   * Set the position of the elevator
+   * 
+   * @param position The position in meters
+   */
   public void setPosition(double position) {
-    double positionRotations = position / ElevatorConstants.kElevatorMetersPerMotorRotation;
-    // m_request = m_request.withPosition(positionRotations).withSlot(0);
-    m_elevatorLeaderMotor.setControl(m_request.withPosition(positionRotations).withSlot(0));
-
     m_setpoint = position;
+    double positionRotations = position / ElevatorConstants.kElevatorMetersPerMotorRotation;
+    // slot = (position < 1.0) ? 0 : 1; // Use Slot 1 for heights above 1 meter
+    // m_request = m_request.withPosition(positionRotations).withSlot(slot);
+    
+    m_request = m_request.withPosition(positionRotations).withSlot(0);
+    m_elevatorLeaderMotor.setControl(m_request);
+    // if (m_homed) {
+    //   m_elevatorLeaderMotor.setControl(m_request.withSlot(0));
+    // }
   }
 
   /** Returns whether the elevator is at the retract limit */
   public boolean isAtRetractLimit() {
-    return !m_retractLimit.get();
+    return m_elevatorLeaderMotor.getReverseLimit().getValue() == ReverseLimitValue.ClosedToGround;
   }
 
   /**
@@ -218,8 +263,10 @@ public class ElevatorSubsystem extends SubsystemBase {
   public Command sysIdDynamic(SysIdRoutine.Direction direction) {
     return m_sysIdRoutine.dynamic(direction);
   }
+
   /**
-   * A command that homes the elevator by retracting it until the retract limit switch is triggered. 
+   * A command that homes the elevator by retracting it until the retract limit
+   * switch is triggered.
    *
    * @return A command that homes the elevator
    */
@@ -236,7 +283,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         },
         () -> {
           // Start retracting the elevator
-          m_elevatorLeaderMotor.set(-0.4); // adjust
+          m_elevatorLeaderMotor.set(-0.4);
         },
         (interrupted) -> {
           // Enable soft limits and stop the elevator
@@ -249,7 +296,8 @@ public class ElevatorSubsystem extends SubsystemBase {
           if (!interrupted) {
             zero();
             m_homed = true;
-            SmartDashboard.putBoolean("Homed", m_homed);
+          } else {
+           m_homed = false;
           }
         },
         this::isAtRetractLimit, // End the command when the retract limit is hit
@@ -258,25 +306,21 @@ public class ElevatorSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // if (!m_homed) {
-    //   if (isAtRetractLimit()) {
-    //     m_homed = true;
-    //     zero();
-    //   } else {
-    //     // If not at the retract limit, and not homed, retract slowly until the limit is hit
-    //     homeCommand().schedule();
-    //   }
-    // } else {
-    //   // Once homed, then use motion magic
-    //   if (!atHeight()) {
-    //     double positionRotations = m_setpoint / ElevatorConstants.kElevatorMetersPerMotorRotation;
-    //     m_request = m_request.withPosition(positionRotations).withSlot(0);
-    //     m_elevatorLeaderMotor.setControl(m_request.withPosition(positionRotations).withSlot(0));
-    //   } else {
-    //     stop();
-    //   }
-    // }
+    if (isAtRetractLimit()) {
+      zero();
+      m_homed = true;
+      m_orchestra.stop();
+    }
 
+    if (!m_homed && !m_homingCommand.isScheduled()) {
+        m_homingCommand.schedule();
+    }    
+  
+    if (getPositionMeters() != 0) {
+        m_orchestra.loadMusic(m_songs[0]); 
+        m_orchestra.play();
+    } 
+   
     // Update SmartDashboard
     SmartDashboard.putNumber("Elevator position (m)", getPositionMeters());
     SmartDashboard.putNumber("Elevator setpoint position (m)", m_elevatorLeaderMotor.getClosedLoopReference().getValueAsDouble() * ElevatorConstants.kElevatorMetersPerMotorRotation);
@@ -284,6 +328,8 @@ public class ElevatorSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Rotations", m_elevatorLeaderMotor.getPosition().getValueAsDouble());
     SmartDashboard.putNumber("Rotations setpoint", m_elevatorLeaderMotor.getClosedLoopReference().getValueAsDouble());
     SmartDashboard.putBoolean("Homed", m_homed);
+    SmartDashboard.putBoolean("Reverse limit switch", isAtRetractLimit());
+    // SmartDashboard.putNumber("Slot", slot);
 
     updateTelemetry();
   }
@@ -303,8 +349,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     m_elevatorLeaderMotor.getSimState().setRotorVelocity(velocityRps);
 
     // Update battery simulation
-    RoboRioSim.setVInVoltage(
-        BatterySim.calculateDefaultBatteryLoadedVoltage(m_elevatorSim.getCurrentDrawAmps()));
+    RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(m_elevatorSim.getCurrentDrawAmps()));
   }
 
 }
