@@ -40,6 +40,9 @@ public final class Constants {
     public static final int armUpVoltage=7;
     public static final double armDownVoltage=-7;
 
+    public static final double MinAngle = 0.0; // Minimum allowed angle
+    public static final double MaxAngle = 180.0; // Maximum allowed angle
+
   }
 
   public static class IntakeConstants {

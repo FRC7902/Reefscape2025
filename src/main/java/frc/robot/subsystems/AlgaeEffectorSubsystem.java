@@ -35,6 +35,8 @@ public class AlgaeEffectorSubsystem extends SubsystemBase {
     private final SparkMax  elevatorManipulator = new SparkMax(OperatorConstants.elevatorManipulatorID, MotorType.kBrushless);
     private final SparkMaxConfig elevatorManipulatorConfig = new SparkMaxConfig();
 
+    //
+    private double targetAngle;
 
     // the pid controller 
     private final PIDController algaeArmController = new PIDController(OperatorConstants.algaeArmControllerKp,OperatorConstants.algaeArmControllerKi, OperatorConstants.algaeArmControllerKd);
@@ -107,9 +109,26 @@ public class AlgaeEffectorSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+
+        double output = algaeArmController.calculate(armPivotEncoder.get(), targetAngle);
+
+        groundIntakePivot.set(output);
+
             if (hasAlgae()&&(groundIntakeRoller.get()<0)){ //groundIntakeRoller.get() returns the rpm value of the motor
                 groundIntakeRoller.stopMotor();            //which can be -1 to +1 depending on the speed and direction of the motor
             }
+    }
+
+    public void setArmAngle(double targetAngleDegrees) {
+        // Check if the target angle is within the valid range
+        if (targetAngleDegrees >= OperatorConstants.MinAngle && targetAngleDegrees <= OperatorConstants.MaxAngle) {
+            targetAngle = targetAngleDegrees;
+            
+
+        } else {
+            
+        }
+       
     }
 
     public void armStop(){ //might not need

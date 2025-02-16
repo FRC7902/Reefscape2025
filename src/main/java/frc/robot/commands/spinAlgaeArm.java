@@ -30,17 +30,17 @@ public class spinAlgaeArm extends Command {
   public void execute() {
 
     if (RobotContainer.m_operatorStick.getAButton()){
-      RobotContainer.m_intake.algaeOuttake();
+      RobotContainer.m_intake.setGroundAlgaeVoltage(1);
     }
 
 
     if (RobotContainer.m_operatorStick.getXButton()){
-      RobotContainer.m_intake.algaeIntake();
+      RobotContainer.m_intake.setGroundAlgaeVoltage(2);
     }
 
     
     if (RobotContainer.m_operatorStick.getYButton()){
-      RobotContainer.m_intake.algaeStop();
+      RobotContainer.m_intake.setGroundAlgaeVoltage(3);
     }
    
     
@@ -50,7 +50,7 @@ public class spinAlgaeArm extends Command {
   @Override
   public void end(boolean interrupted) {
 
-    RobotContainer.m_intake.algaeStop();
+    RobotContainer.m_intake.setGroundAlgaeVoltage(3);
   }
 
   // Returns true when the command should end.
