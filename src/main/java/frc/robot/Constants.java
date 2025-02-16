@@ -29,10 +29,10 @@ public final class Constants {
     public static final int kElevatorFollowerCAN = 1;
 
     // Physical Constants
-    public static final double kGearRatio = 7.5;
-    public static final double kCarriageMass = Units.lbsToKilograms(20);
-    public static final double kDrumRadius = Units.inchesToMeters(1.625 / 2);
-    public static final double kElevatorMetersPerMotorRotation = (kDrumRadius * 2 * Math.PI) / kGearRatio;
+    public static final double kElevatorGearing = 7.5;
+    public static final double kElevatorCarriageMass = Units.lbsToKilograms(20);
+    public static final double kElevatorDrumRadius = Units.inchesToMeters(1.625 / 2);
+    public static final double kElevatorMetersPerMotorRotation = (kElevatorDrumRadius * 2 * Math.PI) / kElevatorGearing;
 
     // Elevator Dimensions
     public static final double kElevatorHeightMeters = 0.0;
@@ -40,21 +40,21 @@ public final class Constants {
     public static final double kElevatorMaxHeightMeters = Units.inchesToMeters(39.75);
 
     // Motion Constraints
-    public static final double kMaxVelocity = 80.0;
-    public static final double kMaxAcceleration = 160.0; 
+    public static final double kElevatorMaxVelocity = 80.0;
+    public static final double kElevatorMaxAcceleration = 160.0; 
 
     // PID Constants
-    public static final double kP = 1;
-    public static final double kI = 0.0;
-    public static final double kD = 0.01;
+    public static final double kElevatorP = 1;
+    public static final double kElevatorI = 0.0;
+    public static final double kElevatorD = 0.01;
 
     // Elevator Gains
     // set all to 0 during testing
-    public static final double kMaxV = 10.0; // volts
-    public static final double kS = 0.0; // negligible
-    public static final double kG = 0.2; 
-    public static final double kV = 6.85 * kElevatorMetersPerMotorRotation;
-    public static final double kA = 0.04 * kElevatorMetersPerMotorRotation;
+    public static final double kElevatorMaxV = 10.0; // volts
+    public static final double kElevatorS = 0.0; // negligible
+    public static final double kElevatorG = 0.2; 
+    public static final double kElevatorV = 6.85 * kElevatorMetersPerMotorRotation;
+    public static final double kElevatorA = 0.04 * kElevatorMetersPerMotorRotation;
 
     // Elevator Setpoints
     public static final double kLevel1 = Units.inchesToMeters(31.875);
@@ -62,10 +62,8 @@ public final class Constants {
     public static final double kLevel3 = Units.inchesToMeters(72.0);
 
     // Control Parameters
-    public static final double kTargetError = 2;
-    public static final double kMotorResistance = 0.002; // Assume 2mOhm resistance for voltage drop calculation
+    public static final double kElevatorTargetError = 2;
+    public static final double kElevatorMotorResistance = 0.002; // Assume 2mOhm resistance for voltage drop calculation
 
-    // Encoder Constants
-    public static final int kEncoderCPR = 2048;
   }
 }
