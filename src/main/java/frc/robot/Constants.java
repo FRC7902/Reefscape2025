@@ -40,9 +40,18 @@ public final class Constants {
     public static final int kMotorCANId = 30;
     public static final int kMotorCurrentLimit = 60;
 
-    public static final int kbeamBreakPortId = 9;
+    public static final int kbeamBreakPortId = 8;
 
     public static final int kIntakeVoltage = 12;
     public static final int kOuttakeVoltage = -12;
   }
+  public static class IndexConstants {
+    public static int kIndexMotorCAN = 38;
+    public static final double kRampRate = 0;
+    public static final double kShootSpeed = 40;
+    public static double kS = 1;
+    public static double kV = 1;
+    public static final int kBeamSensorPort = 9; 
+  }
 }
+
