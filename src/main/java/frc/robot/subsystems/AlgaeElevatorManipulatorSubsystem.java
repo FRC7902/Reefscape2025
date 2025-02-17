@@ -34,6 +34,11 @@ public class AlgaeElevatorManipulatorSubsystem extends SubsystemBase {
   }
 
   public void setIntakeVoltage(double voltage) {
+
+    // TODO: For safety, if moving, check current for some duration (e.g., 0.5 sec),
+    // if current is above threshold, stop motor. Due to current limit of 60A, we do
+    // not want the motor to be running for more than 75s.
+
     m_motor.setVoltage(voltage);
   }
 
