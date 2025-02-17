@@ -29,6 +29,30 @@ public final class Constants {
                                                // correct
   public static final double MAX_SPEED = Units.feetToMeters(15);
 
+  public static class ClimbConstants {
+    // CAN ID of the primary motor
+    public static final int kClimbLeaderMotorCANID = 41;
+    // CAN ID of the secondary motor
+    public static final int kClimbFollowerMotorCANID = 42;
+    public static final int kRevThroughBoreIO = 0;
+    // current limit when motor rpm is at 0 (in amps)
+    public static final int kMotorStallCurrent = 50;
+    // current limit when motor rpm is greater than 5700 rpm (since we are using neo
+    // motors) (in amps)
+    public static final int kMotorFreeSpeedCurrent = 50;
+    // rpm limit, where any rpm values that are below the limit you set will be set
+    // to the stall current.
+    // rpm greater than the set rpm limit will linearly increase to the free current
+    // limit.
+    // speed of motors when moving up
+    public static final double kClimbUpMotorSpeed = 0.5;
+    // speed of motors when moving down
+    public static final double kClimbRestPosition = 0.5;
+    public static final double kClimbRaisedPosition = 0.5;
+    public static final double kMotorVoltageUp = 12;
+    public static final double kMotorVoltageDown = -12;
+  }
+
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
     public static final int kOperatorControllerPort = 1;
@@ -100,6 +124,7 @@ public final class Constants {
     // Control Parameters
     public static final double kElevatorTargetError = 0.005;
     public static final double kElevatorMotorResistance = 0.002; // Assume 2mOhm resistance for voltage drop calculation
+    public static final int kOperatorControllerPort = 0;
 
   }
 }
