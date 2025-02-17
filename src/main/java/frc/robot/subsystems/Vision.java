@@ -48,11 +48,11 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Vision extends SubsystemBase {
   public static final AprilTagFieldLayout fieldLayout = AprilTagFieldLayout.loadField(
       AprilTagFields.k2025Reefscape);
-  private final       double              maximumAmbiguity                = 0.25;
-  public              VisionSystemSim     visionSim;
-  private             double              longDistancePoseEstimationCount = 0;
-  private             Supplier<Pose2d>    currentPose;
-  private             Field2d             field2d;
+  private final double maximumAmbiguity = 0.25; //used in deleted deprecated method from yagsl
+  public VisionSystemSim visionSim;
+  private double longDistancePoseEstimationCount = 0; //used in deleted deprecated method from yagsl
+  private Supplier<Pose2d> currentPose;
+  private Field2d field2d;
 
   public Vision(Supplier<Pose2d> currentPose, Field2d field) {
     this.currentPose = currentPose;
@@ -62,12 +62,10 @@ public class Vision extends SubsystemBase {
     {
       visionSim = new VisionSystemSim("Vision");
       visionSim.addAprilTags(fieldLayout);
-
       for (Cameras c : Cameras.values())
       {
         c.addToVisionSim(visionSim);
       }
-
       openSimCameraViews();
     }
   }
@@ -194,7 +192,7 @@ public class Vision extends SubsystemBase {
 
     field2d.getObject("tracked targets").setPoses(poses);
   }
-  enum Cameras
+  public enum Cameras
   {
     MAIN_CAM("Markham_Firebirds Camera",
                new Rotation3d(0, Units.degreesToRadians(18), 0),
@@ -230,15 +228,15 @@ public class Vision extends SubsystemBase {
     /**
      * Simulated camera instance which only exists during simulations.
      */
-    public        PhotonCameraSim              cameraSim;
+    public PhotonCameraSim cameraSim;
     /**
      * Results list to be updated periodically and cached to avoid unnecessary queries.
      */
-    public        List<PhotonPipelineResult>   resultsList       = new ArrayList<>();
+    public List<PhotonPipelineResult> resultsList  = new ArrayList<>();
     /**
      * Last read from the camera timestamp to prevent lag due to slow data fetches.
      */
-    private       double                       lastReadTimestamp = Microseconds.of(NetworkTablesJNI.now()).in(Seconds);
+    private double lastReadTimestamp = Microseconds.of(NetworkTablesJNI.now()).in(Seconds);
 
     /**
      * Construct a Photon Camera class with help. Standard deviations are fake values, experiment and determine
