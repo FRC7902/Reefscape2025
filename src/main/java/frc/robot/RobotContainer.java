@@ -14,8 +14,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
-import frc.robot.commands.teleop.IntakeGroundAlgaeCommand;
-import frc.robot.commands.teleop.OuttakeGroundAlgaeCommand;
+import frc.robot.commands.teleop.IntakeAlgaeCommand;
+import frc.robot.commands.teleop.OuttakeAlgaeCommand;
 import frc.robot.subsystems.AlgaeElevatorManipulatorSubsystem;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
@@ -140,8 +140,8 @@ public class RobotContainer {
 
         m_driverController.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
 
-        m_driverController.leftBumper().whileTrue(new IntakeGroundAlgaeCommand());
-        m_driverController.rightBumper().whileTrue(new OuttakeGroundAlgaeCommand());
+        m_driverController.leftBumper().whileTrue(new IntakeAlgaeCommand());
+        m_driverController.rightBumper().whileTrue(new OuttakeAlgaeCommand());
     }
 
     /**
