@@ -4,7 +4,12 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import swervelib.math.Matter;
 
@@ -32,5 +37,15 @@ public final class Constants {
 
     // Joystick Deadband
     public static final double DEADBAND = 0.5;
+  }
+
+  public final class VisionConstants {
+    public static Rotation3d CAMERA_ROTATION = new Rotation3d(0,Units.degreesToRadians(18),0);
+    public static final Translation3d CAMERA_TRANSLATION = new Translation3d(
+            Units.inchesToMeters(-4.628),
+            Units.inchesToMeters(-10.687),
+            Units.inchesToMeters(16.129));
+    public static final Matrix<N3, N1> SINGLE_TAG_STD_DEVS = VecBuilder.fill(4, 4, 8);
+    public static final Matrix<N3, N1> MULTI_TAG_STD_DEVS = VecBuilder.fill(0.5, 0.5, 1);
   }
 }
