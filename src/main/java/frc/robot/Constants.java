@@ -35,4 +35,14 @@ public final class Constants {
     // Joystick Deadband
     public static final double DEADBAND = 0.5;
   }
+
+  public static class AlgaeElevatorManipulatorConstants {
+    public static final int kMotorCANId = 30;
+    public static final int kMotorCurrentLimit = 60;
+
+    public static final int kbeamBreakPortId = 9;
+
+    public static final int kIntakeVoltage = 12;
+    public static final int kOuttakeVoltage = -12;
+  }
 }
