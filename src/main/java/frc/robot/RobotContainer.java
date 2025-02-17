@@ -6,9 +6,7 @@ package frc.robot;
 
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.elevator.ElevatorLevel1;
-import frc.robot.commands.elevator.ElevatorLevel2;
-import frc.robot.commands.elevator.ElevatorLevel3;
+import frc.robot.commands.elevator.ElevatorReefSetpoint;
 import frc.robot.subsystems.ElevatorSubsystem;
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.wpilibj.Joystick;
@@ -85,10 +83,15 @@ public class RobotContainer {
     // m_operatorController.y().onTrue(new InstantCommand(() -> m_elevatorSubsystem.setPosition(ElevatorConstants.kLevel3)));
     //m_operatorController.x().onTrue(new InstantCommand(() -> m_elevatorSubsystem.setPosition(ElevatorConstants.kElevatorMinHeightMeters)));
 
-    m_operatorController.a().onTrue(new ElevatorLevel1(ElevatorConstants.kLevel1));
-    m_operatorController.b().onTrue(new ElevatorLevel2(ElevatorConstants.kLevel2));
-    m_operatorController.y().onTrue(new ElevatorLevel3(ElevatorConstants.kLevel3));
+    // m_operatorController.a().onTrue(new ElevatorReefSetpoint(ElevatorConstants.kLevel1));
+    // m_operatorController.b().onTrue(new ElevatorReefSetpoint(ElevatorConstants.kLevel2));
+    // m_operatorController.y().onTrue(new ElevatorReefSetpoint(ElevatorConstants.kLevel3));
+    // m_operatorController.y().onTrue(new ElevatorReefSetpoint(ElevatorConstants.kElevatorMinHeightMeters));
 
+    m_operatorController.a().onTrue(new ElevatorReefSetpoint(ElevatorConstants.kLevel1));
+    m_operatorController.b().onTrue(new ElevatorReefSetpoint(ElevatorConstants.kLevel2));
+    m_operatorController.y().onTrue(new ElevatorReefSetpoint(ElevatorConstants.kLevel3));
+    m_operatorController.x().onTrue(new ElevatorReefSetpoint(ElevatorConstants.kElevatorMinHeightMeters));
 
     // Run the SignalLogger when the left bumper is pressed, stop when the right bumper is pressed
     m_operatorController.leftBumper().onTrue(Commands.runOnce(SignalLogger::start));
