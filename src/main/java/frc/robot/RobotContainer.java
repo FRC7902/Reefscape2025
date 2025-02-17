@@ -9,9 +9,7 @@ import java.io.File;
 import edu.wpi.first.wpilibj.Filesystem;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.elevator.ElevatorLevel1;
-import frc.robot.commands.elevator.ElevatorLevel2;
-import frc.robot.commands.elevator.ElevatorLevel3;
+import frc.robot.commands.elevator.ElevatorReefSetpoint;
 import frc.robot.subsystems.ElevatorSubsystem;
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.wpilibj.Joystick;
@@ -159,10 +157,14 @@ public class RobotContainer {
 
         m_driverController.rightTrigger().whileTrue(new SetShootSpeed());
 
-        // m_operatorController.a().onTrue(new ElevatorReefSetpoint(ElevatorConstants.kLevel1));
-        // m_operatorController.b().onTrue(new ElevatorReefSetpoint(ElevatorConstants.kLevel2));
-        // m_operatorController.y().onTrue(new ElevatorReefSetpoint(ElevatorConstants.kLevel3));
-        // m_operatorController.x().onTrue(new ElevatorReefSetpoint(ElevatorConstants.kElevatorMinHeightMeters));
+        // m_operatorController.a().onTrue(new
+        // ElevatorReefSetpoint(ElevatorConstants.kLevel1));
+        // m_operatorController.b().onTrue(new
+        // ElevatorReefSetpoint(ElevatorConstants.kLevel2));
+        // m_operatorController.y().onTrue(new
+        // ElevatorReefSetpoint(ElevatorConstants.kLevel3));
+        // m_operatorController.x().onTrue(new
+        // ElevatorReefSetpoint(ElevatorConstants.kElevatorMinHeightMeters));
     }
 
     /**
