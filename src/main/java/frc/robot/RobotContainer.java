@@ -157,14 +157,10 @@ public class RobotContainer {
 
         m_driverController.rightTrigger().whileTrue(new SetShootSpeed());
 
-        // m_operatorController.a().onTrue(new
-        // ElevatorReefSetpoint(ElevatorConstants.kLevel1));
-        // m_operatorController.b().onTrue(new
-        // ElevatorReefSetpoint(ElevatorConstants.kLevel2));
-        // m_operatorController.y().onTrue(new
-        // ElevatorReefSetpoint(ElevatorConstants.kLevel3));
-        // m_operatorController.x().onTrue(new
-        // ElevatorReefSetpoint(ElevatorConstants.kElevatorMinHeightMeters));
+        m_operatorController.a().onTrue(new ElevatorReefSetpoint(ElevatorConstants.kLevel1));
+        m_operatorController.b().onTrue(new ElevatorReefSetpoint(ElevatorConstants.kLevel2));
+        m_operatorController.y().onTrue(new ElevatorReefSetpoint(ElevatorConstants.kLevel3));
+        m_operatorController.x().onTrue(new ElevatorReefSetpoint(ElevatorConstants.kElevatorMinHeightMeters));
     }
 
     /**
