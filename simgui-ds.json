@@ -1,19 +1,14 @@
 {
-<<<<<<< HEAD
   "FMS": {
     "window": {
       "visible": false
     }
   },
   "Keyboard 1 Settings": {
-=======
-  "Keyboard 0 Settings": {
->>>>>>> 407b22e (added initial sim code)
     "window": {
       "visible": true
     }
   },
-<<<<<<< HEAD
   "keyboardJoysticks": [
     {
       "axisConfig": [
@@ -21,26 +16,6 @@
         {
           "decKey": 87,
           "incKey": 262
-=======
-  "System Joysticks": {
-    "window": {
-      "enabled": false
-    }
-  },
-  "System Joysticks": {
-    "window": {
-      "enabled": false
-    }
-  },
-  "keyboardJoysticks": [
-    {
-      "axisConfig": [
-        {
-          "incKey": 87
-        },
-        {
-          "incKey": 83
->>>>>>> 407b22e (added initial sim code)
         },
         {
           "decKey": 69,
@@ -49,7 +24,6 @@
           "keyRate": 0.009999999776482582
         }
       ],
-<<<<<<< HEAD
       "axisCount": 4,
       "buttonCount": 4,
       "buttonKeys": [
@@ -58,15 +32,6 @@
         -1,
         -1,
         -1
-=======
-      "axisCount": 3,
-      "buttonCount": 4,
-      "buttonKeys": [
-        90,
-        88,
-        67,
-        86
->>>>>>> 407b22e (added initial sim code)
       ],
       "povConfig": [
         {
@@ -96,29 +61,17 @@
       "axisCount": 2,
       "buttonCount": 4,
       "buttonKeys": [
-<<<<<<< HEAD
         65,
         66,
         67,
         68
-=======
-        77,
-        44,
-        46,
-        47
->>>>>>> 407b22e (added initial sim code)
       ],
       "povCount": 0
     },
     {
       "axisConfig": [
         {
-<<<<<<< HEAD
           "decKey": 263
-=======
-          "decKey": 263,
-          "incKey": 262
->>>>>>> 407b22e (added initial sim code)
         },
         {
           "decKey": 265,
@@ -142,7 +95,6 @@
       "buttonCount": 0,
       "povCount": 0
     }
-<<<<<<< HEAD
   ],
   "robotJoysticks": [
     {
@@ -151,7 +103,5 @@
     {
       "guid": "Keyboard1"
     }
-=======
->>>>>>> 407b22e (added initial sim code)
   ]
 }
