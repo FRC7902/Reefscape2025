@@ -10,13 +10,13 @@ import frc.robot.Constants.ClimbConstants;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.ClimbSubsystem;
 
-public class MoveClimbUp extends Command {
+public class MoveClimbDown extends Command {
 
   private ClimbSubsystem m_climb;
   private RobotContainer m_robotContainer;
 
   
-  public MoveClimbUp(ClimbSubsystem climb, RobotContainer robotContainer) {
+  public MoveClimbDown(ClimbSubsystem climb, RobotContainer robotContainer) {
     m_climb = climb;
     m_robotContainer = robotContainer;
     addRequirements(getRequirements());
@@ -31,16 +31,7 @@ public class MoveClimbUp extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    /*
-    if (m_climb.getEncoderDistance() < ClimbConstants.kClimbRaisedPosition) {
-      m_climb.driveMotors(ClimbConstants.kClimbRaisedPosition);
-    }
-    else if (m_climb.getEncoderDistance() >= ClimbConstants.kClimbRaisedPosition) {
-      m_climb.stopMotors();
-      m_robotContainer.m_operatorController.setRumble(RumbleType.kBothRumble, 1);
-    }
-    */
-    m_climb.driveMotors(ClimbConstants.kMotorVoltageUp);
+    m_climb.driveMotors(ClimbConstants.kMotorVoltageDown);
   }
 
   // Called once the command ends or is interrupted.

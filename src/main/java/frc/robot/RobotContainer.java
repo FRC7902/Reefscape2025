@@ -20,6 +20,7 @@ import frc.robot.commands.teleop.IntakeAlgaeCommand;
 import frc.robot.commands.teleop.IntakeCoralCommand;
 import frc.robot.commands.teleop.NullCommand;
 import frc.robot.commands.teleop.OuttakeAlgaeCommand;
+import frc.robot.commands.teleopCommands.climb.MoveClimbDown;
 import frc.robot.commands.teleopCommands.climb.MoveClimbUp;
 import frc.robot.subsystems.AlgaeElevatorManipulatorSubsystem;
 import frc.robot.subsystems.ClimbSubsystem;

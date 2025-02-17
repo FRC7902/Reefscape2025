@@ -34,16 +34,16 @@ public class ClimbSubsystem extends SubsystemBase {
 
     private final SparkMaxSim s_climbLeaderMotor = new SparkMaxSim(m_climbLeaderMotor, motorSim);
 
-    
     //object creation of motor configuration (used to configure tbe motors)
     private final SparkMaxConfig m_climbLeaderMotorConfig = new SparkMaxConfig();
     private final SparkMaxConfig m_climbFollowerMotorConfig = new SparkMaxConfig();
 
     //object creation of absolute encoder. The REV Through bore encoder is used for climb
-    private final AnalogEncoder m_absoluteEncoder = new AnalogEncoder(0, 0, 0);
+    private final AnalogEncoder m_absoluteEncoder = new AnalogEncoder(ClimbConstants.kRevThroughBoreIO, 0, 0);
     private final AnalogEncoderSim s_absoluteEncoder = new AnalogEncoderSim(m_absoluteEncoder);
 
 
+    /* 
     private final ElevatorSim m_climbSim =
     new ElevatorSim(
         motorSim,
@@ -56,6 +56,7 @@ public class ClimbSubsystem extends SubsystemBase {
         0.0, 
         0.01,
         0);
+    */
 
     //object creation of bangbang controller
     //bang-bang controllers are used in high-inertia system. Considering the climb will be carrying the whole robot, it falls under "high inertia".
@@ -63,7 +64,7 @@ public class ClimbSubsystem extends SubsystemBase {
     //we want this as the climb should move as fast as possible (as you will generally be climbing in the last few seconds of the match)
     //BE SURE TO SET THE MOTORS TO COAST INSTEAD OF BRAKE FOR IDLE ACTION!!! BRAKE CAN CAUSE DESTRUCTIVE OSCILLATION and a very upset argoon
     //ariana grande would love this controller
-    private final BangBangController m_bangBang = new BangBangController();
+    //private final BangBangController m_bangBang = new BangBangController();
 
     public ClimbSubsystem() {
     
@@ -84,13 +85,13 @@ public class ClimbSubsystem extends SubsystemBase {
 
         //ensures motors stay at their current position when no power is being applied to them.
         //we don't want the motors moving downwards when we want to it to stay up!
-        m_climbLeaderMotorConfig.idleMode(IdleMode.kCoast);
-        m_climbFollowerMotorConfig.idleMode(IdleMode.kCoast);       
+        m_climbLeaderMotorConfig.idleMode(IdleMode.kBrake);
+        m_climbFollowerMotorConfig.idleMode(IdleMode.kBrake);       
 
         //sets current limits to motors to ensure they do not exceed a set current limit
         //prevents damage towards motors from pulling too much current -- VERY IMPORTANT!
-        m_climbLeaderMotorConfig.smartCurrentLimit(ClimbConstants.kMotorStallCurrent, ClimbConstants.kMotorFreeSpeedCurrent, ClimbConstants.kMotorRPMLimit);
-        m_climbFollowerMotorConfig.smartCurrentLimit(ClimbConstants.kMotorStallCurrent, ClimbConstants.kMotorFreeSpeedCurrent, ClimbConstants.kMotorRPMLimit);
+        m_climbLeaderMotorConfig.smartCurrentLimit(ClimbConstants.kMotorStallCurrent, ClimbConstants.kMotorFreeSpeedCurrent);
+        m_climbFollowerMotorConfig.smartCurrentLimit(ClimbConstants.kMotorStallCurrent, ClimbConstants.kMotorFreeSpeedCurrent);
 
         //inverts the encoder on true (if motor is spinning counter-clockwise)
         m_absoluteEncoder.setInverted(false);
@@ -106,10 +107,8 @@ public class ClimbSubsystem extends SubsystemBase {
     }
 
 
-    public void reachGoal (double goal) {
-        m_bangBang.setSetpoint(goal);
-        double bangBangOutput = m_bangBang.calculate(m_absoluteEncoder.get());
-        m_climbLeaderMotor.setVoltage(bangBangOutput);
+    public void driveMotors (double voltage) {
+        m_climbLeaderMotor.setVoltage(voltage);
     }
 
     //Returns the reading of the encoder.
@@ -161,20 +160,16 @@ public class ClimbSubsystem extends SubsystemBase {
             SmartDashboard.putNumber("Encoder reading", getEncoderDistance());
             SmartDashboard.putBoolean("Climb stopped", m_climbLeaderMotor.get() == 0);
 
+            SmartDashboard.putNumber("Leader Motor Speed", m_climbLeaderMotor.get());
             SmartDashboard.putNumber("Leader Motor Voltage", m_climbLeaderMotor.getBusVoltage());
             SmartDashboard.putNumber("Leader Motor Current", m_climbLeaderMotor.getOutputCurrent());
             SmartDashboard.putNumber("Leader Motor Temperature", m_climbLeaderMotor.getMotorTemperature());
 
+            SmartDashboard.putNumber("Follower Motor Speed", m_climbFollowerMotor.get());
             SmartDashboard.putNumber("Follower Motor Voltage", m_climbFollowerMotor.getBusVoltage());
             SmartDashboard.putNumber("Follower Motor Current", m_climbFollowerMotor.getOutputCurrent());
             SmartDashboard.putNumber("Follower Motor Temperature", m_climbFollowerMotor.getMotorTemperature());
 
-        //Checks to see if motors are going upwards and if the encoder has reached the set limit
-            if (m_climbLeaderMotor.get() > 0 && getEncoderDistance() >= ClimbConstants.kClimbRaisedPosition) {
-                stopMotors();
-            }
-
-        //Checks to see if any of the motors have any faults, and if so, reports it to DriverStation
             if (m_climbLeaderMotor.hasActiveFault()) {
             DriverStation.reportWarning("MOTOR WARNING: SparkMax ID " + ClimbConstants.kClimbLeaderMotorCANID + " is currently reporting an error with: \"" + reportMotorError(m_climbLeaderMotor) + "\"", true);
             }
@@ -190,8 +185,7 @@ public class ClimbSubsystem extends SubsystemBase {
         if (Robot.isSimulation()) { 
             SmartDashboard.putNumber("Encoder reading", getEncoderDistance());
             SmartDashboard.putBoolean("Climb stopped", s_climbLeaderMotor.getAppliedOutput() == 0);
-
-            SmartDashboard.putNumber("Motor Voltage", s_climbLeaderMotor.getBusVoltage());
+            SmartDashboard.putNumber("Motor Bus Voltage", s_climbLeaderMotor.getBusVoltage());
             SmartDashboard.putNumber("Motor Current", s_climbLeaderMotor.getMotorCurrent());
             SmartDashboard.putNumber("Climb Setpoint", s_climbLeaderMotor.getSetpoint());
             SmartDashboard.putNumber("Applied Output", s_climbLeaderMotor.getAppliedOutput());
@@ -202,11 +196,11 @@ public class ClimbSubsystem extends SubsystemBase {
             //Checks to see if motors are going upwards and if the encoder has reached the set limit
 
             s_climbLeaderMotor.iterate(m_climbLeaderMotor.getAppliedOutput(), 12, 0.02);
-            m_climbSim.setInput(s_climbLeaderMotor.getVelocity() * RobotController.getBatteryVoltage());
-            m_climbSim.update(0.020);
-            s_absoluteEncoder.set(m_climbSim.getPositionMeters());
-            RoboRioSim.setVInVoltage(
-                        BatterySim.calculateDefaultBatteryLoadedVoltage(m_climbSim.getCurrentDrawAmps()));
+            //m_climbSim.setInput(s_climbLeaderMotor.getVelocity() * RobotController.getBatteryVoltage());
+            //m_climbSim.update(0.020);
+            //s_absoluteEncoder.set(m_climbSim.getPositionMeters());
+            //RoboRioSim.setVInVoltage(
+            //            BatterySim.calculateDefaultBatteryLoadedVoltage(m_climbSim.getCurrentDrawAmps()));
             }
     }
 }
