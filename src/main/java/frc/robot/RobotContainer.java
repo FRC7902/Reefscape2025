@@ -9,12 +9,15 @@ import java.io.File;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.SetShootSpeed;
 import frc.robot.commands.teleop.IntakeAlgaeCommand;
+import frc.robot.commands.teleop.IntakeCoralCommand;
 import frc.robot.commands.teleop.OuttakeAlgaeCommand;
+import frc.robot.commands.teleop.NullCommand;
 import frc.robot.subsystems.AlgaeElevatorManipulatorSubsystem;
 import frc.robot.subsystems.IndexSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
@@ -33,7 +36,7 @@ public class RobotContainer {
     // The robot's subsystems and commands are defined here...
     public static final AlgaeElevatorManipulatorSubsystem m_algaeElevatorManipulatorSubsystem = new AlgaeElevatorManipulatorSubsystem();
 
-    private final IndexSubsystem m_indexSubsystem = new IndexSubsystem();
+    public static final IndexSubsystem m_indexSubsystem = new IndexSubsystem();
 
     // Replace with CommandPS4Controller or CommandJoystick if needed
     private final CommandXboxController m_driverController = new CommandXboxController(
@@ -135,7 +138,10 @@ public class RobotContainer {
         m_driverController.leftBumper().whileTrue(new IntakeAlgaeCommand());
         m_driverController.rightBumper().whileTrue(new OuttakeAlgaeCommand());
 
-        m_driverController.rightTrigger().whileTrue(new SetShootSpeed(m_indexSubsystem));
+        m_indexSubsystem.setDefaultCommand(
+                new ConditionalCommand(new IntakeCoralCommand(), new NullCommand(), m_indexSubsystem::isBeamBroken));
+
+        m_driverController.rightTrigger().whileTrue(new SetShootSpeed());
     }
 
     /**
