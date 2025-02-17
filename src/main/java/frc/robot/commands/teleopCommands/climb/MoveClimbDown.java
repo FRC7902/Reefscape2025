@@ -4,40 +4,32 @@
 
 package frc.robot.commands.teleopCommands.climb;
 
-import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.ClimbConstants;
 import frc.robot.RobotContainer;
-import frc.robot.subsystems.ClimbSubsystem;
 
 public class MoveClimbDown extends Command {
 
-  private ClimbSubsystem m_climb;
-  private RobotContainer m_robotContainer;
-
-  
-  public MoveClimbDown(ClimbSubsystem climb, RobotContainer robotContainer) {
-    m_climb = climb;
-    m_robotContainer = robotContainer;
-    addRequirements(getRequirements());
+  public MoveClimbDown() {
+    addRequirements(RobotContainer.m_climbSubsystem);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_climb.stopMotors();
+    RobotContainer.m_climbSubsystem.stopMotors();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_climb.driveMotors(ClimbConstants.kMotorVoltageDown);
+    RobotContainer.m_climbSubsystem.driveMotors(ClimbConstants.kMotorVoltageDown);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_climb.stopMotors();
+    RobotContainer.m_climbSubsystem.stopMotors();
   }
 
   // Returns true when the command should end.

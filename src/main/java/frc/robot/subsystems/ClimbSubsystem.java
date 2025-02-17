@@ -1,28 +1,20 @@
 package frc.robot.subsystems;
-import com.revrobotics.spark.SparkMax;
 import com.revrobotics.sim.SparkMaxSim;
 import com.revrobotics.spark.SparkBase.Faults;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.config.SparkMaxConfig;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
 
-import edu.wpi.first.math.controller.BangBangController;
-import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.system.plant.LinearSystemId;
-import edu.wpi.first.wpilibj.AnalogEncoder;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.simulation.AnalogEncoderSim;
-import edu.wpi.first.wpilibj.simulation.BatterySim;
-import edu.wpi.first.wpilibj.simulation.ElevatorSim;
-import edu.wpi.first.wpilibj.simulation.RoboRioSim;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Robot;
 import frc.robot.Constants.ClimbConstants;
+import frc.robot.Robot;
 
 public class ClimbSubsystem extends SubsystemBase {
 
@@ -39,8 +31,8 @@ public class ClimbSubsystem extends SubsystemBase {
     private final SparkMaxConfig m_climbFollowerMotorConfig = new SparkMaxConfig();
 
     //object creation of absolute encoder. The REV Through bore encoder is used for climb
-    private final AnalogEncoder m_absoluteEncoder = new AnalogEncoder(ClimbConstants.kRevThroughBoreIO, 0, 0);
-    private final AnalogEncoderSim s_absoluteEncoder = new AnalogEncoderSim(m_absoluteEncoder);
+    private final DutyCycleEncoder m_absoluteEncoder = new DutyCycleEncoder(ClimbConstants.kRevThroughBoreIO, 0, 0);
+    //private final AnalogEncoderSim s_absoluteEncoder = new AnalogEncoderSim(m_absoluteEncoder);
 
 
     /* 
@@ -97,13 +89,12 @@ public class ClimbSubsystem extends SubsystemBase {
         m_absoluteEncoder.setInverted(false);
         //similar to controller deadband, reduces sensitivity of inputs
         //in this case, it is when the absolute encoder reaches the end of its range, which can result in instability.
-        m_absoluteEncoder.setVoltagePercentageRange(0, 0);
         
         //sets all configuration to the motors.
         //any previous parameters are reset here to be overwritten with new parameters.
         //these parameters will persist. This is incredibly important as without this, all parameters are wiped on reboot.        
         m_climbLeaderMotor.configure(m_climbLeaderMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        m_climbFollowerMotor.configure(m_climbLeaderMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        m_climbFollowerMotor.configure(m_climbFollowerMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
 
@@ -116,9 +107,9 @@ public class ClimbSubsystem extends SubsystemBase {
         return m_absoluteEncoder.get();
     } 
 
-    public double getSimEncoderDistance() {
-        return s_absoluteEncoder.get();
-    }
+    //public double getSimEncoderDistance() {
+    //    return s_absoluteEncoder.get();
+    //}
 
     //Stops outputting to motors.
     public void stopMotors() {
@@ -183,7 +174,7 @@ public class ClimbSubsystem extends SubsystemBase {
     public void simulationPeriodic() {
         //Displays live motor and limit switch metrics on SmartDashboard
         if (Robot.isSimulation()) { 
-            SmartDashboard.putNumber("Encoder reading", getEncoderDistance());
+            //SmartDashboard.putNumber("Encoder reading", getEncoderDistance());
             SmartDashboard.putBoolean("Climb stopped", s_climbLeaderMotor.getAppliedOutput() == 0);
             SmartDashboard.putNumber("Motor Bus Voltage", s_climbLeaderMotor.getBusVoltage());
             SmartDashboard.putNumber("Motor Current", s_climbLeaderMotor.getMotorCurrent());
