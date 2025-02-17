@@ -94,9 +94,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
   private String[] m_songs = new String[] {
     "song1.chrp",
-    "song2.chrp", // under the sea
-    "song3.chrp",
-    "song4.chrp"
+    "song2.chrp" // under the sea
   };
 
   /** Creates a new ElevatorSubsystem */
@@ -125,56 +123,60 @@ public class ElevatorSubsystem extends SubsystemBase {
     m_motorConfig.Slot0.GravityType = GravityTypeValue.Elevator_Static;
 
     // Set motion magic
-    m_motorConfig.MotionMagic.MotionMagicCruiseVelocity = 80; // Target cruise velocity of 80 rps
+    m_motorConfig.MotionMagic.MotionMagicCruiseVelocity = ElevatorConstants.kElevatorMaxVelocity; // Target cruise velocity of 80 rps
     m_motorConfig.MotionMagic.MotionMagicAcceleration = 160; // Target acceleration of 160 rps/s (0.5 seconds)
-    m_motorConfig.MotionMagic.MotionMagicJerk = 1600; // Target jerk of 1600 rps/s/s (0.1 seconds)
-
+    // m_motorConfig.MotionMagic.MotionMagicJerk = 1600; // Target jerk of 1600 rps/s/s (0.1 seconds)
 
     // Set safety limits
-    m_motorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-    m_motorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = ElevatorConstants.kElevatorMaxHeightMeters / ElevatorConstants.kElevatorMetersPerMotorRotation;
-    m_motorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-    m_motorConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0;
+    // m_motorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+    // m_motorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = ElevatorConstants.kElevatorMaxHeightMeters / ElevatorConstants.kElevatorMetersPerMotorRotation;
+    // m_motorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+    // m_motorConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0;
+
+
+    m_motorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+    m_motorConfig.CurrentLimits.StatorCurrentLimit = 125;
 
     // Set current limits
     m_motorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-    m_motorConfig.CurrentLimits.SupplyCurrentLimit = 40;
-    m_motorConfig.CurrentLimits.StatorCurrentLimitEnable = false;
-    m_motorConfig.CurrentLimits.StatorCurrentLimit = 125;
+    m_motorConfig.CurrentLimits.SupplyCurrentLimit = 60;
 
     // Create a new HardwareLimitSwitchConfigs object
     HardwareLimitSwitchConfigs limitConfigs = new HardwareLimitSwitchConfigs();
 
     // Configure the reverse limit switch
-    limitConfigs.ReverseLimitType = ReverseLimitTypeValue.NormallyOpen;
-    limitConfigs.ReverseLimitEnable = true;
-    limitConfigs.ReverseLimitSource = ReverseLimitSourceValue.LimitSwitchPin;
+    // limitConfigs.ReverseLimitType = ReverseLimitTypeValue.NormallyOpen;
+    // limitConfigs.ReverseLimitEnable = true;
+    // limitConfigs.ReverseLimitSource = ReverseLimitSourceValue.LimitSwitchPin;
 
     // Apply the configuration to your TalonFX
-    m_elevatorLeaderMotor.getConfigurator().apply(limitConfigs);
+    // m_elevatorLeaderMotor.getConfigurator().apply(limitConfigs);
+
+    // Set follower
+    m_elevatorFollowerMotor.setControl(new Follower(m_elevatorLeaderMotor.getDeviceID(), true));
 
     // Apply configuration to motors
     m_elevatorLeaderMotor.getConfigurator().apply(m_motorConfig);
     m_elevatorFollowerMotor.getConfigurator().apply(m_motorConfig);
 
-    // Set follower
-    m_elevatorFollowerMotor.setControl(new Follower(m_elevatorLeaderMotor.getDeviceID(), true));
-
+    
     // Set update frequencies
     m_elevatorLeaderMotor.getPosition().setUpdateFrequency(50);
     m_elevatorLeaderMotor.getVelocity().setUpdateFrequency(50);
     m_elevatorLeaderMotor.getDutyCycle().setUpdateFrequency(50);
     m_elevatorLeaderMotor.getMotorVoltage().setUpdateFrequency(50);
     m_elevatorLeaderMotor.getTorqueCurrent().setUpdateFrequency(50);
-    m_elevatorFollowerMotor.optimizeBusUtilization();
-    m_elevatorLeaderMotor.optimizeBusUtilization();
+    //m_elevatorFollowerMotor.optimizeBusUtilization();
+    //m_elevatorLeaderMotor.optimizeBusUtilization();
 
-    m_orchestra.addInstrument(m_elevatorLeaderMotor);
-    m_orchestra.addInstrument(m_elevatorFollowerMotor);
+    //m_orchestra.addInstrument(m_elevatorLeaderMotor);
+    // m_orchestra.addInstrument(m_elevatorFollowerMotor);
 
     m_homed = false;
-    m_homingCommand = homeCommand(); 
-  
+    // m_homingCommand = homeCommand(); 
+
+    // m_orchestra.loadMusic(m_songs[1]);
+    // m_orchestra.play();
   }
 
   /** Stop the motors */
@@ -210,7 +212,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
   /** Returns whether the elevator is at the setpoint */
   public boolean atHeight() {
-    return Math.abs(getPositionMeters() - m_setpoint) <= ElevatorConstants.kElevatorTargetError;
+    return Math.abs(getPositionMeters() - m_setpoint) < ElevatorConstants.kElevatorTargetError;
   }
 
   /**
@@ -230,20 +232,14 @@ public class ElevatorSubsystem extends SubsystemBase {
   public void setPosition(double position) {
     m_setpoint = position;
     double positionRotations = position / ElevatorConstants.kElevatorMetersPerMotorRotation;
-    // slot = (position < 1.0) ? 0 : 1; // Use Slot 1 for heights above 1 meter
-    // m_request = m_request.withPosition(positionRotations).withSlot(slot);
-    
     m_request = m_request.withPosition(positionRotations).withSlot(0);
     m_elevatorLeaderMotor.setControl(m_request);
-    // if (m_homed) {
-    //   m_elevatorLeaderMotor.setControl(m_request.withSlot(0));
-    // }
   }
 
   /** Returns whether the elevator is at the retract limit */
-  public boolean isAtRetractLimit() {
-    return m_elevatorLeaderMotor.getReverseLimit().getValue() == ReverseLimitValue.ClosedToGround;
-  }
+  // public boolean isAtRetractLimit() {
+  //   return m_elevatorLeaderMotor.getReverseLimit().getValue() == ReverseLimitValue.ClosedToGround;
+  // }
 
   /**
    * Returns a command that will execute a quasistatic test in the given
@@ -270,63 +266,71 @@ public class ElevatorSubsystem extends SubsystemBase {
    *
    * @return A command that homes the elevator
    */
-  public Command homeCommand() {
-    return new FunctionalCommand(
-        () -> {
-          // Clear homed state
-          m_homed = false;
+  // public Command homeCommand() {
+  //   return new FunctionalCommand(
+  //       () -> {
+  //         // Clear homed state
+  //         m_homed = false;
 
-          // Disable soft limits
-          m_elevatorLeaderMotor.getConfigurator().refresh(m_motorConfig);
-          m_motorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = false;
-          m_elevatorLeaderMotor.getConfigurator().apply(m_motorConfig);
-        },
-        () -> {
-          // Start retracting the elevator
-          m_elevatorLeaderMotor.set(-0.4);
-        },
-        (interrupted) -> {
-          // Enable soft limits and stop the elevator
-          m_elevatorLeaderMotor.getConfigurator().refresh(m_motorConfig);
-          m_motorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-          m_elevatorLeaderMotor.getConfigurator().apply(m_motorConfig);
+  //         // Disable soft limits
+  //         m_elevatorLeaderMotor.getConfigurator().refresh(m_motorConfig);
+  //         m_motorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = false;
+  //         m_elevatorLeaderMotor.getConfigurator().apply(m_motorConfig);
+  //       },
+  //       () -> {
+  //         // Start retracting the elevator
+  //         m_elevatorLeaderMotor.set(-0.4);
+  //       },
+  //       (interrupted) -> {
+  //         // Enable soft limits and stop the elevator
+  //         m_elevatorLeaderMotor.getConfigurator().refresh(m_motorConfig);
+  //         m_motorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+  //         m_elevatorLeaderMotor.getConfigurator().apply(m_motorConfig);
 
-          stop();
+  //         stop();
 
-          if (!interrupted) {
-            zero();
-            m_homed = true;
-          } else {
-           m_homed = false;
-          }
-        },
-        this::isAtRetractLimit, // End the command when the retract limit is hit
-        this);
-  }
+  //         if (!interrupted) {
+  //           zero();
+  //           m_homed = true;
+  //         } else {
+  //          m_homed = false;
+  //         }
+  //       },
+  //       this::isAtRetractLimit, // End the command when the retract limit is hit
+  //       this);
+  // }
 
   @Override
   public void periodic() {
-    if (isAtRetractLimit()) {
-      zero();
-      m_homed = true;
-      m_orchestra.pause();
-    } else {
-      m_orchestra.loadMusic(m_songs[0]); 
-      m_orchestra.play();
-    }
+    // if (isAtRetractLimit()) {
+    //   zero();
+    //   m_homed = true;
+    //   m_orchestra.pause();
+    // } else {
+    //   m_orchestra.loadMusic(m_songs[0]); 
+    //   m_orchestra.play();
+    // }
 
-    if (!m_homed && !m_homingCommand.isScheduled()) {
-        m_homingCommand.schedule();
-    }    
+    m_elevatorLeaderMotor.setControl(m_request);
+
+    // if (!m_homed && !m_homingCommand.isScheduled()) {
+    //     m_homingCommand.schedule();
+    // }    
    
     // Update SmartDashboard
     SmartDashboard.putNumber("Elevator position (m)", getPositionMeters());
     SmartDashboard.putNumber("Elevator setpoint position (m)", m_elevatorLeaderMotor.getClosedLoopReference().getValueAsDouble() * ElevatorConstants.kElevatorMetersPerMotorRotation);
+    // SmartDashboard.putNumber("Elevator setpoint position (m)", m_setpoint);
     SmartDashboard.putNumber("Elevator velocity (m/s)", getVelocityMetersPerSecond());
     SmartDashboard.putNumber("Rotations", m_elevatorLeaderMotor.getPosition().getValueAsDouble());
     SmartDashboard.putNumber("Rotations setpoint", m_elevatorLeaderMotor.getClosedLoopReference().getValueAsDouble());
     SmartDashboard.putBoolean("Homed", m_homed);
-    SmartDashboard.putBoolean("Reverse limit switch", isAtRetractLimit());
+    SmartDashboard.putNumber("Leader stator current", m_elevatorLeaderMotor.getStatorCurrent().getValueAsDouble());
+    SmartDashboard.putNumber("Follower stator current", m_elevatorFollowerMotor.getStatorCurrent().getValueAsDouble());
+    SmartDashboard.putNumber("Leader supply current", m_elevatorLeaderMotor.getSupplyCurrent().getValueAsDouble());
+    SmartDashboard.putNumber("Follower supply current", m_elevatorFollowerMotor.getSupplyCurrent().getValueAsDouble());
+
+    // SmartDashboard.putBoolean("Reverse limit switch", isAtRetractLimit());
     // SmartDashboard.putNumber("Slot", slot);
 
     updateTelemetry();
