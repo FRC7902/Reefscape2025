@@ -8,7 +8,6 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.ExampleSubsystem;
-import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.Vision.Cameras;
 import frc.robot.subsystems.SwerveSubsystem;
 

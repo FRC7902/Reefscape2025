@@ -25,6 +25,7 @@ import edu.wpi.first.networktables.NetworkTablesJNI;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import frc.robot.Constants.VisionConstants;
 import frc.robot.Robot;
 import java.awt.Desktop;
 import java.util.ArrayList;
@@ -48,9 +49,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Vision extends SubsystemBase {
   public static final AprilTagFieldLayout fieldLayout = AprilTagFieldLayout.loadField(
       AprilTagFields.k2025Reefscape);
-  private final double maximumAmbiguity = 0.25; //used in deleted deprecated method from yagsl
   public VisionSystemSim visionSim;
-  private double longDistancePoseEstimationCount = 0; //used in deleted deprecated method from yagsl
   private Supplier<Pose2d> currentPose;
   private Field2d field2d;
 
@@ -195,11 +194,10 @@ public class Vision extends SubsystemBase {
   public enum Cameras
   {
     MAIN_CAM("Markham_Firebirds Camera",
-               new Rotation3d(0, Units.degreesToRadians(18), 0),
-               new Translation3d(Units.inchesToMeters(-4.628),
-                                 Units.inchesToMeters(-10.687),
-                                 Units.inchesToMeters(16.129)),
-               VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1));
+              VisionConstants.CAMERA_ROTATION,
+              VisionConstants.CAMERA_TRANSLATION,
+              VisionConstants.SINGLE_TAG_STD_DEVS,
+              VisionConstants.MULTI_TAG_STD_DEVS);
 
     public final  Alert latencyAlert;
     public final  PhotonCamera camera;

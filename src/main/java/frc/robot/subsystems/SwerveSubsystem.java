@@ -102,6 +102,10 @@ public class SwerveSubsystem extends SubsystemBase {
     {
       swerveDrive.updateOdometry();
       vision.updatePoseEstimation(swerveDrive);
+      Pose2d currentPose = swerveDrive.getPose();
+      SmartDashboard.putNumber("Robot Pose X (m)", currentPose.getTranslation().getX());
+      SmartDashboard.putNumber("Robot Pose Y (m)", currentPose.getTranslation().getY());
+      SmartDashboard.putNumber("Robot Heading (deg)",currentPose.getRotation().getDegrees());
     }
   }
 
