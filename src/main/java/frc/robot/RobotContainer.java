@@ -151,4 +151,13 @@ public class RobotContainer {
     public void setMotorBrake(boolean brake) {
         drivebase.setMotorBrake(brake);
     }
+
+    /**
+     * Use this to pass the autonomous command to the main {@link Robot} class.
+     *
+     * @return the command to run in autonomous
+     */
+    public Command getAutonomousCommand() {
+        return null;
+    }
 }
