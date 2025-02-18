@@ -4,9 +4,7 @@
     "version": "2025.0.1",
     "uuid": "cb311d09-36e9-4143-a032-55bb2b94443b",
     "frcYear": "2025",
-    "mavenUrls": [
-        "https://dev.studica.com/maven/release/2025/"
-    ],
+    "mavenUrls": ["https://dev.studica.com/maven/release/2025/"],
     "jsonUrl": "https://dev.studica.com/releases/2025/Studica-2025.0.1.json",
     "cppDependencies": [
         {
