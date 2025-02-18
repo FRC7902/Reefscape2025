@@ -63,10 +63,6 @@ public class CoralIndexerSubsystem extends SubsystemBase {
         m_indexMotorConfig.idleMode(IdleMode.kBrake);
     }
 
-    public void shoot() {
-        setSpeed(Constants.IndexConstants.kShootSpeed);
-    }
-
     public boolean isBeamBroken() {
         return !m_beamSensor.get();
     }
