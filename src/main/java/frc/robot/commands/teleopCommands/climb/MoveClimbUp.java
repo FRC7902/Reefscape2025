@@ -36,7 +36,7 @@ public class MoveClimbUp extends Command {
      * m_robotContainer.m_operatorController.setRumble(RumbleType.kBothRumble, 1);
      * }
      */
-    RobotContainer.m_climbSubsystem.driveMotors(ClimbConstants.kMotorVoltageUp);
+    RobotContainer.m_climbSubsystem.setVoltage(ClimbConstants.kMotorVoltageUp);
   }
 
   // Called once the command ends or is interrupted.
