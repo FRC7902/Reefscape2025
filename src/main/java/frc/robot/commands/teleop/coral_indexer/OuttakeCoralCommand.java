@@ -7,9 +7,9 @@ package frc.robot.commands.teleop.coral_indexer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
 
-public class SetShootSpeedCommand extends Command {
+public class OuttakeCoralCommand extends Command {
 
-    public SetShootSpeedCommand() {
+    public OuttakeCoralCommand() {
         addRequirements(RobotContainer.m_indexSubsystem);
     }
 
