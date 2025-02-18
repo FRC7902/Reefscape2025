@@ -4,8 +4,6 @@
 
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -14,9 +12,10 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.AlgaeElevatorManipulatorConstants;
 
-public class AlgaeElevatorManipulatorSubsystem extends SubsystemBase {
+public class AlgaeManipulatorSubsystem extends SubsystemBase {
 
   private SparkMax m_motor = new SparkMax(AlgaeElevatorManipulatorConstants.kMotorCANId, MotorType.kBrushless);
   private SparkMaxConfig m_motorConfig = new SparkMaxConfig();
@@ -24,7 +23,7 @@ public class AlgaeElevatorManipulatorSubsystem extends SubsystemBase {
   private DigitalInput m_beamBreak = new DigitalInput(AlgaeElevatorManipulatorConstants.kbeamBreakPortId);
 
   /** Creates a new AlgaeElevatorManipulatorSubsystem. */
-  public AlgaeElevatorManipulatorSubsystem() {
+  public AlgaeManipulatorSubsystem() {
     configure();
   }
 
