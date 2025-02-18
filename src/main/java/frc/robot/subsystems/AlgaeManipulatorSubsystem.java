@@ -13,14 +13,15 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.AlgaeElevatorManipulatorConstants;
+import frc.robot.Constants.AlgaeManipulatorConstants;
 
 public class AlgaeManipulatorSubsystem extends SubsystemBase {
 
-  private SparkMax m_motor = new SparkMax(AlgaeElevatorManipulatorConstants.kMotorCANId, MotorType.kBrushless);
+  private SparkMax m_motor =
+      new SparkMax(AlgaeManipulatorConstants.kMotorCANId, MotorType.kBrushless);
   private SparkMaxConfig m_motorConfig = new SparkMaxConfig();
 
-  private DigitalInput m_beamBreak = new DigitalInput(AlgaeElevatorManipulatorConstants.kbeamBreakPortId);
+  private DigitalInput m_beamBreak = new DigitalInput(AlgaeManipulatorConstants.kbeamBreakPortId);
 
   /** Creates a new AlgaeElevatorManipulatorSubsystem. */
   public AlgaeManipulatorSubsystem() {
@@ -28,8 +29,9 @@ public class AlgaeManipulatorSubsystem extends SubsystemBase {
   }
 
   private void configure() {
-    m_motorConfig.smartCurrentLimit(AlgaeElevatorManipulatorConstants.kMotorCurrentLimit);
-    m_motor.configure(m_motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    m_motorConfig.smartCurrentLimit(AlgaeManipulatorConstants.kMotorCurrentLimit);
+    m_motor.configure(m_motorConfig, ResetMode.kResetSafeParameters,
+        PersistMode.kPersistParameters);
   }
 
   public void setIntakeVoltage(double voltage) {

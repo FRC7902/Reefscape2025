@@ -61,7 +61,7 @@ public final class Constants {
     public static final double DEADBAND = 0.5;
   }
 
-  public static class AlgaeElevatorManipulatorConstants {
+  public static class AlgaeManipulatorConstants {
     public static final int kMotorCANId = 30;
     public static final int kMotorCurrentLimit = 60;
 

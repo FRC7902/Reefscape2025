@@ -5,10 +5,14 @@
 package frc.robot.commands.teleop.algae_manipulator;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants.AlgaeElevatorManipulatorConstants;
+import frc.robot.Constants.AlgaeManipulatorConstants;
 import frc.robot.RobotContainer;
 
-/* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
+/*
+ * You should consider using the more terse Command factories API instead
+ * https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#
+ * defining-commands
+ */
 public class OuttakeAlgaeCommand extends Command {
   /** Creates a new OuttakeGroundAlgaeCommand. */
   public OuttakeAlgaeCommand() {
@@ -20,13 +24,12 @@ public class OuttakeAlgaeCommand extends Command {
   @Override
   public void initialize() {
     RobotContainer.m_algaeElevatorManipulatorSubsystem
-        .setIntakeVoltage(AlgaeElevatorManipulatorConstants.kOuttakeVoltage);
+        .setIntakeVoltage(AlgaeManipulatorConstants.kOuttakeVoltage);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {
-  }
+  public void execute() {}
 
   // Called once the command ends or is interrupted.
   @Override
