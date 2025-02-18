@@ -21,7 +21,7 @@ import frc.robot.commands.teleop.climb.MoveClimbDownCommand;
 import frc.robot.commands.teleop.climb.MoveClimbUpCommand;
 import frc.robot.commands.teleop.coral_indexer.IntakeCoralCommand;
 import frc.robot.commands.teleop.coral_indexer.OuttakeCoralCommand;
-import frc.robot.commands.teleop.elevator.ElevatorReefSetpointCommand;
+import frc.robot.commands.teleop.elevator.SetElevatorPositionCommand;
 import frc.robot.subsystems.AlgaeManipulatorSubsystem;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.CoralIndexerSubsystem;
@@ -133,11 +133,11 @@ public class RobotContainer {
 
         m_driverController.rightTrigger().whileTrue(new OuttakeCoralCommand());
 
-        m_operatorController.a().onTrue(new ElevatorReefSetpointCommand(ElevatorConstants.kLevel1));
-        m_operatorController.b().onTrue(new ElevatorReefSetpointCommand(ElevatorConstants.kLevel2));
-        m_operatorController.y().onTrue(new ElevatorReefSetpointCommand(ElevatorConstants.kLevel3));
+        m_operatorController.a().onTrue(new SetElevatorPositionCommand(ElevatorConstants.kLevel1));
+        m_operatorController.b().onTrue(new SetElevatorPositionCommand(ElevatorConstants.kLevel2));
+        m_operatorController.y().onTrue(new SetElevatorPositionCommand(ElevatorConstants.kLevel3));
         m_operatorController.x().onTrue(
-                new ElevatorReefSetpointCommand(ElevatorConstants.kElevatorMinHeightMeters));
+                new SetElevatorPositionCommand(ElevatorConstants.kElevatorMinHeightMeters));
 
         // runs the climb motors up when the up button is pressed on the POV buttons of
         // the controller.
