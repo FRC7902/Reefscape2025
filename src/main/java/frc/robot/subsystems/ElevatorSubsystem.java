@@ -4,9 +4,10 @@
 
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Volts;
+
 import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.SignalLogger;
-import com.ctre.phoenix6.configs.HardwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
@@ -15,12 +16,10 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.signals.ReverseLimitSourceValue;
-import com.ctre.phoenix6.signals.ReverseLimitTypeValue;
 import com.ctre.phoenix6.signals.ReverseLimitValue;
+
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
-import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
@@ -32,7 +31,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.ElevatorConstants;
@@ -259,14 +257,14 @@ public class ElevatorSubsystem extends SubsystemBase {
     // Update SmartDashboard
     SmartDashboard.putNumber("Elevator position (m)", getPositionMeters());
     SmartDashboard.putNumber("Elevator setpoint position (m)", m_elevatorLeaderMotor.getClosedLoopReference().getValueAsDouble() * ElevatorConstants.kElevatorMetersPerMotorRotation);
-    SmartDashboard.putNumber("Elevator velocity (m/s)", getVelocityMetersPerSecond());
-    SmartDashboard.putNumber("Rotations", m_elevatorLeaderMotor.getPosition().getValueAsDouble());
-    SmartDashboard.putNumber("Rotations setpoint", m_elevatorLeaderMotor.getClosedLoopReference().getValueAsDouble());
-    SmartDashboard.putBoolean("Homed", m_homed);
-    SmartDashboard.putNumber("Leader stator current", m_elevatorLeaderMotor.getStatorCurrent().getValueAsDouble());
-    SmartDashboard.putNumber("Follower stator current", m_elevatorFollowerMotor.getStatorCurrent().getValueAsDouble());
-    SmartDashboard.putNumber("Leader supply current", m_elevatorLeaderMotor.getSupplyCurrent().getValueAsDouble());
-    SmartDashboard.putNumber("Follower supply current", m_elevatorFollowerMotor.getSupplyCurrent().getValueAsDouble());
+    // SmartDashboard.putNumber("Elevator velocity (m/s)", getVelocityMetersPerSecond());
+    // SmartDashboard.putNumber("Rotations", m_elevatorLeaderMotor.getPosition().getValueAsDouble());
+    // SmartDashboard.putNumber("Rotations setpoint", m_elevatorLeaderMotor.getClosedLoopReference().getValueAsDouble());
+    // SmartDashboard.putBoolean("Homed", m_homed);
+    // SmartDashboard.putNumber("Leader stator current", m_elevatorLeaderMotor.getStatorCurrent().getValueAsDouble());
+    // SmartDashboard.putNumber("Follower stator current", m_elevatorFollowerMotor.getStatorCurrent().getValueAsDouble());
+    // SmartDashboard.putNumber("Leader supply current", m_elevatorLeaderMotor.getSupplyCurrent().getValueAsDouble());
+    // SmartDashboard.putNumber("Follower supply current", m_elevatorFollowerMotor.getSupplyCurrent().getValueAsDouble());
     // SmartDashboard.putBoolean("Reverse limit switch", isAtRetractLimit());
 
     updateTelemetry();
