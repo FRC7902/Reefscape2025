@@ -20,8 +20,8 @@ import frc.robot.commands.teleop.IntakeAlgaeCommand;
 import frc.robot.commands.teleop.IntakeCoralCommand;
 import frc.robot.commands.teleop.NullCommand;
 import frc.robot.commands.teleop.OuttakeAlgaeCommand;
-import frc.robot.commands.teleopCommands.climb.MoveClimbDown;
-import frc.robot.commands.teleopCommands.climb.MoveClimbUp;
+import frc.robot.commands.teleop.climb.MoveClimbDownCommand;
+import frc.robot.commands.teleop.climb.MoveClimbUpCommand;
 import frc.robot.subsystems.AlgaeElevatorManipulatorSubsystem;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
@@ -162,10 +162,10 @@ public class RobotContainer {
 
         // runs the climb motors up when the up button is pressed on the POV buttons of
         // the controller.
-        m_operatorController.povUp().whileTrue(new MoveClimbUp());
+        m_operatorController.povUp().whileTrue(new MoveClimbUpCommand());
         // runs the climb motors down when the down button is pressed on the POV buttons
         // of the controller.
-        m_operatorController.povDown().whileTrue(new MoveClimbDown());
+        m_operatorController.povDown().whileTrue(new MoveClimbDownCommand());
     }
 
     /**
