@@ -14,18 +14,18 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.SetShootSpeed;
-import frc.robot.commands.elevator.ElevatorReefSetpoint;
-import frc.robot.commands.teleop.IntakeAlgaeCommand;
-import frc.robot.commands.teleop.IntakeCoralCommand;
 import frc.robot.commands.teleop.NullCommand;
-import frc.robot.commands.teleop.OuttakeAlgaeCommand;
-import frc.robot.commands.teleopCommands.climb.MoveClimbDown;
-import frc.robot.commands.teleopCommands.climb.MoveClimbUp;
-import frc.robot.subsystems.AlgaeElevatorManipulatorSubsystem;
+import frc.robot.commands.teleop.algae_manipulator.IntakeAlgaeCommand;
+import frc.robot.commands.teleop.algae_manipulator.OuttakeAlgaeCommand;
+import frc.robot.commands.teleop.climb.MoveClimbDownCommand;
+import frc.robot.commands.teleop.climb.MoveClimbUpCommand;
+import frc.robot.commands.teleop.coral_indexer.IntakeCoralCommand;
+import frc.robot.commands.teleop.coral_indexer.OuttakeCoralCommand;
+import frc.robot.commands.teleop.elevator.ElevatorReefSetpointCommand;
+import frc.robot.subsystems.AlgaeManipulatorSubsystem;
 import frc.robot.subsystems.ClimbSubsystem;
+import frc.robot.subsystems.CoralIndexerSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
-import frc.robot.subsystems.IndexSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import swervelib.SwerveInputStream;
 
@@ -40,12 +40,12 @@ import swervelib.SwerveInputStream;
  */
 public class RobotContainer {
     // The robot's subsystems and commands are defined here...
-    public static final AlgaeElevatorManipulatorSubsystem m_algaeElevatorManipulatorSubsystem = new AlgaeElevatorManipulatorSubsystem();
+    public static final AlgaeManipulatorSubsystem m_algaeElevatorManipulatorSubsystem = new AlgaeManipulatorSubsystem();
     // The robot's subsystems and commands are defined here...
     public static final ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
     public static final ClimbSubsystem m_climbSubsystem = new ClimbSubsystem();
 
-    public static final IndexSubsystem m_indexSubsystem = new IndexSubsystem();
+    public static final CoralIndexerSubsystem m_indexSubsystem = new CoralIndexerSubsystem();
 
     // Replace with CommandPS4Controller or CommandJoystick if needed
     private final CommandXboxController m_driverController = new CommandXboxController(
@@ -153,19 +153,20 @@ public class RobotContainer {
                 new ConditionalCommand(new IntakeCoralCommand(), new NullCommand(),
                         m_indexSubsystem::isBeamBroken));
 
-        m_driverController.rightTrigger().whileTrue(new SetShootSpeed());
+        m_driverController.rightTrigger().whileTrue(new OuttakeCoralCommand());
 
-        m_operatorController.a().onTrue(new ElevatorReefSetpoint(ElevatorConstants.kLevel1));
-        m_operatorController.b().onTrue(new ElevatorReefSetpoint(ElevatorConstants.kLevel2));
-        m_operatorController.y().onTrue(new ElevatorReefSetpoint(ElevatorConstants.kLevel3));
-        m_operatorController.x().onTrue(new ElevatorReefSetpoint(ElevatorConstants.kElevatorMinHeightMeters));
+        m_operatorController.a().onTrue(new ElevatorReefSetpointCommand(ElevatorConstants.kLevel1));
+        m_operatorController.b().onTrue(new ElevatorReefSetpointCommand(ElevatorConstants.kLevel2));
+        m_operatorController.y().onTrue(new ElevatorReefSetpointCommand(ElevatorConstants.kLevel3));
+        m_operatorController.x()
+                .onTrue(new ElevatorReefSetpointCommand(ElevatorConstants.kElevatorMinHeightMeters));
 
         // runs the climb motors up when the up button is pressed on the POV buttons of
         // the controller.
-        m_operatorController.povUp().whileTrue(new MoveClimbUp());
+        m_operatorController.povUp().whileTrue(new MoveClimbUpCommand());
         // runs the climb motors down when the down button is pressed on the POV buttons
         // of the controller.
-        m_operatorController.povDown().whileTrue(new MoveClimbDown());
+        m_operatorController.povDown().whileTrue(new MoveClimbDownCommand());
     }
 
     /**

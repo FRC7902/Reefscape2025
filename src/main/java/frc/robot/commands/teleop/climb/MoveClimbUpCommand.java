@@ -2,15 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands.teleopCommands.climb;
+package frc.robot.commands.teleop.climb;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.ClimbConstants;
 import frc.robot.RobotContainer;
 
-public class MoveClimbUp extends Command {
+public class MoveClimbUpCommand extends Command {
 
-  public MoveClimbUp() {
+  public MoveClimbUpCommand() {
     addRequirements(RobotContainer.m_climbSubsystem);
   }
 
@@ -36,7 +36,7 @@ public class MoveClimbUp extends Command {
      * m_robotContainer.m_operatorController.setRumble(RumbleType.kBothRumble, 1);
      * }
      */
-    RobotContainer.m_climbSubsystem.driveMotors(ClimbConstants.kMotorVoltageUp);
+    RobotContainer.m_climbSubsystem.setVoltage(ClimbConstants.kMotorVoltageUp);
   }
 
   // Called once the command ends or is interrupted.

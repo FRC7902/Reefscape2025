@@ -4,9 +4,7 @@
     "version": "2025.0.1",
     "frcYear": "2025",
     "uuid": "151ecca8-670b-4026-8160-cdd2679ef2bd",
-    "mavenUrls": [
-        "https://maven.reduxrobotics.com/"
-    ],
+    "mavenUrls": ["https://maven.reduxrobotics.com/"],
     "jsonUrl": "https://frcsdk.reduxrobotics.com/ReduxLib_2025.json",
     "javaDependencies": [
         {
