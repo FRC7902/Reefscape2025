@@ -54,44 +54,33 @@ public class ElevatorSubsystem extends SubsystemBase {
     private Orchestra m_orchestra = new Orchestra();
 
     /** Object of a simulated elevator */
-    private final ElevatorSim m_elevatorSim = new ElevatorSim(
-            DCMotor.getFalcon500(2),
-            ElevatorConstants.kElevatorGearing,
-            ElevatorConstants.kElevatorCarriageMass,
-            ElevatorConstants.kElevatorDrumRadius,
-            ElevatorConstants.kElevatorMinHeightMeters,
-            ElevatorConstants.kElevatorMaxHeightMeters,
-            true,
-            ElevatorConstants.kElevatorHeightMeters,
-            0.01, // add some noise
+    private final ElevatorSim m_elevatorSim = new ElevatorSim(DCMotor.getFalcon500(2),
+            ElevatorConstants.kElevatorGearing, ElevatorConstants.kElevatorCarriageMass,
+            ElevatorConstants.kElevatorDrumRadius, ElevatorConstants.kElevatorMinHeightMeters,
+            ElevatorConstants.kElevatorMaxHeightMeters, true,
+            ElevatorConstants.kElevatorHeightMeters, 0.01, // add some noise
             0);
 
-    private final Mechanism2d m_mech2d = new Mechanism2d(Units.inchesToMeters(10), Units.inchesToMeters(50));
-    private final MechanismRoot2d m_mech2dRoot = m_mech2d.getRoot("Elevator Root", Units.inchesToMeters(5),
-            Units.inchesToMeters(0.5));
-    private final MechanismLigament2d m_elevatorMech2d = m_mech2dRoot.append(
-            new MechanismLigament2d("Elevator", m_elevatorSim.getPositionMeters(), 90, 7,
-                    new Color8Bit(Color.kAntiqueWhite)));
+    private final Mechanism2d m_mech2d =
+            new Mechanism2d(Units.inchesToMeters(10), Units.inchesToMeters(50));
+    private final MechanismRoot2d m_mech2dRoot =
+            m_mech2d.getRoot("Elevator Root", Units.inchesToMeters(5), Units.inchesToMeters(0.5));
+    private final MechanismLigament2d m_elevatorMech2d =
+            m_mech2dRoot.append(new MechanismLigament2d("Elevator",
+                    m_elevatorSim.getPositionMeters(), 90, 7, new Color8Bit(Color.kAntiqueWhite)));
 
     // System identification routine
     private final SysIdRoutine m_sysIdRoutine = new SysIdRoutine(
-            new SysIdRoutine.Config(
-                    null,
-                    Volts.of(4),
-                    null,
+            new SysIdRoutine.Config(null, Volts.of(4), null,
                     (state) -> SignalLogger.writeString("state", state.toString())),
             new SysIdRoutine.Mechanism(
                     (volts) -> m_leaderMotor.setControl(m_voltReq.withOutput(volts.in(Volts))),
-                    null,
-                    this));
+                    null, this));
 
     private double m_setpoint;
     private boolean m_homed;
 
-    private String[] m_songs = new String[] {
-            "song1.chrp",
-            "song2.chrp"
-    };
+    private String[] m_songs = new String[] {"song1.chrp", "song2.chrp"};
 
     /** Creates a new ElevatorSubsystem */
     public ElevatorSubsystem() {
@@ -117,17 +106,20 @@ public class ElevatorSubsystem extends SubsystemBase {
         m_motorConfig.Slot0.GravityType = GravityTypeValue.Elevator_Static;
 
         // Set motion magic
-        m_motorConfig.MotionMagic.MotionMagicCruiseVelocity = ElevatorConstants.kElevatorMaxVelocity; // Target cruise
-                                                                                                      // velocity of 80
-                                                                                                      // rps
-        m_motorConfig.MotionMagic.MotionMagicAcceleration = 160; // Target acceleration of 160 rps/s (0.5 seconds)
+        m_motorConfig.MotionMagic.MotionMagicCruiseVelocity =
+                ElevatorConstants.kElevatorMaxVelocity; // Target cruise
+                                                        // velocity of 80
+                                                        // rps
+        m_motorConfig.MotionMagic.MotionMagicAcceleration = 160; // Target acceleration of 160 rps/s
+                                                                 // (0.5 seconds)
         // m_motorConfig.MotionMagic.MotionMagicJerk = 1600; // Target jerk of 1600
         // rps/s/s (0.1 seconds)
 
         // Set safety limits
         m_motorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-        m_motorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = ElevatorConstants.kElevatorMaxHeightMeters
-                / ElevatorConstants.kElevatorMetersPerMotorRotation;
+        m_motorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
+                ElevatorConstants.kElevatorMaxHeightMeters
+                        / ElevatorConstants.kElevatorMetersPerMotorRotation;
         m_motorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
         m_motorConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0;
 
@@ -184,7 +176,8 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     /** Gets the current velocity of the elevator in m/s */
     public double getVelocityMetersPerSecond() {
-        return m_leaderMotor.getVelocity().getValueAsDouble() * ElevatorConstants.kElevatorMetersPerMotorRotation;
+        return m_leaderMotor.getVelocity().getValueAsDouble()
+                * ElevatorConstants.kElevatorMetersPerMotorRotation;
     }
 
     /** Zero the elevator */
@@ -235,8 +228,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     /**
-     * Returns a command that will execute a quasistatic test in the given
-     * direction.
+     * Returns a command that will execute a quasistatic test in the given direction.
      *
      * @param direction The direction (forward or reverse) to run the test in
      */
@@ -299,7 +291,8 @@ public class ElevatorSubsystem extends SubsystemBase {
         m_leaderMotor.getSimState().setRotorVelocity(velocityRps);
 
         // Update battery simulation
-        RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(m_elevatorSim.getCurrentDrawAmps()));
+        RoboRioSim.setVInVoltage(BatterySim
+                .calculateDefaultBatteryLoadedVoltage(m_elevatorSim.getCurrentDrawAmps()));
     }
 
 }

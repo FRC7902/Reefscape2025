@@ -14,32 +14,32 @@ import frc.robot.RobotContainer;
  * defining-commands
  */
 public class IntakeAlgaeCommand extends Command {
-  /** Creates a new IntakeGroundAlgaeCommand. */
-  public IntakeAlgaeCommand() {
-    // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(RobotContainer.m_algaeElevatorManipulatorSubsystem);
-  }
+    /** Creates a new IntakeGroundAlgaeCommand. */
+    public IntakeAlgaeCommand() {
+        // Use addRequirements() here to declare subsystem dependencies.
+        addRequirements(RobotContainer.m_algaeElevatorManipulatorSubsystem);
+    }
 
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {
-    RobotContainer.m_algaeElevatorManipulatorSubsystem
-        .setIntakeVoltage(AlgaeManipulatorConstants.kIntakeVoltage);
-  }
+    // Called when the command is initially scheduled.
+    @Override
+    public void initialize() {
+        RobotContainer.m_algaeElevatorManipulatorSubsystem
+                .setIntakeVoltage(AlgaeManipulatorConstants.kIntakeVoltage);
+    }
 
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {}
+    // Called every time the scheduler runs while the command is scheduled.
+    @Override
+    public void execute() {}
 
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {
-    RobotContainer.m_algaeElevatorManipulatorSubsystem.stopIntake();
-  }
+    // Called once the command ends or is interrupted.
+    @Override
+    public void end(boolean interrupted) {
+        RobotContainer.m_algaeElevatorManipulatorSubsystem.stopIntake();
+    }
 
-  // Returns true when the command should end.
-  @Override
-  public boolean isFinished() {
-    return false;
-  }
+    // Returns true when the command should end.
+    @Override
+    public boolean isFinished() {
+        return false;
+    }
 }

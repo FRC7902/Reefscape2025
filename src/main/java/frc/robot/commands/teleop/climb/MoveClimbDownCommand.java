@@ -10,31 +10,31 @@ import frc.robot.RobotContainer;
 
 public class MoveClimbDownCommand extends Command {
 
-  public MoveClimbDownCommand() {
-    addRequirements(RobotContainer.m_climbSubsystem);
-  }
+    public MoveClimbDownCommand() {
+        addRequirements(RobotContainer.m_climbSubsystem);
+    }
 
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {
-    RobotContainer.m_climbSubsystem.stopMotors();
-  }
+    // Called when the command is initially scheduled.
+    @Override
+    public void initialize() {
+        RobotContainer.m_climbSubsystem.stopMotors();
+    }
 
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {
-    RobotContainer.m_climbSubsystem.setVoltage(ClimbConstants.kMotorVoltageDown);
-  }
+    // Called every time the scheduler runs while the command is scheduled.
+    @Override
+    public void execute() {
+        RobotContainer.m_climbSubsystem.setVoltage(ClimbConstants.kMotorVoltageDown);
+    }
 
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {
-    RobotContainer.m_climbSubsystem.stopMotors();
-  }
+    // Called once the command ends or is interrupted.
+    @Override
+    public void end(boolean interrupted) {
+        RobotContainer.m_climbSubsystem.stopMotors();
+    }
 
-  // Returns true when the command should end.
-  @Override
-  public boolean isFinished() {
-    return false;
-  }
+    // Returns true when the command should end.
+    @Override
+    public boolean isFinished() {
+        return false;
+    }
 }

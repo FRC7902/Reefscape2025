@@ -20,9 +20,10 @@ import frc.robot.Robot;
 public class ClimbSubsystem extends SubsystemBase {
 
     // object creation of motors
-    private final SparkMax m_leaderMotor = new SparkMax(ClimbConstants.kClimbLeaderMotorCANID, MotorType.kBrushless);
-    private final SparkMax m_followerMotor = new SparkMax(ClimbConstants.kClimbFollowerMotorCANID,
-            MotorType.kBrushless);
+    private final SparkMax m_leaderMotor =
+            new SparkMax(ClimbConstants.kClimbLeaderMotorCANID, MotorType.kBrushless);
+    private final SparkMax m_followerMotor =
+            new SparkMax(ClimbConstants.kClimbFollowerMotorCANID, MotorType.kBrushless);
 
     private final DCMotor m_simMotor = DCMotor.getNeo550(2);
 
@@ -34,21 +35,12 @@ public class ClimbSubsystem extends SubsystemBase {
 
     // object creation of absolute encoder. The REV Through bore encoder is used for
     // climb
-    private final DutyCycleEncoder m_absoluteEncoder = new DutyCycleEncoder(ClimbConstants.kRevThroughBoreIO, 0, 0);
+    private final DutyCycleEncoder m_absoluteEncoder =
+            new DutyCycleEncoder(ClimbConstants.kRevThroughBoreIO, 0, 0);
 
     /*
-     * private final ElevatorSim m_climbSim =
-     * new ElevatorSim(
-     * motorSim,
-     * 5,
-     * 70,
-     * 6,
-     * 0,
-     * 100,
-     * true,
-     * 0.0,
-     * 0.01,
-     * 0);
+     * private final ElevatorSim m_climbSim = new ElevatorSim( motorSim, 5, 70, 6, 0, 100, true,
+     * 0.0, 0.01, 0);
      */
 
     // object creation of bangbang controller
@@ -93,7 +85,8 @@ public class ClimbSubsystem extends SubsystemBase {
         // limit
         // prevents damage towards motors from pulling too much current -- VERY
         // IMPORTANT!
-        m_leaderMotorConfig.smartCurrentLimit(ClimbConstants.kMotorStallCurrent, ClimbConstants.kMotorFreeSpeedCurrent);
+        m_leaderMotorConfig.smartCurrentLimit(ClimbConstants.kMotorStallCurrent,
+                ClimbConstants.kMotorFreeSpeedCurrent);
         m_followerMotorConfig.smartCurrentLimit(ClimbConstants.kMotorStallCurrent,
                 ClimbConstants.kMotorFreeSpeedCurrent);
 
@@ -107,7 +100,8 @@ public class ClimbSubsystem extends SubsystemBase {
         // any previous parameters are reset here to be overwritten with new parameters.
         // these parameters will persist. This is incredibly important as without this,
         // all parameters are wiped on reboot.
-        m_leaderMotor.configure(m_leaderMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        m_leaderMotor.configure(m_leaderMotorConfig, ResetMode.kResetSafeParameters,
+                PersistMode.kPersistParameters);
         m_followerMotor.configure(m_followerMotorConfig, ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
     }
@@ -163,22 +157,28 @@ public class ClimbSubsystem extends SubsystemBase {
             SmartDashboard.putNumber("Leader Motor Speed", m_leaderMotor.get());
             SmartDashboard.putNumber("Leader Motor Voltage", m_leaderMotor.getBusVoltage());
             SmartDashboard.putNumber("Leader Motor Current", m_leaderMotor.getOutputCurrent());
-            SmartDashboard.putNumber("Leader Motor Temperature", m_leaderMotor.getMotorTemperature());
+            SmartDashboard.putNumber("Leader Motor Temperature",
+                    m_leaderMotor.getMotorTemperature());
 
             SmartDashboard.putNumber("Follower Motor Speed", m_followerMotor.get());
             SmartDashboard.putNumber("Follower Motor Voltage", m_followerMotor.getBusVoltage());
             SmartDashboard.putNumber("Follower Motor Current", m_followerMotor.getOutputCurrent());
-            SmartDashboard.putNumber("Follower Motor Temperature", m_followerMotor.getMotorTemperature());
+            SmartDashboard.putNumber("Follower Motor Temperature",
+                    m_followerMotor.getMotorTemperature());
 
             if (m_leaderMotor.hasActiveFault()) {
                 DriverStation.reportWarning(
                         "MOTOR WARNING: SparkMax ID " + ClimbConstants.kClimbLeaderMotorCANID
-                                + " is currently reporting an error with: \"" + reportMotorError(m_leaderMotor) + "\"",
+                                + " is currently reporting an error with: \""
+                                + reportMotorError(m_leaderMotor) + "\"",
                         true);
             }
             if (m_followerMotor.hasActiveFault()) {
-                DriverStation.reportWarning("MOTOR WARNING: SparkMax ID " + ClimbConstants.kClimbFollowerMotorCANID
-                        + " is currently reporting an error with: \"" + reportMotorError(m_followerMotor) + "\"", true);
+                DriverStation.reportWarning(
+                        "MOTOR WARNING: SparkMax ID " + ClimbConstants.kClimbFollowerMotorCANID
+                                + " is currently reporting an error with: \""
+                                + reportMotorError(m_followerMotor) + "\"",
+                        true);
             }
         }
     }

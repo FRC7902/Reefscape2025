@@ -17,43 +17,43 @@ import frc.robot.Constants.AlgaeManipulatorConstants;
 
 public class AlgaeManipulatorSubsystem extends SubsystemBase {
 
-  private SparkMax m_motor =
-      new SparkMax(AlgaeManipulatorConstants.kMotorCANId, MotorType.kBrushless);
-  private SparkMaxConfig m_motorConfig = new SparkMaxConfig();
+    private SparkMax m_motor =
+            new SparkMax(AlgaeManipulatorConstants.kMotorCANId, MotorType.kBrushless);
+    private SparkMaxConfig m_motorConfig = new SparkMaxConfig();
 
-  private DigitalInput m_beamBreak = new DigitalInput(AlgaeManipulatorConstants.kbeamBreakPortId);
+    private DigitalInput m_beamBreak = new DigitalInput(AlgaeManipulatorConstants.kbeamBreakPortId);
 
-  /** Creates a new AlgaeElevatorManipulatorSubsystem. */
-  public AlgaeManipulatorSubsystem() {
-    configure();
-  }
+    /** Creates a new AlgaeElevatorManipulatorSubsystem. */
+    public AlgaeManipulatorSubsystem() {
+        configure();
+    }
 
-  private void configure() {
-    m_motorConfig.smartCurrentLimit(AlgaeManipulatorConstants.kMotorCurrentLimit);
-    m_motor.configure(m_motorConfig, ResetMode.kResetSafeParameters,
-        PersistMode.kPersistParameters);
-  }
+    private void configure() {
+        m_motorConfig.smartCurrentLimit(AlgaeManipulatorConstants.kMotorCurrentLimit);
+        m_motor.configure(m_motorConfig, ResetMode.kResetSafeParameters,
+                PersistMode.kPersistParameters);
+    }
 
-  public void setIntakeVoltage(double voltage) {
+    public void setIntakeVoltage(double voltage) {
 
-    // TODO: For safety, if moving, check current for some duration (e.g., 0.5 sec),
-    // if current is above threshold, stop motor. Due to current limit of 60A, we do
-    // not want the motor to be running for more than 75s.
+        // TODO: For safety, if moving, check current for some duration (e.g., 0.5 sec),
+        // if current is above threshold, stop motor. Due to current limit of 60A, we do
+        // not want the motor to be running for more than 75s.
 
-    m_motor.setVoltage(voltage);
-  }
+        m_motor.setVoltage(voltage);
+    }
 
-  public void stopIntake() {
-    m_motor.stopMotor();
-  }
+    public void stopIntake() {
+        m_motor.stopMotor();
+    }
 
-  public boolean hasAlgae() {
-    return m_beamBreak.get();
-  }
+    public boolean hasAlgae() {
+        return m_beamBreak.get();
+    }
 
-  @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
-    SmartDashboard.putBoolean("hasAlgae", hasAlgae());
-  }
+    @Override
+    public void periodic() {
+        // This method will be called once per scheduler run
+        SmartDashboard.putBoolean("hasAlgae", hasAlgae());
+    }
 }

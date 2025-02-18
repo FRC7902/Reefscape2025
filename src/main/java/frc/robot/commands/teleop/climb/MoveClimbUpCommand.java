@@ -10,44 +10,39 @@ import frc.robot.RobotContainer;
 
 public class MoveClimbUpCommand extends Command {
 
-  public MoveClimbUpCommand() {
-    addRequirements(RobotContainer.m_climbSubsystem);
-  }
+    public MoveClimbUpCommand() {
+        addRequirements(RobotContainer.m_climbSubsystem);
+    }
 
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {
-    RobotContainer.m_climbSubsystem.stopMotors();
-  }
+    // Called when the command is initially scheduled.
+    @Override
+    public void initialize() {
+        RobotContainer.m_climbSubsystem.stopMotors();
+    }
 
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {
-    /*
-     * if (RobotContainer.m_climbSubsystem.getEncoderDistance() <
-     * ClimbConstants.kClimbRaisedPosition) {
-     * RobotContainer.m_climbSubsystem.driveMotors(ClimbConstants.
-     * kClimbRaisedPosition);
-     * }
-     * else if (RobotContainer.m_climbSubsystem.getEncoderDistance() >=
-     * ClimbConstants.kClimbRaisedPosition)
-     * {
-     * RobotContainer.m_climbSubsystem.stopMotors();
-     * m_robotContainer.m_operatorController.setRumble(RumbleType.kBothRumble, 1);
-     * }
-     */
-    RobotContainer.m_climbSubsystem.setVoltage(ClimbConstants.kMotorVoltageUp);
-  }
+    // Called every time the scheduler runs while the command is scheduled.
+    @Override
+    public void execute() {
+        /*
+         * if (RobotContainer.m_climbSubsystem.getEncoderDistance() <
+         * ClimbConstants.kClimbRaisedPosition) {
+         * RobotContainer.m_climbSubsystem.driveMotors(ClimbConstants. kClimbRaisedPosition); } else
+         * if (RobotContainer.m_climbSubsystem.getEncoderDistance() >=
+         * ClimbConstants.kClimbRaisedPosition) { RobotContainer.m_climbSubsystem.stopMotors();
+         * m_robotContainer.m_operatorController.setRumble(RumbleType.kBothRumble, 1); }
+         */
+        RobotContainer.m_climbSubsystem.setVoltage(ClimbConstants.kMotorVoltageUp);
+    }
 
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {
-    RobotContainer.m_climbSubsystem.stopMotors();
-  }
+    // Called once the command ends or is interrupted.
+    @Override
+    public void end(boolean interrupted) {
+        RobotContainer.m_climbSubsystem.stopMotors();
+    }
 
-  // Returns true when the command should end.
-  @Override
-  public boolean isFinished() {
-    return false;
-  }
+    // Returns true when the command should end.
+    @Override
+    public boolean isFinished() {
+        return false;
+    }
 }
