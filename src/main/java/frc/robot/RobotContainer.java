@@ -5,9 +5,11 @@
 package frc.robot;
 
 import java.io.File;
+import java.util.Map;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SelectCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ElevatorConstants;
@@ -25,6 +27,7 @@ import frc.robot.subsystems.AlgaeManipulatorSubsystem;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.CoralIndexerSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.ElevatorSubsystem.ElevatorPosition;
 import frc.robot.subsystems.SwerveSubsystem;
 import swervelib.SwerveInputStream;
 
@@ -98,6 +101,26 @@ public class RobotContainer {
         // Configure the trigger bindings
         configureBindings();
     }
+
+    private ElevatorPosition select() {
+        return m_elevatorSubsystem.getElevatorEnumPosition();
+    }
+
+    private final Command m_selectIntakeCommand = new SelectCommand<>(
+            Map.ofEntries(
+                    Map.entry(ElevatorPosition.ALGAE_LOW,
+                            Commands.race(new IntakeAlgaeCommand(),
+                                    new RelativeMoveElevatorCommand(0.41))),
+                    Map.entry(ElevatorPosition.ALGAE_HIGH, Commands.race(new IntakeAlgaeCommand(),
+                            new RelativeMoveElevatorCommand(0.41)))),
+            this::select);
+
+    private final Command m_selectOuttakeCommand = new SelectCommand<>(
+            Map.ofEntries(Map.entry(ElevatorPosition.CORAL_L1, new OuttakeCoralCommand()),
+                    Map.entry(ElevatorPosition.CORAL_L2, new OuttakeCoralCommand()),
+                    Map.entry(ElevatorPosition.CORAL_L3, new OuttakeCoralCommand()),
+                    Map.entry(ElevatorPosition.PROCESSOR, new OuttakeAlgaeCommand())),
+            this::select);
 
     /**
      * Use this method to define your trigger->command mappings. Triggers can be created via the

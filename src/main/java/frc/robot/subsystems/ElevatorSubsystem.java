@@ -257,7 +257,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     // ALGAE_HIGH = kElevatorAlgaeHighHeight
     // ALGAE_LOW = kElevatorAlgaeLowHeight
     // PROCESSOR = kElevatorProcessorHeight
-    public ElevatorPosition getElevatorPosition() {
+    public ElevatorPosition getElevatorEnumPosition() {
         // Match current position to known positions
         double currentPosition = getPositionMeters();
 
@@ -320,6 +320,8 @@ public class ElevatorSubsystem extends SubsystemBase {
         // SmartDashboard.putNumber("Follower supply current",
         // m_elevatorFollowerMotor.getSupplyCurrent().getValueAsDouble());
         // SmartDashboard.putBoolean("Reverse limit switch", isAtRetractLimit());
+
+        SmartDashboard.putString("Curr Position Name", getElevatorEnumPosition().toString());
 
         updateTelemetry();
     }
