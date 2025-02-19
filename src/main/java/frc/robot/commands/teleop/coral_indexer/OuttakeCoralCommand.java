@@ -17,6 +17,7 @@ public class OuttakeCoralCommand extends Command {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
+        RobotContainer.m_indexSubsystem.setPower(Constants.IndexConstants.kOuttakePower);
 
     }
 

@@ -120,9 +120,16 @@ public final class Constants {
         // public static final double kLevel1 = Units.inchesToMeters(31.875);
         // public static final double kLevel2 = Units.inchesToMeters(47.625);
         // public static final double kLevel3 = Units.inchesToMeters(72.0);
+
+        // public static final double kLevel1 = Units.inchesToMeters(8);
+        // public static final double kLevel2 = Units.inchesToMeters(20);
+        // public static final double kLevel3 = Units.inchesToMeters(30);
+
         public static final double kLevel1 = Units.inchesToMeters(8);
-        public static final double kLevel2 = Units.inchesToMeters(20);
-        public static final double kLevel3 = Units.inchesToMeters(30);
+        public static final double kLevel2 = 0.188;
+        public static final double kLevel3 = 0.548;
+        // public static final double kLevel2 = Units.inchesToMeters(7.40);
+        // public static final double kLevel3 = Units.inchesToMeters(21.57);
 
         // Control Parameters
         public static final double kElevatorTargetError = 0.005;

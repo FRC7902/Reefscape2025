@@ -135,8 +135,7 @@ public class RobotContainer {
                 m_driverController.leftBumper().whileTrue(new IntakeAlgaeCommand());
                 m_driverController.rightBumper().whileTrue(new OuttakeAlgaeCommand());
 
-                m_indexSubsystem.setDefaultCommand(new ConditionalCommand(new IntakeCoralCommand(),
-                                new NullCommand(), m_indexSubsystem::isBeamBroken));
+                m_indexSubsystem.setDefaultCommand(new IntakeCoralCommand());
 
                 m_driverController.rightTrigger().whileTrue(new OuttakeCoralCommand());
 
@@ -157,8 +156,8 @@ public class RobotContainer {
                 m_operatorController.povDown().whileTrue(new MoveClimbDownCommand());
 
                 // Elevator adjustment for tuning
-                m_driverController.povUp().onTrue(new RelativeMoveElevatorCommand(0.1));
-                m_driverController.povDown().onTrue(new RelativeMoveElevatorCommand(-0.1));
+                m_driverController.povUp().whileTrue(new RelativeMoveElevatorCommand(0.00635));
+                m_driverController.povDown().whileTrue(new RelativeMoveElevatorCommand(-0.00635));
         }
 
         /**
