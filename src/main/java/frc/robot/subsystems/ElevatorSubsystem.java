@@ -33,6 +33,7 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.Constants;
 import frc.robot.Constants.ElevatorConstants;
 
 public class ElevatorSubsystem extends SubsystemBase {
@@ -221,7 +222,15 @@ public class ElevatorSubsystem extends SubsystemBase {
      * @param position The position in meters
      */
     public void setPosition(double position) {
-        m_setpoint = position;
+
+        if (position > ElevatorConstants.kElevatorMaxHeightMeters) {
+            m_setpoint = ElevatorConstants.kElevatorMaxHeightMeters;
+        } else if (position < ElevatorConstants.kElevatorMinHeightMeters) {
+            m_setpoint = ElevatorConstants.kElevatorMinHeightMeters;
+        } else {
+            m_setpoint = position;
+        }
+
         double positionRotations = position / ElevatorConstants.kElevatorMetersPerMotorRotation;
         m_request = m_request.withPosition(positionRotations).withSlot(0);
         m_leaderMotor.setControl(m_request);
@@ -321,7 +330,9 @@ public class ElevatorSubsystem extends SubsystemBase {
         // m_elevatorFollowerMotor.getSupplyCurrent().getValueAsDouble());
         // SmartDashboard.putBoolean("Reverse limit switch", isAtRetractLimit());
 
-        SmartDashboard.putString("Curr Position Name", getElevatorEnumPosition().toString());
+        String elevatorEnumPosition =
+                (getElevatorEnumPosition() != null) ? getElevatorEnumPosition().toString() : "N/A";
+        SmartDashboard.putString("Curr Position Name", elevatorEnumPosition);
 
         updateTelemetry();
     }

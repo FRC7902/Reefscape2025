@@ -44,6 +44,7 @@ public class AlgaeManipulatorSubsystem extends SubsystemBase {
     }
 
     public void stopIntake() {
+        setIntakeVoltage(0);
         m_motor.stopMotor();
     }
 
