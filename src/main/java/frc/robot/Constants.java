@@ -132,6 +132,8 @@ public final class Constants {
 
         public static final double kElevatorAlgaeLowHeight = 0.0;
         public static final double kElevatorAlgaeHighHeight = 0.0;
+
+        public static final double kElevatorProcessorHeight = 0.0;
         // ==============================
 
         // ===== Control Parameters =====
