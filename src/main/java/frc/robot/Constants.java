@@ -72,10 +72,10 @@ public final class Constants {
     }
 
     public static class IndexConstants {
-        public static int kIndexMotorCAN = 38;
+        public static int kIndexMotorCAN = 35;
         public static final double kRampRate = 0;
-        public static final double kOuttakeSpeed = 80;
-        public static final double kIntakeSpeed = 40;
+        public static final double kOuttakePower = 1;
+        public static final double kIntakeSpeed = 10;
         public static double kS = 1;
         public static double kV = 1;
         public static final int kBeamSensorPort = 9;

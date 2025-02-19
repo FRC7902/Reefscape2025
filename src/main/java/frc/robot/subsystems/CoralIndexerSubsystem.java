@@ -31,7 +31,7 @@ public class CoralIndexerSubsystem extends SubsystemBase {
     private double m_simMotorVelocity = 0;
 
     public CoralIndexerSubsystem() {
-        m_indexMotorConfig.smartCurrentLimit(20).openLoopRampRate(IndexConstants.kRampRate)
+        m_indexMotorConfig.smartCurrentLimit(30).openLoopRampRate(IndexConstants.kRampRate)
                 .idleMode(IdleMode.kBrake);
 
         m_indexMotor.configure(m_indexMotorConfig, ResetMode.kNoResetSafeParameters,
@@ -44,6 +44,10 @@ public class CoralIndexerSubsystem extends SubsystemBase {
     public void setSpeed(double speed) {
         m_indexSpeed = speed;
         m_indexMotor.setVoltage(m_feedforward.calculate(m_indexSpeed));
+    }
+
+    public void setPower(double motorPower) {
+        m_indexMotor.set(motorPower);
     }
 
     public double getSpeed() {
