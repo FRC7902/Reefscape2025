@@ -12,11 +12,11 @@ import frc.robot.RobotContainer;
  * https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#
  * defining-commands
  */
-public class SetElevatorCommand extends Command {
+public class SetElevatorPositionCommand extends Command {
     private double m_targetHeight;
 
     /** Creates a new ElevatorSetpoint. */
-    public SetElevatorCommand(double targetHeight) {
+    public SetElevatorPositionCommand(double targetHeight) {
         m_targetHeight = targetHeight;
         addRequirements(RobotContainer.m_elevatorSubsystem);
     }
