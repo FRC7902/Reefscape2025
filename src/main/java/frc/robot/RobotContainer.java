@@ -134,8 +134,11 @@ public class RobotContainer {
                 m_driverController.leftBumper().whileTrue(new IntakeAlgaeCommand());
                 m_driverController.rightBumper().whileTrue(new OuttakeAlgaeCommand());
 
-                m_indexSubsystem.setDefaultCommand(new IntakeCoralCommand()
-                                .andThen(new CorrectCoralPositionCommand()));
+                m_indexSubsystem.setDefaultCommand(
+                                new IntakeCoralCommand(Constants.CoralIndexerConstants.kIntakePower)
+                                                .andThen(new CorrectCoralPositionCommand())
+                                                .andThen(new IntakeCoralCommand(
+                                                                Constants.CoralIndexerConstants.kCorrectionPower)));
 
                 m_driverController.rightTrigger().whileTrue(new OuttakeCoralCommand());
 

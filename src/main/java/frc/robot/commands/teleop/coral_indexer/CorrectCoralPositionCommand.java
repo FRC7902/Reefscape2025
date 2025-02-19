@@ -28,7 +28,7 @@ public class CorrectCoralPositionCommand extends Command {
   @Override
   public void execute() {
     if (!RobotContainer.m_indexSubsystem.isBeamBroken()) {
-      RobotContainer.m_indexSubsystem.setPower(Constants.CoralIndexerConstants.kCorrectionPower);
+      RobotContainer.m_indexSubsystem.setPower(-Constants.CoralIndexerConstants.kCorrectionPower);
     } else {
       RobotContainer.m_indexSubsystem.stop();
     }

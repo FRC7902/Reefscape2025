@@ -19,14 +19,16 @@ import swervelib.math.Matter;
  */
 public final class Constants {
 
-    public static final double ROBOT_MASS = (148 - 20.3) * 0.453592; // 32lbs * kg per pound //
-                                                                     // TODO: Change this to
-                                                                     // actual robot mass
-    public static final Matter CHASSIS =
-            new Matter(new Translation3d(0, 0, Units.inchesToMeters(8)), ROBOT_MASS);
-    public static final double LOOP_TIME = 0.13; // s, 20ms + 110ms sprk max velocity lag // TODO:
-                                                 // Check if this is
-                                                 // correct
+    // public static final double ROBOT_MASS = (148 - 20.3) * 0.453592; // 32lbs * kg per pound //
+    // // TODO: Change this to
+    // // actual robot mass
+    // public static final Matter CHASSIS =
+    // new Matter(new Translation3d(0, 0, Units.inchesToMeters(8)), ROBOT_MASS);
+    // public static final double LOOP_TIME = 0.13; // s, 20ms + 110ms sprk max velocity lag //
+    // TODO:
+    // // Check if this is
+    // // correct
+
     public static final double MAX_SPEED = Units.feetToMeters(12);
 
     public static class ClimbConstants {
@@ -76,8 +78,8 @@ public final class Constants {
         public static final double kRampRate = 0;
 
         public static final double kOuttakePower = 1;
-        public static final double kIntakePower = 0.75;
-        public static final double kCorrectionPower = -0.2;
+        public static final double kIntakePower = 1;
+        public static final double kCorrectionPower = 0.2;
 
         public static double kS = 1;
         public static double kV = 1;
