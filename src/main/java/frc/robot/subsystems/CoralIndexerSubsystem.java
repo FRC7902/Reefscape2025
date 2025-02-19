@@ -10,15 +10,15 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.Constants.IndexConstants;
+import frc.robot.Constants.CoralIndexerConstants;
 import edu.wpi.first.wpilibj.DigitalInput;
 
 public class CoralIndexerSubsystem extends SubsystemBase {
-    public SparkMax m_indexMotor =
-            new SparkMax(Constants.IndexConstants.kIndexMotorCAN, SparkMax.MotorType.kBrushless);
+    public SparkMax m_indexMotor = new SparkMax(Constants.CoralIndexerConstants.kIndexMotorCAN,
+            SparkMax.MotorType.kBrushless);
     public SparkMaxConfig m_indexMotorConfig = new SparkMaxConfig();
-    public SimpleMotorFeedforward m_feedforward =
-            new SimpleMotorFeedforward(Constants.IndexConstants.kS, Constants.IndexConstants.kV);
+    public SimpleMotorFeedforward m_feedforward = new SimpleMotorFeedforward(
+            Constants.CoralIndexerConstants.kS, Constants.CoralIndexerConstants.kV);
 
     private RelativeEncoder m_encoder;
     private DigitalInput m_beamSensor;
@@ -31,14 +31,14 @@ public class CoralIndexerSubsystem extends SubsystemBase {
     private double m_simMotorVelocity = 0;
 
     public CoralIndexerSubsystem() {
-        m_indexMotorConfig.smartCurrentLimit(30).openLoopRampRate(IndexConstants.kRampRate)
+        m_indexMotorConfig.smartCurrentLimit(30).openLoopRampRate(CoralIndexerConstants.kRampRate)
                 .idleMode(IdleMode.kBrake);
 
         m_indexMotor.configure(m_indexMotorConfig, ResetMode.kNoResetSafeParameters,
                 PersistMode.kPersistParameters);
 
         m_encoder = m_indexMotor.getEncoder();
-        m_beamSensor = new DigitalInput(Constants.IndexConstants.kBeamSensorPort);
+        m_beamSensor = new DigitalInput(Constants.CoralIndexerConstants.kBeamSensorPort);
     }
 
     public void setSpeed(double speed) {
