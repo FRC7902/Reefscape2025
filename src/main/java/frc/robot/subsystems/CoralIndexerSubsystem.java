@@ -78,11 +78,7 @@ public class CoralIndexerSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Motor Velocity (Encoder)", m_encoder.getVelocity());
         SmartDashboard.putBoolean("Beam Sensor Broken", isBeamBroken());
 
-        if (isBeamBroken()) {
-            m_indexMotor.set(0.35);
-        } else {
-            m_indexMotor.set(0);
-        }
+
 
     }
 

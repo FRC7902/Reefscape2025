@@ -22,13 +22,20 @@ public class IntakeCoralCommand extends Command {
 
     // Called when the command is initially scheduled.
     @Override
-    public void initialize() {
-        RobotContainer.m_indexSubsystem.setSpeed(Constants.IndexConstants.kIntakeSpeed);
-    }
+    public void initialize() {}
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
-    public void execute() {}
+    public void execute() {
+        if (RobotContainer.m_indexSubsystem.isBeamBroken()) {
+            RobotContainer.m_indexSubsystem.setPower(0.2);
+
+        } else {
+            RobotContainer.m_indexSubsystem.stop();
+
+        }
+
+    }
 
     // Called once the command ends or is interrupted.
     @Override
