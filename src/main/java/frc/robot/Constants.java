@@ -27,7 +27,7 @@ public final class Constants {
     public static final double LOOP_TIME = 0.13; // s, 20ms + 110ms sprk max velocity lag // TODO:
                                                  // Check if this is
                                                  // correct
-    public static final double MAX_SPEED = Units.feetToMeters(15);
+    public static final double MAX_SPEED = Units.feetToMeters(12);
 
     public static class ClimbConstants {
         // CAN ID of the primary motor
