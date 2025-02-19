@@ -33,9 +33,15 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.Constants;
 import frc.robot.Constants.ElevatorConstants;
 
 public class ElevatorSubsystem extends SubsystemBase {
+
+    // create an enum
+    public enum ElevatorPosition {
+        CORAL_L1, CORAL_L2, CORAL_L3, CORAL_STATION, ALGAE_HIGH, ALGAE_LOW, PROCESSOR
+    }
 
     // Declare motor controllers
     private final TalonFX m_leaderMotor = new TalonFX(ElevatorConstants.kElevatorLeaderCAN);
@@ -216,7 +222,15 @@ public class ElevatorSubsystem extends SubsystemBase {
      * @param position The position in meters
      */
     public void setPosition(double position) {
-        m_setpoint = position;
+
+        if (position > ElevatorConstants.kElevatorMaxHeightMeters) {
+            m_setpoint = ElevatorConstants.kElevatorMaxHeightMeters;
+        } else if (position < ElevatorConstants.kElevatorMinHeightMeters) {
+            m_setpoint = ElevatorConstants.kElevatorMinHeightMeters;
+        } else {
+            m_setpoint = position;
+        }
+
         double positionRotations = position / ElevatorConstants.kElevatorMetersPerMotorRotation;
         m_request = m_request.withPosition(positionRotations).withSlot(0);
         m_leaderMotor.setControl(m_request);
@@ -245,6 +259,51 @@ public class ElevatorSubsystem extends SubsystemBase {
         return m_sysIdRoutine.dynamic(direction);
     }
 
+    // CORAL_L1 = kkElevatorCoralLevel1Height
+    // CORAL_L2 = kElevatorCoralLevel2Height
+    // CORAL_L3 = kElevatorCoralLevel3Height
+    // CORAL_STATION = kElevatorCoralStationHeight
+    // ALGAE_HIGH = kElevatorAlgaeHighHeight
+    // ALGAE_LOW = kElevatorAlgaeLowHeight
+    // PROCESSOR = kElevatorProcessorHeight
+    public ElevatorPosition getElevatorEnumPosition() {
+        // Match current position to known positions
+        double currentPosition = getPositionMeters();
+
+        if (Math.abs(currentPosition
+                - ElevatorConstants.kElevatorCoralLevel1Height) < ElevatorConstants.kElevatorTargetError
+                        * 2) {
+            return ElevatorPosition.CORAL_L1;
+        } else if (Math.abs(currentPosition
+                - ElevatorConstants.kElevatorCoralLevel2Height) < ElevatorConstants.kElevatorTargetError
+                        * 2) {
+            return ElevatorPosition.CORAL_L2;
+        } else if (Math.abs(currentPosition
+                - ElevatorConstants.kElevatorCoralLevel3Height) < ElevatorConstants.kElevatorTargetError
+                        * 2) {
+            return ElevatorPosition.CORAL_L3;
+        } else if (Math.abs(currentPosition
+                - ElevatorConstants.kElevatorCoralStationHeight) < ElevatorConstants.kElevatorTargetError
+                        * 2) {
+            return ElevatorPosition.CORAL_STATION;
+        } else if (Math.abs(currentPosition
+                - ElevatorConstants.kElevatorAlgaeHighHeight) < ElevatorConstants.kElevatorTargetError
+                        * 2) {
+            return ElevatorPosition.ALGAE_HIGH;
+        } else if (Math.abs(currentPosition
+                - ElevatorConstants.kElevatorAlgaeLowHeight) < ElevatorConstants.kElevatorTargetError
+                        * 2) {
+            return ElevatorPosition.ALGAE_LOW;
+        } else if (Math.abs(currentPosition
+                - ElevatorConstants.kElevatorProcessorHeight) < ElevatorConstants.kElevatorTargetError
+                        * 2) {
+            return ElevatorPosition.PROCESSOR;
+        } else {
+            // Return null or a default value if no position matches
+            return null;
+        }
+    }
+
     @Override
     public void periodic() {
         m_leaderMotor.setControl(m_request);
@@ -270,6 +329,10 @@ public class ElevatorSubsystem extends SubsystemBase {
         // SmartDashboard.putNumber("Follower supply current",
         // m_elevatorFollowerMotor.getSupplyCurrent().getValueAsDouble());
         // SmartDashboard.putBoolean("Reverse limit switch", isAtRetractLimit());
+
+        String elevatorEnumPosition =
+                (getElevatorEnumPosition() != null) ? getElevatorEnumPosition().toString() : "N/A";
+        SmartDashboard.putString("Curr Position Name", elevatorEnumPosition);
 
         updateTelemetry();
     }
