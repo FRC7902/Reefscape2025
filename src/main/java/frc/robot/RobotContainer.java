@@ -8,16 +8,15 @@ import java.io.File;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.teleop.NullCommand;
 import frc.robot.commands.teleop.algae_manipulator.IntakeAlgaeCommand;
 import frc.robot.commands.teleop.algae_manipulator.OuttakeAlgaeCommand;
 import frc.robot.commands.teleop.climb.MoveClimbDownCommand;
 import frc.robot.commands.teleop.climb.MoveClimbUpCommand;
+import frc.robot.commands.teleop.coral_indexer.CorrectCoralPositionCommand;
 import frc.robot.commands.teleop.coral_indexer.IntakeCoralCommand;
 import frc.robot.commands.teleop.coral_indexer.OuttakeCoralCommand;
 import frc.robot.commands.teleop.elevator.RelativeMoveElevatorCommand;
@@ -135,7 +134,11 @@ public class RobotContainer {
                 m_driverController.leftBumper().whileTrue(new IntakeAlgaeCommand());
                 m_driverController.rightBumper().whileTrue(new OuttakeAlgaeCommand());
 
-                m_indexSubsystem.setDefaultCommand(new IntakeCoralCommand());
+                m_indexSubsystem.setDefaultCommand(
+                                new IntakeCoralCommand(Constants.CoralIndexerConstants.kIntakePower)
+                                                .andThen(new CorrectCoralPositionCommand())
+                                                .andThen(new IntakeCoralCommand(
+                                                                Constants.CoralIndexerConstants.kCorrectionPower)));
 
                 m_driverController.rightTrigger().whileTrue(new OuttakeCoralCommand());
 

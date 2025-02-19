@@ -17,14 +17,14 @@ public class OuttakeCoralCommand extends Command {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        RobotContainer.m_indexSubsystem.setPower(Constants.IndexConstants.kOuttakePower);
+        RobotContainer.m_indexSubsystem.setPower(Constants.CoralIndexerConstants.kOuttakePower);
 
     }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        RobotContainer.m_indexSubsystem.setPower(Constants.IndexConstants.kOuttakePower);
+        RobotContainer.m_indexSubsystem.setPower(Constants.CoralIndexerConstants.kOuttakePower);
     }
 
     // Called once the command ends or is interrupted.

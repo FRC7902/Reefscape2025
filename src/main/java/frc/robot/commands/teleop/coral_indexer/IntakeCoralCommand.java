@@ -14,27 +14,32 @@ import frc.robot.RobotContainer;
  * defining-commands
  */
 public class IntakeCoralCommand extends Command {
+
+    private boolean beamBrokenInitially = false;
+    private double m_power;
+
     /** Creates a new IntakeCoralCommand. */
-    public IntakeCoralCommand() {
+    public IntakeCoralCommand(double power) {
         // Use addRequirements() here to declare subsystem dependencies.
         addRequirements(RobotContainer.m_indexSubsystem);
+        m_power = power;
     }
 
     // Called when the command is initially scheduled.
     @Override
-    public void initialize() {}
+    public void initialize() {
+        beamBrokenInitially = false;
+    }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
         if (RobotContainer.m_indexSubsystem.isBeamBroken()) {
-            RobotContainer.m_indexSubsystem.setPower(0.2);
-
+            RobotContainer.m_indexSubsystem.setPower(m_power);
+            beamBrokenInitially = true;
         } else {
             RobotContainer.m_indexSubsystem.stop();
-
         }
-
     }
 
     // Called once the command ends or is interrupted.
@@ -46,6 +51,6 @@ public class IntakeCoralCommand extends Command {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return false;
+        return beamBrokenInitially && !RobotContainer.m_indexSubsystem.isBeamBroken();
     }
 }
