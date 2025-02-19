@@ -125,8 +125,7 @@ public final class Constants {
         // ===== Elevator Setpoints =====
         public static final double kElevatorCoralStationHeight = 0.0;
 
-        // TODO: tune this
-        public static final double kElevatorCoralLevel1Height = Units.inchesToMeters(8);
+        public static final double kElevatorCoralLevel1Height = 0.100; // TODO: Tune this
         public static final double kElevatorCoralLevel2Height = 0.188;
         public static final double kElevatorCoralLevel3Height = 0.548;
 
