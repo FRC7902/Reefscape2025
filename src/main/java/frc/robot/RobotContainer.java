@@ -126,8 +126,10 @@ public class RobotContainer {
         // Zero gyro
         m_driverController.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
 
-        // Algae manipulator controls
-        m_driverController.leftBumper().whileTrue(new IntakeAlgaeCommand());
+
+        // Raise elevator (by height of Algae diameter) while intaking algae
+        m_driverController.leftBumper().onTrue(
+                Commands.race(new IntakeAlgaeCommand(), new RelativeMoveElevatorCommand(0.41)));
         m_driverController.rightBumper().whileTrue(new OuttakeAlgaeCommand());
 
         m_indexSubsystem.setDefaultCommand(
