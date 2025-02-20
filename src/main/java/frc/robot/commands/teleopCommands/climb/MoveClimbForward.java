@@ -28,14 +28,17 @@ public class MoveClimbForward extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    RobotContainer.m_climbSubsystem.driveMotors(ClimbConstants.kMotorVoltageUp);
 
+    /* 
     if (RobotContainer.m_climbSubsystem.getClimbArmAngle() < ClimbConstants.kClimbForwardLimit) {
       RobotContainer.m_climbSubsystem.driveMotors(ClimbConstants.kMotorVoltageUp);
     }
     else if (RobotContainer.m_climbSubsystem.getClimbArmAngle() >= ClimbConstants.kClimbForwardLimit) {
       RobotContainer.m_climbSubsystem.stopMotors();
       m_robotContainer.m_operatorController.setRumble(RumbleType.kBothRumble, 1);
-      }  
+      }
+      */  
     }
 
   // Called once the command ends or is interrupted.

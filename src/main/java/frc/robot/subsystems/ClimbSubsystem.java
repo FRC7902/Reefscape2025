@@ -109,8 +109,14 @@ public class ClimbSubsystem extends SubsystemBase {
         return m_absoluteEncoder.get() * 360;
     } 
 
+    //315.1 degrees - true 90
+
+    public double getEncoderOffset() {
+        return 315.1;
+    }
+
     public double getSimEncoderDistance() {
-        return s_absoluteEncoder.get() * 360;
+        return (s_absoluteEncoder.get() * 360) - getEncoderOffset();
     }
 
     //Stops outputting to motors.
