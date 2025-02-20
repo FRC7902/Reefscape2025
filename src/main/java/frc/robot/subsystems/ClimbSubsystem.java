@@ -11,6 +11,11 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.simulation.BatterySim;
+import edu.wpi.first.wpilibj.simulation.DutyCycleEncoderSim;
+import edu.wpi.first.wpilibj.simulation.ElevatorSim;
+import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ClimbConstants;
@@ -19,7 +24,7 @@ import frc.robot.Robot;
 public class ClimbSubsystem extends SubsystemBase {
 
     //object creation of motors
-    private final SparkMax  m_climbLeaderMotor = new SparkMax(ClimbConstants.kClimbLeaderMotorCANID, MotorType.kBrushless);
+    private final SparkMax m_climbLeaderMotor = new SparkMax(ClimbConstants.kClimbLeaderMotorCANID, MotorType.kBrushless);
     private final SparkMax m_climbFollowerMotor = new SparkMax(ClimbConstants.kClimbFollowerMotorCANID, MotorType.kBrushless);
 
     //object creation of simulation placeholder motor
@@ -35,8 +40,9 @@ public class ClimbSubsystem extends SubsystemBase {
     // Object creation of absolute encoder. The REV Through bore encoder is used for climb
     // The DutyCycleEncoder is used as the REV Through bore encoder is an absolute encoder that uses PWM via one of the DI (Digital IO) pins on the RIO
     private final DutyCycleEncoder m_absoluteEncoder = new DutyCycleEncoder(ClimbConstants.kRevThroughBoreIO);
+    private final DutyCycleEncoderSim s_absoluteEncoder = new DutyCycleEncoderSim(m_absoluteEncoder);
 
-    /* 
+     
     private final ElevatorSim m_climbSim =
     new ElevatorSim(
         motorSim,
@@ -49,7 +55,7 @@ public class ClimbSubsystem extends SubsystemBase {
         0.0, 
         0.01,
         0);
-    */
+    
 
     public ClimbSubsystem() {
     
@@ -103,9 +109,9 @@ public class ClimbSubsystem extends SubsystemBase {
         return m_absoluteEncoder.get() * 360;
     } 
 
-    //public double getSimEncoderDistance() {
-    //    return s_absoluteEncoder.get();
-    //}
+    public double getSimEncoderDistance() {
+        return s_absoluteEncoder.get() * 360;
+    }
 
     //Stops outputting to motors.
     public void stopMotors() {
@@ -183,11 +189,11 @@ public class ClimbSubsystem extends SubsystemBase {
             //Checks to see if motors are going upwards and if the encoder has reached the set limit
 
             s_climbLeaderMotor.iterate(m_climbLeaderMotor.getAppliedOutput(), 12, 0.02);
-            //m_climbSim.setInput(s_climbLeaderMotor.getVelocity() * RobotController.getBatteryVoltage());
-            //m_climbSim.update(0.020);
-            //s_absoluteEncoder.set(m_climbSim.getPositionMeters());
-            //RoboRioSim.setVInVoltage(
-            //            BatterySim.calculateDefaultBatteryLoadedVoltage(m_climbSim.getCurrentDrawAmps()));
+            m_climbSim.setInput(s_climbLeaderMotor.getVelocity() * RobotController.getBatteryVoltage());
+            m_climbSim.update(0.020);
+            s_absoluteEncoder.set(m_climbSim.getPositionMeters());
+            RoboRioSim.setVInVoltage(
+                        BatterySim.calculateDefaultBatteryLoadedVoltage(m_climbSim.getCurrentDrawAmps()));
             }
     }
 }
