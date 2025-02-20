@@ -103,7 +103,7 @@ public final class Constants {
         // Elevator Dimensions
         public static final double kElevatorHeightMeters = 0.0;
         public static final double kElevatorMinHeightMeters = 0.0;
-        public static final double kElevatorMaxHeightMeters = 0.9;
+        public static final double kElevatorMaxHeightMeters = 0.85;
 
         // Motion Constraints
         public static final double kElevatorMaxVelocity =
