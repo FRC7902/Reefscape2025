@@ -29,6 +29,34 @@ public final class Constants {
                                                // correct
   public static final double MAX_SPEED = Units.feetToMeters(15);
 
+  public static class ClimbConstants {
+    // CAN ID of the primary motor
+    public static final int kClimbLeaderMotorCANID = 41;
+    // CAN ID of the secondary motor
+    public static final int kClimbFollowerMotorCANID = 42;
+    // Digital IO Port that the REV Through Bore Absolute Encoder is connected to on the RIO (uses PWM)
+    public static final int kRevThroughBoreIO = 0;
+    // current limit when motor rpm is at 0 (in amps)
+    public static final int kMotorStallCurrent = 50;
+    // current limit when motor rpm is at 5700 (unique to NEO motors) (in amps)
+    public static final int kMotorFreeSpeedCurrent = 50;
+    // climb arm angle limiter when arm is moving outwards from the robot (in degrees)
+    public static final double kClimbBackwardLimit = 345; 
+    // climb arm angle limiter when arm is moving inwards to the robot (in degrees)
+    public static final double kClimbForwardLimit = 155; 
+    // motor voltage applied when climb arm is set to move foward
+    public static final double kMotorVoltageUp = 12;
+    // motor voltage applied when climb arm is set to move backwards (negative to move the opposite direction)
+    public static final double kMotorVoltageDown = -12;
+    //975.6 Hz for REV Through Bore Absolute Encoder
+    //https://www.revrobotics.com/rev-11-1271/#:~:text=Output%20Frequency%3A%20975.6Hz
+    public static final double kRevThroughBoreFrequency = 975.6; 
+    //The REV Throughbore has a minimum pulse of 1 μs / 1025 μs and a maximum pulse of 1024 μs / 1025 μs
+    //these values are used to ensure accuracy of the encoder's data
+    public static final double kRevThroughBoreMinPulse = 0.000975609756; 
+    public static final double kRevThroughBoreMaxPulse = 0.99902439;
+                                                                }
+                                                                
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
     public static final int kOperatorControllerPort = 1;
@@ -100,6 +128,7 @@ public final class Constants {
     // Control Parameters
     public static final double kElevatorTargetError = 0.005;
     public static final double kElevatorMotorResistance = 0.002; // Assume 2mOhm resistance for voltage drop calculation
+    public static final int kOperatorControllerPort = 0;
 
   }
 }

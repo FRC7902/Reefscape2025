@@ -20,7 +20,10 @@ import frc.robot.commands.teleop.IntakeAlgaeCommand;
 import frc.robot.commands.teleop.IntakeCoralCommand;
 import frc.robot.commands.teleop.NullCommand;
 import frc.robot.commands.teleop.OuttakeAlgaeCommand;
+import frc.robot.commands.teleopCommands.climb.MoveClimbBackwards;
+import frc.robot.commands.teleopCommands.climb.MoveClimbForward;
 import frc.robot.subsystems.AlgaeElevatorManipulatorSubsystem;
+import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.IndexSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
@@ -40,13 +43,14 @@ public class RobotContainer {
     public static final AlgaeElevatorManipulatorSubsystem m_algaeElevatorManipulatorSubsystem = new AlgaeElevatorManipulatorSubsystem();
     // The robot's subsystems and commands are defined here...
     public static final ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
+    public static final ClimbSubsystem m_climbSubsystem = new ClimbSubsystem();
 
     public static final IndexSubsystem m_indexSubsystem = new IndexSubsystem();
 
     // Replace with CommandPS4Controller or CommandJoystick if needed
-    private final CommandXboxController m_driverController = new CommandXboxController(
+    public final CommandXboxController m_driverController = new CommandXboxController(
             OperatorConstants.kDriverControllerPort);
-    private final CommandXboxController m_operatorController = new CommandXboxController(
+    public final CommandXboxController m_operatorController = new CommandXboxController(
             OperatorConstants.kOperatorControllerPort);
 
     private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
@@ -146,7 +150,8 @@ public class RobotContainer {
         m_driverController.rightBumper().whileTrue(new OuttakeAlgaeCommand());
 
         m_indexSubsystem.setDefaultCommand(
-                new ConditionalCommand(new IntakeCoralCommand(), new NullCommand(), m_indexSubsystem::isBeamBroken));
+                new ConditionalCommand(new IntakeCoralCommand(), new NullCommand(),
+                        m_indexSubsystem::isBeamBroken));
 
         m_driverController.rightTrigger().whileTrue(new SetShootSpeed());
 
@@ -154,6 +159,13 @@ public class RobotContainer {
         m_operatorController.b().onTrue(new ElevatorReefSetpoint(ElevatorConstants.kLevel2));
         m_operatorController.y().onTrue(new ElevatorReefSetpoint(ElevatorConstants.kLevel3));
         m_operatorController.x().onTrue(new ElevatorReefSetpoint(ElevatorConstants.kElevatorMinHeightMeters));
+
+        // runs the climb motors up when the up button is pressed on the POV buttons of
+        // the controller.
+        m_operatorController.povUp().whileTrue(new MoveClimbForward(this));
+        // runs the climb motors down when the down button is pressed on the POV buttons
+        // of the controller.
+        m_operatorController.povDown().whileTrue(new MoveClimbBackwards(this));
     }
 
     /**
