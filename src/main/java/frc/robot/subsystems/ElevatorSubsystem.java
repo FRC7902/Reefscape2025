@@ -330,9 +330,9 @@ public class ElevatorSubsystem extends SubsystemBase {
         // m_elevatorFollowerMotor.getSupplyCurrent().getValueAsDouble());
         // SmartDashboard.putBoolean("Reverse limit switch", isAtRetractLimit());
 
-        String elevatorEnumPosition =
-                (getElevatorEnumPosition() != null) ? getElevatorEnumPosition().toString() : "N/A";
-        SmartDashboard.putString("Curr Position Name", elevatorEnumPosition);
+        // String elevatorEnumPosition =
+        //         (getElevatorEnumPosition() != null) ? getElevatorEnumPosition().toString() : "N/A";
+        // SmartDashboard.putString("Curr Position Name", elevatorEnumPosition);
 
         updateTelemetry();
     }
