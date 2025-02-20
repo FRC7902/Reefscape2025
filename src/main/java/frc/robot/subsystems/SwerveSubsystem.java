@@ -52,7 +52,7 @@ public class SwerveSubsystem extends SubsystemBase {
                                                // cosine compensation for
                                                // simulations since it causes discrepancies not
                                                // seen in real life.
-        swerveDrive.setAngularVelocityCompensation(true, true, -0.15); // Correct for skew that gets
+        swerveDrive.setAngularVelocityCompensation(true, true, -0.14); // Correct for skew that gets
                                                                        // worse as angular velocity
                                                                        // increases. Start with a
                                                                        // coefficient of 0.1.
