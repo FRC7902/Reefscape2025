@@ -157,10 +157,13 @@ public class RobotContainer {
                 .onFalse(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeLowHeight));
         m_driverController.rightBumper().whileTrue(new OuttakeAlgaeCommand());
 
-        m_indexSubsystem.setDefaultCommand(
-                new IntakeCoralCommand(Constants.CoralIndexerConstants.kIntakePower)
-                        .andThen(new CorrectCoralPositionCommand()).andThen(new IntakeCoralCommand(
-                                Constants.CoralIndexerConstants.kCorrectionPower)));
+        m_indexSubsystem
+                .setDefaultCommand(
+                        new IntakeCoralCommand(Constants.CoralIndexerConstants.kIntakePower)
+                                .andThen(new CorrectCoralPositionCommand().withTimeout(1))
+                                .andThen(new IntakeCoralCommand(
+                                        Constants.CoralIndexerConstants.kCorrectionPower)
+                                                .withTimeout(1)));
 
         // Coral indexer controls (default intake and manual outtake)
         m_driverController.rightTrigger().whileTrue(new OuttakeCoralCommand());
