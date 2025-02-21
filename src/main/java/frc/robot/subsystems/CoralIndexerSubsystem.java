@@ -7,6 +7,7 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -22,6 +23,7 @@ public class CoralIndexerSubsystem extends SubsystemBase {
 
     private RelativeEncoder m_encoder;
     private DigitalInput m_beamSensor;
+    private Debouncer m_debouncedBeamBreak;
 
     public double m_indexSpeed = 0;
     public double m_volts = 0;
@@ -39,6 +41,7 @@ public class CoralIndexerSubsystem extends SubsystemBase {
 
         m_encoder = m_indexMotor.getEncoder();
         m_beamSensor = new DigitalInput(Constants.CoralIndexerConstants.kBeamSensorPort);
+        m_debouncedBeamBreak = new Debouncer(1);
     }
 
     public void setSpeed(double speed) {
@@ -71,12 +74,22 @@ public class CoralIndexerSubsystem extends SubsystemBase {
         return !m_beamSensor.get();
     }
 
+    /**
+     * Indicates if the subsystem has a coral 
+     * @return true if the coral has broken the beam for a significant amount of time
+     */
+    public boolean hasCoral(){
+        return m_debouncedBeamBreak.calculate(isBeamBroken());
+    }
+
     @Override
     public void periodic() {
         // This code runs in both real and simulation modes.
         SmartDashboard.putNumber("Index Speed", m_indexSpeed);
         SmartDashboard.putNumber("Motor Velocity (Encoder)", m_encoder.getVelocity());
         SmartDashboard.putBoolean("Beam Sensor Broken", isBeamBroken());
+
+       // m_debouncedBeamBreak.calculate(m_beamSensor.get());
 
 
 
