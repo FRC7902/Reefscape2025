@@ -154,7 +154,7 @@ public class RobotContainer {
         m_driverController.leftBumper()
                 .whileTrue(Commands.race(new IntakeAlgaeCommand(),
                         new RelativeMoveElevatorCommand(0.20)))
-                .onFalse(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeLowHeight));
+                .onFalse(new SetElevatorPositionCommand(ElevatorConstants.kElevatorProcessorHeight));
         m_driverController.rightBumper().whileTrue(new OuttakeAlgaeCommand());
 
         m_indexSubsystem
@@ -170,9 +170,9 @@ public class RobotContainer {
 
         // Elevator coral positions
         m_operatorController.x().onTrue(
-                new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralStationHeight));
-        m_operatorController.a().onTrue(
                 new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel1Height));
+        m_operatorController.a().onTrue(
+                new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralStationHeight));
         m_operatorController.b().onTrue(
                 new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel2Height));
         m_operatorController.y().onTrue(
