@@ -48,9 +48,9 @@ public class RobotContainer {
     public static final CoralIndexerSubsystem m_indexSubsystem = new CoralIndexerSubsystem();
 
     // Replace with CommandPS4Controller or CommandJoystick if needed
-    private final CommandXboxController m_driverController =
+    public static final CommandXboxController m_driverController =
             new CommandXboxController(OperatorConstants.kDriverControllerPort);
-    private final CommandXboxController m_operatorController =
+    public static final CommandXboxController m_operatorController =
             new CommandXboxController(OperatorConstants.kOperatorControllerPort);
 
     private final SwerveSubsystem drivebase =

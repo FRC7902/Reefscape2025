@@ -4,6 +4,7 @@
 
 package frc.robot.commands.teleop.coral_indexer;
 
+import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
@@ -32,6 +33,8 @@ public class CorrectCoralPositionCommand extends Command {
     } else {
       RobotContainer.m_indexSubsystem.stop();
     }
+
+    RobotContainer.m_operatorController.setRumble(GenericHID.RumbleType.kBothRumble, 1);
   }
 
   // Called once the command ends or is interrupted.
