@@ -267,7 +267,8 @@ public class SwerveSubsystem extends SubsystemBase {
         swerveDrive.setChassisSpeeds(chassisSpeed);
     }
 
-  public ChassisSpeeds getRobotVelocity() {
-    return swerveDrive.getRobotVelocity();
-  }
+    public ChassisSpeeds getRobotVelocity() {
+        return swerveDrive.getRobotVelocity();
+    }
+}
 
