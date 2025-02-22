@@ -53,6 +53,9 @@ public final class Constants {
         public static final double kClimbRaisedPosition = 0.5;
         public static final double kMotorVoltageUp = 12;
         public static final double kMotorVoltageDown = -12;
+
+        public static final int kLeftServoID = -1;
+        public static final int kRightServoID = -1;
     }
 
     public static class OperatorConstants {
