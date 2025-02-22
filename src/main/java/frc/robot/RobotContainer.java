@@ -9,7 +9,6 @@ import java.util.Map;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -19,8 +18,6 @@ import frc.robot.commands.teleop.algae_manipulator.IntakeAlgaeCommand;
 import frc.robot.commands.teleop.algae_manipulator.OuttakeAlgaeCommand;
 import frc.robot.commands.teleop.climb.InitiateClimbCommand;
 import frc.robot.commands.teleop.climb.LockFunnelCommand;
-import frc.robot.commands.teleop.climb.MoveClimbDownCommand;
-import frc.robot.commands.teleop.climb.MoveClimbUpCommand;
 import frc.robot.commands.teleop.coral_indexer.CorrectCoralPositionCommand;
 import frc.robot.commands.teleop.coral_indexer.IntakeCoralCommand;
 import frc.robot.commands.teleop.coral_indexer.OuttakeCoralCommand;
@@ -110,19 +107,16 @@ public class RobotContainer {
     }
 
     private final Command m_selectIntakeCommand = new SelectCommand<>(
-            Map.ofEntries(
-                    Map.entry(ElevatorPosition.ALGAE_LOW,
-                            Commands.race(new IntakeAlgaeCommand(),
-                                    new RelativeMoveElevatorCommand(0.41))),
-                    Map.entry(ElevatorPosition.ALGAE_HIGH, Commands.race(new IntakeAlgaeCommand(),
-                            new RelativeMoveElevatorCommand(0.41)))),
+            Map.ofEntries(Map.entry(ElevatorPosition.ALGAE_LOW, new IntakeAlgaeCommand()),
+                    Map.entry(ElevatorPosition.ALGAE_HIGH, new IntakeAlgaeCommand())),
+
             this::select);
 
-    private final Command m_selectOuttakeCommand = new SelectCommand<>(
-            Map.ofEntries(Map.entry(ElevatorPosition.CORAL_L1, new OuttakeCoralCommand()),
-                    Map.entry(ElevatorPosition.CORAL_L2, new OuttakeCoralCommand()),
-                    Map.entry(ElevatorPosition.CORAL_L3, new OuttakeCoralCommand()),
-                    Map.entry(ElevatorPosition.PROCESSOR, new OuttakeAlgaeCommand())),
+    private final Command m_selectOuttakeCommand = new SelectCommand<>(Map.ofEntries(
+            Map.entry(ElevatorPosition.CORAL_L1, new OuttakeCoralCommand()),
+            Map.entry(ElevatorPosition.CORAL_L2, new OuttakeCoralCommand()),
+            Map.entry(ElevatorPosition.CORAL_L3, new OuttakeCoralCommand()),
+            Map.entry(ElevatorPosition.CORAL_STATION_AND_PROCESSOR, new OuttakeAlgaeCommand())),
             this::select);
 
     /**
@@ -156,7 +150,11 @@ public class RobotContainer {
         m_driverController.back().whileTrue(new InitiateClimbCommand());
 
         // Raise elevator (by height of Algae diameter) while intaking algae
-        m_driverController.leftBumper().whileTrue(new IntakeAlgaeCommand());
+        m_driverController.leftBumper()
+                .whileTrue(Commands.race(new IntakeAlgaeCommand(),
+                        new RelativeMoveElevatorCommand(0.20)))
+                .onFalse(new SetElevatorPositionCommand(
+                        ElevatorConstants.kElevatorCoralStationAndProcessorHeight));
         m_driverController.rightBumper().whileTrue(new OuttakeAlgaeCommand());
 
         m_indexSubsystem
@@ -166,35 +164,18 @@ public class RobotContainer {
                                 .andThen(new IntakeCoralCommand(
                                         Constants.CoralIndexerConstants.kCorrectionPower)
                                                 .withTimeout(1)));
-
         // Coral indexer controls (default intake and manual outtake)
         m_driverController.rightTrigger().whileTrue(new OuttakeCoralCommand());
 
         // Elevator coral positions
         m_operatorController.x().onTrue(
                 new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel1Height));
-        m_operatorController.a().onTrue(
-                new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralStationHeight));
+        m_operatorController.a().onTrue(new SetElevatorPositionCommand(
+                ElevatorConstants.kElevatorCoralStationAndProcessorHeight));
         m_operatorController.b().onTrue(
                 new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel2Height));
         m_operatorController.y().onTrue(
                 new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel3Height));
-
-        // Elevator algae positions
-        m_operatorController.povDown()
-                .onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeLowHeight));
-        m_operatorController.povUp()
-                .onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeHighHeight));
-
-        // Climb controls
-        m_driverController.povUp().whileTrue(new MoveClimbUpCommand());
-        m_driverController.povDown().whileTrue(new MoveClimbDownCommand());
-
-        // Elevator adjustment for tuning
-        // m_driverController.povUp().whileTrue(new
-        // RelativeMoveElevatorCommand(0.00635));
-        // m_driverController.povDown().whileTrue(new
-        // RelativeMoveElevatorCommand(-0.00635));
     }
 
     /**
