@@ -40,7 +40,7 @@ public class ClimbSubsystem extends SubsystemBase {
             new DutyCycleEncoder(ClimbConstants.kRevThroughBoreIO, 0, 0);
 
     private final Servo m_leftServo = new Servo(ClimbConstants.kLeftServoID);
-    // private final Servo m_rightServo = new Servo(ClimbConstants.kRightServoID);
+    private final Servo m_rightServo = new Servo(ClimbConstants.kRightServoID);
 
     /*
      * private final ElevatorSim m_climbSim = new ElevatorSim( motorSim, 5, 70, 6, 0, 100, true,
@@ -131,13 +131,18 @@ public class ClimbSubsystem extends SubsystemBase {
     }
 
     public void lockFunnel() {
-        m_leftServo.setAngle(85);
-        // m_rightServo.setAngle(85);
+        m_leftServo.setAngle(80);
+        m_rightServo.setAngle(95);
     }
 
     public void unlockFunnel() {
-        m_leftServo.setAngle(95);
-        // m_rightServo.setAngle(95);
+        m_leftServo.setAngle(180);
+        m_rightServo.setAngle(0);
+    }
+
+    public void stopFunnelServos() {
+        m_leftServo.setAngle(90);
+        m_rightServo.setAngle(90);
     }
 
     // public void setRightServo(double degrees) {
