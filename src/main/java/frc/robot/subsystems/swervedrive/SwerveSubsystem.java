@@ -2,12 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems;
+package frc.robot.subsystems.swervedrive;
 
 import static edu.wpi.first.units.Units.Meter;
 import java.io.File;
+import java.util.Optional;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+import org.photonvision.targeting.PhotonPipelineResult;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -16,6 +18,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.subsystems.swervedrive.Vision.Cameras;
 import swervelib.SwerveDrive;
 import swervelib.math.SwerveMath;
 import swervelib.parser.SwerveParser;
@@ -28,6 +31,16 @@ public class SwerveSubsystem extends SubsystemBase {
      * Swerve drive object.
      */
     private final SwerveDrive swerveDrive;
+
+    /**
+     * Enable vision odometry updates while driving.
+     */
+    private final boolean visionDriveTest = false;
+
+    /**
+     * PhotonVision class to keep an accurate odometry.
+     */
+    private Vision vision;
 
     /** Creates a new SwerveSubsystem. */
     public SwerveSubsystem(File directory) {
@@ -52,8 +65,10 @@ public class SwerveSubsystem extends SubsystemBase {
                                                // cosine compensation for
                                                // simulations since it causes discrepancies not
                                                // seen in real life.
-        swerveDrive.setAngularVelocityCompensation(true, true, -0.14); // Correct for skew that gets
-                                                                       // worse as angular velocity
+        swerveDrive.setAngularVelocityCompensation(true, true, -0.14); // Correct for skew that
+                                                                       // gets
+                                                                       // worse as angular
+                                                                       // velocity
                                                                        // increases. Start with a
                                                                        // coefficient of 0.1.
         swerveDrive.setModuleEncoderAutoSynchronize(false, 1); // Enable if you want to
@@ -62,10 +77,55 @@ public class SwerveSubsystem extends SubsystemBase {
                                                                // periodically when they are not
                                                                // moving.
 
+        if (visionDriveTest) {
+            setupPhotonVision();
+            // Stop the odometry thread if we are using vision that way we can synchronize updates
+            // better.
+            swerveDrive.stopOdometryThread();
+        }
+
+    }
+
+    /**
+     * Setup the photon vision class.
+     */
+    public void setupPhotonVision() {
+        vision = new Vision(swerveDrive::getPose, swerveDrive.field);
+    }
+
+    /**
+     * Aim the robot at the target returned by PhotonVision.
+     *
+     * @return A {@link Command} which will run the alignment.
+     */
+    public Command aimAtTarget(Cameras camera) {
+
+        return run(() -> {
+            Optional<PhotonPipelineResult> resultO = camera.getBestResult();
+            if (resultO.isPresent()) {
+                var result = resultO.get();
+                if (result.hasTargets()) {
+                    drive(getTargetSpeeds(0, 0,
+                            Rotation2d.fromDegrees(result.getBestTarget().getYaw()))); // Not sure
+                                                                                       // if this
+                                                                                       // will work,
+                                                                                       // more math
+                                                                                       // may be
+                                                                                       // required.
+                }
+            }
+        });
     }
 
     @Override
     public void periodic() {
+
+        // When vision is enabled we must manually update odometry in SwerveDrive
+        if (visionDriveTest) {
+            swerveDrive.updateOdometry();
+            vision.updatePoseEstimation(swerveDrive);
+        }
+
         // This method will be called once per scheduler run
         SmartDashboard.putNumber("Gyro angle rotation (rad)",
                 swerveDrive.getGyro().getRotation3d().getAngle());
@@ -193,5 +253,60 @@ public class SwerveSubsystem extends SubsystemBase {
      */
     public SwerveDrive getSwerveDrive() {
         return swerveDrive;
+    }
+
+    /**
+     * Gets the current pose (position and rotation) of the robot, as reported by odometry.
+     *
+     * @return The robot's pose
+     */
+    public Pose2d getPose() {
+        return swerveDrive.getPose();
+    }
+
+    /**
+     * Gets the current yaw angle of the robot, as reported by the swerve pose estimator in the
+     * underlying drivebase. Note, this is not the raw gyro reading, this may be corrected from
+     * calls to resetOdometry().
+     *
+     * @return The yaw angle
+     */
+    public Rotation2d getHeading() {
+        return getPose().getRotation();
+    }
+
+    /**
+     * Get the chassis speeds based on controller input of 2 joysticks. One for speeds in which
+     * direction. The other for the angle of the robot.
+     *
+     * @param xInput X joystick input for the robot to move in the X direction.
+     * @param yInput Y joystick input for the robot to move in the Y direction.
+     * @param headingX X joystick which controls the angle of the robot.
+     * @param headingY Y joystick which controls the angle of the robot.
+     * @return {@link ChassisSpeeds} which can be sent to the Swerve Drive.
+     */
+    public ChassisSpeeds getTargetSpeeds(double xInput, double yInput, double headingX,
+            double headingY) {
+        Translation2d scaledInputs = SwerveMath.cubeTranslation(new Translation2d(xInput, yInput));
+        return swerveDrive.swerveController.getTargetSpeeds(scaledInputs.getX(),
+                scaledInputs.getY(), headingX, headingY, getHeading().getRadians(),
+                Constants.MAX_SPEED);
+    }
+
+    /**
+     * Get the chassis speeds based on controller input of 1 joystick and one angle. Control the
+     * robot at an offset of 90deg.
+     *
+     * @param xInput X joystick input for the robot to move in the X direction.
+     * @param yInput Y joystick input for the robot to move in the Y direction.
+     * @param angle The angle in as a {@link Rotation2d}.
+     * @return {@link ChassisSpeeds} which can be sent to the Swerve Drive.
+     */
+    public ChassisSpeeds getTargetSpeeds(double xInput, double yInput, Rotation2d angle) {
+        Translation2d scaledInputs = SwerveMath.cubeTranslation(new Translation2d(xInput, yInput));
+
+        return swerveDrive.swerveController.getTargetSpeeds(scaledInputs.getX(),
+                scaledInputs.getY(), angle.getRadians(), getHeading().getRadians(),
+                Constants.MAX_SPEED);
     }
 }
