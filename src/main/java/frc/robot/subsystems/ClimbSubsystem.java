@@ -108,6 +108,8 @@ public class ClimbSubsystem extends SubsystemBase {
                 PersistMode.kPersistParameters);
         m_followerMotor.configure(m_followerMotorConfig, ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
+
+        lockFunnel();
     }
 
     public void setVoltage(double voltage) {
@@ -128,8 +130,14 @@ public class ClimbSubsystem extends SubsystemBase {
         m_leaderMotor.stopMotor();
     }
 
-    public void setLeftServo(double degrees) {
-        m_leftServo.setAngle(degrees);
+    public void lockFunnel() {
+        m_leftServo.setAngle(85);
+        // m_rightServo.setAngle(85);
+    }
+
+    public void unlockFunnel() {
+        m_leftServo.setAngle(95);
+        // m_rightServo.setAngle(95);
     }
 
     // public void setRightServo(double degrees) {

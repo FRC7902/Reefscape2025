@@ -18,9 +18,8 @@ public class InitiateClimbCommand extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    RobotContainer.m_climbSubsystem.setLeftServo(180);
-    // RobotContainer.m_climbSubsystem.setRightServo(180);
-    // Move climber to 155
+    RobotContainer.m_climbSubsystem.unlockFunnel();
+    // TODO: Move climber to 155
   }
 
   // Called every time the scheduler runs while the command is scheduled.
