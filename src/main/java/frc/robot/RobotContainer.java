@@ -185,12 +185,12 @@ public class RobotContainer {
                 .onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeHighHeight));
 
         // Climb controls
-        m_driverController.leftStick().whileTrue(new MoveClimbUpCommand());
-        m_driverController.rightStick().whileTrue(new MoveClimbDownCommand());
+        m_driverController.povUp().whileTrue(new MoveClimbUpCommand());
+        m_driverController.povDown().whileTrue(new MoveClimbDownCommand());
 
         // Elevator adjustment for tuning
-        m_driverController.povUp().whileTrue(new RelativeMoveElevatorCommand(0.00635));
-        m_driverController.povDown().whileTrue(new RelativeMoveElevatorCommand(-0.00635));
+        // m_driverController.povUp().whileTrue(new RelativeMoveElevatorCommand(0.00635));
+        // m_driverController.povDown().whileTrue(new RelativeMoveElevatorCommand(-0.00635));
     }
 
     /**
