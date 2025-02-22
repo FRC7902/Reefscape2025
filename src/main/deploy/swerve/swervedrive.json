@@ -1,8 +1,8 @@
 {
     "imu": {
         "type": "canandgyro",
-        "id": 0,
-        "canbus": 5
+        "id": 5,
+        "canbus": 0
     },
     "invertedIMU": false,
     "modules": [

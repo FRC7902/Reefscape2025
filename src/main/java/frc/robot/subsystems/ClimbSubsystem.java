@@ -12,6 +12,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ClimbConstants;
@@ -37,6 +38,9 @@ public class ClimbSubsystem extends SubsystemBase {
     // climb
     private final DutyCycleEncoder m_absoluteEncoder =
             new DutyCycleEncoder(ClimbConstants.kRevThroughBoreIO, 0, 0);
+
+    private final Servo m_leftServo = new Servo(ClimbConstants.kLeftServoID);
+    private final Servo m_rightServo = new Servo(ClimbConstants.kRightServoID);
 
     /*
      * private final ElevatorSim m_climbSim = new ElevatorSim( motorSim, 5, 70, 6, 0, 100, true,
@@ -104,6 +108,8 @@ public class ClimbSubsystem extends SubsystemBase {
                 PersistMode.kPersistParameters);
         m_followerMotor.configure(m_followerMotorConfig, ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
+
+        lockFunnel();
     }
 
     public void setVoltage(double voltage) {
@@ -123,6 +129,25 @@ public class ClimbSubsystem extends SubsystemBase {
     public void stopMotors() {
         m_leaderMotor.stopMotor();
     }
+
+    public void lockFunnel() {
+        m_leftServo.setAngle(80);
+        m_rightServo.setAngle(95);
+    }
+
+    public void unlockFunnel() {
+        m_leftServo.setAngle(180);
+        m_rightServo.setAngle(0);
+    }
+
+    public void stopFunnelServos() {
+        m_leftServo.setAngle(90);
+        m_rightServo.setAngle(90);
+    }
+
+    // public void setRightServo(double degrees) {
+    //     m_rightServo.setAngle(degrees);
+    // }
 
     // This function returns the type of error the motor is experiencing should it
     // have an error.
