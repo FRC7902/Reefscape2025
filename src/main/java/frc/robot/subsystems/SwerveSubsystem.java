@@ -51,7 +51,7 @@ public class SwerveSubsystem extends SubsystemBase {
     public SwerveSubsystem(File directory) {
         // Configure the Telemetry before creating the SwerveDrive to avoid unnecessary
         // objects being created.
-        SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
+        SwerveDriveTelemetry.verbosity = TelemetryVerbosity.POSE;
         try {
             swerveDrive = new SwerveParser(directory).createSwerveDrive(Constants.MAX_SPEED,
                     new Pose2d(new Translation2d(Meter.of(1), Meter.of(4)),
@@ -80,6 +80,11 @@ public class SwerveSubsystem extends SubsystemBase {
                                                                // periodically when they are not
                                                                // moving.
 
+        swerveDrive.setHeadingCorrection(true);
+
+        swerveDrive.setChassisDiscretization(true, true, 0.03);
+        swerveDrive.swerveController.addSlewRateLimiters(null, null, null);
+        swerveDrive.swerveController.setMaximumChassisAngularVelocity(20);
     }
 
     /**
@@ -94,6 +99,8 @@ public class SwerveSubsystem extends SubsystemBase {
         // This method will be called once per scheduler run
         SmartDashboard.putNumber("Gyro angle rotation (rad)",
                 swerveDrive.getGyro().getRotation3d().getAngle());
+
+        SmartDashboard.putString("Robo Pose2D", swerveDrive.getPose().toString());
 
         // When vision is enabled we must manually update odometry in SwerveDrive
         // if (visionDriveTest) {
@@ -627,5 +634,32 @@ public class SwerveSubsystem extends SubsystemBase {
      */
     public SwerveDrive getSwerveDrive() {
         return swerveDrive;
+    }
+
+    public Command snapToAngle(double angleDegrees, double toleranceDegrees) {
+        SwerveController controller = swerveDrive.getSwerveController();
+
+        return run(() -> {
+            swerveDrive.drive(ChassisSpeeds.fromFieldRelativeSpeeds(0, 0,
+                    controller.headingCalculate(
+                            swerveDrive.getOdometryHeading().unaryMinus().getRadians(),
+                            new Rotation2d(Math.toRadians(angleDegrees)).getRadians()),
+                    swerveDrive.getPose().getRotation()));
+            SmartDashboard.putNumber("Odom Heading (rad)",
+                    swerveDrive.getOdometryHeading().unaryMinus().getRadians());
+            SmartDashboard.putNumber("Target Heading (rad)", Math.toRadians(angleDegrees));
+            SmartDashboard.putNumber("Error (rad)",
+                    Math.abs(new Rotation2d(Math.toRadians(angleDegrees))
+                            .minus(swerveDrive.getOdometryHeading().unaryMinus()).getRadians()));
+        }).until(() -> (Math.abs(new Rotation2d(Math.toRadians(angleDegrees))
+                .minus(swerveDrive.getOdometryHeading().unaryMinus())
+                .getDegrees()) < toleranceDegrees)
+                && swerveDrive.getRobotVelocity().omegaRadiansPerSecond < 0.1);
+    }
+
+    public void strafe(double strafePower, double speedMultiplier) {
+        swerveDrive.drive(new Translation2d(0,
+                strafePower * Math.abs(speedMultiplier) * swerveDrive.getMaximumChassisVelocity()),
+                0, false, false);
     }
 }
