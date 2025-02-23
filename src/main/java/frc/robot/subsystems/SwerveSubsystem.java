@@ -5,8 +5,11 @@
 package frc.robot.subsystems;
 
 import java.io.File;
+import java.util.Optional;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+
+import org.photonvision.targeting.PhotonPipelineResult;
 
 import static edu.wpi.first.units.Units.Meter;
 
@@ -14,11 +17,15 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.networktables.NTSendableBuilder;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.subsystems.Vision.Cameras;
 import swervelib.SwerveDrive;
 import swervelib.math.SwerveMath;
 import swervelib.parser.SwerveParser;
@@ -30,12 +37,18 @@ public class SwerveSubsystem extends SubsystemBase {
   /**
    * Swerve drive object.
    */
+
   private final SwerveDrive swerveDrive;
+  private final boolean visionDriveTest = true;
+  private Field2d robotPose;
+
+  private Vision vision;
 
   /** Creates a new SwerveSubsystem. */
   public SwerveSubsystem(File directory) {
     // Configure the Telemetry before creating the SwerveDrive to avoid unnecessary
     // objects being created.
+
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
     try {
       swerveDrive = new SwerveParser(directory).createSwerveDrive(Constants.MAX_SPEED,
@@ -61,12 +74,73 @@ public class SwerveSubsystem extends SubsystemBase {
         1); // Enable if you want to resynchronize your absolute encoders and motor encoders
             // periodically when they are not moving.
 
+    if (visionDriveTest) {
+      setupPhotonVision();
+      swerveDrive.stopOdometryThread();
+    }            
+
   }
+
+
+  public void setupPhotonVision() {
+    vision = new Vision(swerveDrive::getPose, swerveDrive.field);
+  }
+
+  public Pose2d getPose() {
+    return swerveDrive.getPose();
+  }
+
+  public Rotation2d getHeading()
+  {
+    return getPose().getRotation();
+  }
+
+  public ChassisSpeeds getTargetSpeeds(double xInput, double yInput, Rotation2d angle)
+  {
+    Translation2d scaledInputs = SwerveMath.cubeTranslation(new Translation2d(xInput, yInput));
+
+    return swerveDrive.swerveController.getTargetSpeeds(scaledInputs.getX(),
+                                                        scaledInputs.getY(),
+                                                        angle.getRadians(),
+                                                        getHeading().getRadians(),
+                                                        Constants.MAX_SPEED);
+  }
+
+
+  public Command aimAtTarget(Cameras camera)
+  {
+
+    return run(() -> {
+      Optional<PhotonPipelineResult> resultO = camera.getBestResult();
+      if (resultO.isPresent())
+      {
+        var result = resultO.get();
+        if (result.hasTargets())
+        {
+          drive(getTargetSpeeds(0,
+                                0,
+                                Rotation2d.fromDegrees(result.getBestTarget()
+                                                             .getYaw()))); // Not sure if this will work, more math may be required.
+        }
+      }
+    });
+  }
+
 
   @Override
   public void periodic() {
+    if (visionDriveTest) {
+      swerveDrive.updateOdometry();
+      vision.updatePoseEstimation(swerveDrive);
+      swerveDrive.addVisionMeasurement(getCurrentPose(), 0);
+    }
+    //robotPose.setRobotPose(getCurrentPose());
+
     // This method will be called once per scheduler run
     SmartDashboard.putNumber("Gyro angle rotation (rad)", swerveDrive.getGyro().getRotation3d().getAngle());
+    SmartDashboard.putNumber("X translation", swerveDrive.getPose().getX());
+    SmartDashboard.putNumber("Y translation", swerveDrive.getPose().getY());
+    //SmartDashboard.putData("Robot", robotPose);
   }
 
   /**
@@ -208,4 +282,9 @@ public class SwerveSubsystem extends SubsystemBase {
   public SwerveDrive getSwerveDrive() {
     return swerveDrive;
   }
+
+  public Pose2d getCurrentPose() {
+    return swerveDrive.getPose();
+  }
+
 }
