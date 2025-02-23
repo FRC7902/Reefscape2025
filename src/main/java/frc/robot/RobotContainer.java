@@ -149,7 +149,7 @@ public class RobotContainer {
         m_climbSubsystem.setDefaultCommand(new LockFunnelCommand());
 
         // Zero gyro
-        m_driverController.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
+        m_driverController.start().onTrue((Commands.runOnce(drivebase::zeroGyroWithAlliance)));
         m_driverController.back().whileTrue(new InitiateClimbCommand());
 
         // Raise elevator (by height of Algae diameter) while intaking algae
