@@ -35,49 +35,50 @@ import frc.robot.Constants.ElevatorConstants;
 
 public class ElevatorSubsystem extends SubsystemBase {
 
-    /** Enum representing elevator positions */
+    /** Enum representing elevator positions. */
     public enum ElevatorPosition {
         CORAL_L1, CORAL_L2, CORAL_L3, CORAL_STATION_AND_PROCESSOR, ALGAE_HIGH, ALGAE_LOW
     }
 
-    /** TalonFX leader motor controller object */
+    /** TalonFX leader motor controller object. */
     private final TalonFX m_leaderMotor = new TalonFX(ElevatorConstants.kElevatorLeaderCAN);
 
-    /** TalonFX follower motor controller object */
+    /** TalonFX follower motor controller object. */
     private final TalonFX m_followerMotor = new TalonFX(ElevatorConstants.kElevatorFollowerCAN);
 
-    /** Configuration object for the TalonFX motor */
+    /** TalonFX motor controller configuration object. */
     private final TalonFXConfiguration m_motorConfig = new TalonFXConfiguration();
 
-    /** Voltage control request object for the TalonFX motor controller */
+    /** Voltage control request object for the TalonFX motor controller. */
     private final VoltageOut m_voltReq = new VoltageOut(0.0);
 
-    /** Motion magic voltage control request object for the TalonFX motor controller */
+    /** Motion magic voltage control request object for the TalonFX motor controller. */
     private MotionMagicVoltage m_request = new MotionMagicVoltage(0).withSlot(0);
 
-    /** Object of the Phoenix Orchestra */
+    /** Object of the Phoenix Orchestra. */
     private Orchestra m_orchestra = new Orchestra();
 
-    /** Object of a simulated elevator */
-    private final ElevatorSim m_elevatorSim = new ElevatorSim(DCMotor.getFalcon500(2),
-            ElevatorConstants.kElevatorGearing, ElevatorConstants.kElevatorCarriageMass,
-            ElevatorConstants.kElevatorDrumRadius, ElevatorConstants.kElevatorMinHeightMeters,
-            ElevatorConstants.kElevatorMaxHeightMeters, true,
-            ElevatorConstants.kElevatorHeightMeters, 0.01, // add some noise
-            0);
+    /** Object of a simulated elevator. */
+    private final ElevatorSim m_elevatorSim = new ElevatorSim(
+        DCMotor.getFalcon500(2),
+        ElevatorConstants.kElevatorGearing, ElevatorConstants.kElevatorCarriageMass,
+        ElevatorConstants.kElevatorDrumRadius, ElevatorConstants.kElevatorMinHeightMeters,
+        ElevatorConstants.kElevatorMaxHeightMeters, true,
+        ElevatorConstants.kElevatorHeightMeters, 0.01, // add some noise
+        0);
 
-    /** Mechanism2d object of an elevator */
+    /** Mechanism2d object of an elevator. */
     private final Mechanism2d m_mech2d =
             new Mechanism2d(Units.inchesToMeters(10), Units.inchesToMeters(50));
-    /** MechanismRoot2d object of an elevator */
+    /** MechanismRoot2d object of an elevator. */
     private final MechanismRoot2d m_mech2dRoot =
             m_mech2d.getRoot("Elevator Root", Units.inchesToMeters(5), Units.inchesToMeters(0.5));
-    /** MechanismLigament2d object of an elevator */
+    /** MechanismLigament2d object of an elevator. */
     private final MechanismLigament2d m_elevatorMech2d =
             m_mech2dRoot.append(new MechanismLigament2d("Elevator",
                     m_elevatorSim.getPositionMeters(), 90, 7, new Color8Bit(Color.kAntiqueWhite)));
 
-    /** Object of a system identification routine */
+    /** Object of a system identification routine. */
     private final SysIdRoutine m_sysIdRoutine = new SysIdRoutine(
             new SysIdRoutine.Config(null, Volts.of(4), null,
                     (state) -> SignalLogger.writeString("state", state.toString())),
@@ -85,16 +86,16 @@ public class ElevatorSubsystem extends SubsystemBase {
                     (volts) -> m_leaderMotor.setControl(m_voltReq.withOutput(volts.in(Volts))),
                     null, this));
 
-    /** Target setpoint for the elevator in meters */
+    /** Target setpoint for the elevator in meters. */
     private double m_setpoint;
 
-    /** Indicates whether the elevator has been homed */
+    /** Indicates whether the elevator has been homed. */
     private boolean m_homed;
 
-    /** Array of songs to be played by the Phoenix Orchestra */
+    /** Array of songs to be played by the Phoenix Orchestra. */
     private String[] m_songs = new String[] {"song1.chrp", "song2.chrp"};
 
-    /** Creates a new ElevatorSubsystem */
+    /** Creates a new ElevatorSubsystem. */
     public ElevatorSubsystem() {
         if (RobotBase.isSimulation()) {
             SmartDashboard.putData("Elevator Sim", m_mech2d);
@@ -173,62 +174,62 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     /**
-     * Gets the current position of the elevator in rotations
+     * Gets the current position of the elevator in rotations.
      * 
-     * @return The current position of the elevator in rotations
+     * @return The current position of the elevator in rotations.
      */
     public double getPosition() {
         return m_leaderMotor.getPosition().getValueAsDouble();
     }
 
     /**
-     * Gets the current position of the elevator in meters
+     * Gets the current position of the elevator in meters.
      * 
-     * @return The current position of the elevator in meters
+     * @return The current position of the elevator in meters.
      */
     public double getPositionMeters() {
         return getPosition() * ElevatorConstants.kElevatorMetersPerMotorRotation;
     }
 
     /**
-     * Gets the current velocity of the elevator in m/s
+     * Gets the current velocity of the elevator.
      * 
-     * @return The current velocity of the elevator in m/s
+     * @return The current velocity of the elevator in m/s.
      */
     public double getVelocityMetersPerSecond() {
         return m_leaderMotor.getVelocity().getValueAsDouble()
                 * ElevatorConstants.kElevatorMetersPerMotorRotation;
     }
 
-    /** Zero the elevator */
+    /** Zero the elevator. */
     public void zero() {
         m_leaderMotor.setPosition(0);
     }
 
     /**
-     * Returns whether the elevator is at the setpoint within the target error range
+     * Returns whether the elevator is at the setpoint within the target error range.
      * 
-     * @return Whether the elevator is at the setpoint
+     * @return True if the elevator is at the setpoint, false otherwise.
      */
     public boolean atHeight() {
         return Math.abs(getPositionMeters() - m_setpoint) < ElevatorConstants.kElevatorTargetError;
     }
 
-    /** Stop the motors */
+    /** Stop the motors. */
     public void stop() {
         m_leaderMotor.stopMotor();
         m_followerMotor.stopMotor();
     }
 
-    /** Update telemetry, including the mechanism visualization */
+    /** Update telemetry, including the mechanism visualization. */
     public void updateTelemetry() {
         m_elevatorMech2d.setLength(getPositionMeters());
     }
 
     /**
-     * Set the position of the elevator using Motion Magic control
+     * Set the position of the elevator using Motion Magic control.
      * 
-     * @param position The position in meters
+     * @param position The position in meters.
      */
     public void setPosition(double position) {
 
@@ -246,34 +247,34 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     /**
-     * Returns whether the elevator is at the retract limit
+     * Returns whether the elevator is at the retract limit.
      * 
-     * @return Whether the elevator is at the retract limit
+     * @return True if the elevator is at the retract limit, false otherwise.
      */
     public boolean isAtRetractLimit() {
         return m_leaderMotor.getReverseLimit().getValue() == ReverseLimitValue.ClosedToGround;
     }
 
     /**
-     * Returns a command that will execute a quasistatic test in the given direction
+     * Returns a command that will execute a quasistatic test in the given direction.
      *
-     * @param direction The direction (forward or reverse) to run the test in
+     * @param direction The direction (forward or reverse) to run the test in.
      */
     public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
         return m_sysIdRoutine.quasistatic(direction);
     }
 
     /**
-     * Returns a command that will execute a dynamic test in the given direction
+     * Returns a command that will execute a dynamic test in the given direction.
      *
-     * @param direction The direction (forward or reverse) to run the test in
+     * @param direction The direction (forward or reverse) to run the test in.
      */
     public Command sysIdDynamic(SysIdRoutine.Direction direction) {
         return m_sysIdRoutine.dynamic(direction);
     }
 
     /**
-     * Returns the current position of the elevator as an enum
+     * Returns the current position of the elevator as an enum.
      * <ul>
      * <li><strong>CORAL_L1</strong>: Represents the first level of the Coral height
      * (kElevatorCoralLevel1Height)</li>
@@ -329,6 +330,8 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        // This method will be called once per scheduler run
+
         if (m_leaderMotor.getClosedLoopReference().getValueAsDouble() == 0
                 && m_leaderMotor.getPosition().getValueAsDouble() < 0.5) {
             m_leaderMotor.setVoltage(0);

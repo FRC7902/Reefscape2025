@@ -24,15 +24,14 @@ import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 
 public class SwerveSubsystem extends SubsystemBase {
 
-    /**
-     * Swerve drive object.
-     */
+    /** Swerve drive object */
     private final SwerveDrive swerveDrive;
 
     /** Creates a new SwerveSubsystem. */
     public SwerveSubsystem(File directory) {
         // Configure the Telemetry before creating the SwerveDrive to avoid unnecessary
         // objects being created.
+        
         SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
         try {
             swerveDrive = new SwerveParser(directory).createSwerveDrive(Constants.MAX_SPEED,
@@ -67,6 +66,7 @@ public class SwerveSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         // This method will be called once per scheduler run
+
         SmartDashboard.putNumber("Gyro angle rotation (rad)",
                 swerveDrive.getGyro().getRotation3d().getAngle());
     }
@@ -170,9 +170,7 @@ public class SwerveSubsystem extends SubsystemBase {
         swerveDrive.drive(velocity);
     }
 
-    /**
-     * Resets the gyro angle to zero and resets odometry to the same position, but facing toward 0.
-     */
+    /** Resets the gyro angle to zero and resets odometry to the same position, but facing toward 0. */
     public void zeroGyro() {
         swerveDrive.zeroGyro();
     }
