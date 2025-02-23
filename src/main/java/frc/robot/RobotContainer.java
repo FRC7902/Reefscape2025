@@ -158,11 +158,16 @@ public class RobotContainer {
         m_driverController.leftBumper().whileTrue(m_selectIntakeCommand);
         m_driverController.rightBumper().whileTrue(m_selectOuttakeCommand);
 
+        // Strafe controls
+        m_driverController.leftTrigger(0.05).whileTrue(new StrafeLeftCommand());
+        m_driverController.rightTrigger(0.05).whileTrue(new StrafeRightCommand());
+
         // Climb controls
         m_driverController.povUp().whileTrue(new ConditionalCommand(new MoveClimbUpCommand(),
                 new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
         m_driverController.povDown().whileTrue(new ConditionalCommand(new MoveClimbDownCommand(),
-                new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
+        new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
+        
 
         m_indexSubsystem
                 .setDefaultCommand(
@@ -182,8 +187,6 @@ public class RobotContainer {
         m_operatorController.y().onTrue(
                 new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel3Height));
 
-        m_driverController.leftTrigger(0.05).whileTrue(new StrafeLeftCommand());
-        m_driverController.rightTrigger(0.05).whileTrue(new StrafeRightCommand());
 
         // Elevator algae positions
         m_operatorController.povDown()
