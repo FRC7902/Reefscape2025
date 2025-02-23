@@ -25,7 +25,6 @@ import frc.robot.commands.teleop.climb.MoveClimbUpCommand;
 import frc.robot.commands.teleop.coral_indexer.CorrectCoralPositionCommand;
 import frc.robot.commands.teleop.coral_indexer.IntakeCoralCommand;
 import frc.robot.commands.teleop.coral_indexer.OuttakeCoralCommand;
-import frc.robot.commands.teleop.elevator.RelativeMoveElevatorCommand;
 import frc.robot.commands.teleop.elevator.SetElevatorPositionCommand;
 import frc.robot.subsystems.AlgaeManipulatorSubsystem;
 import frc.robot.subsystems.ClimbSubsystem;
