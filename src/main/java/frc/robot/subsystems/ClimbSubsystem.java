@@ -42,6 +42,8 @@ public class ClimbSubsystem extends SubsystemBase {
     private final Servo m_leftServo = new Servo(ClimbConstants.kLeftServoID);
     private final Servo m_rightServo = new Servo(ClimbConstants.kRightServoID);
 
+    private boolean isFunnelUnlocked;
+
     /*
      * private final ElevatorSim m_climbSim = new ElevatorSim( motorSim, 5, 70, 6, 0, 100, true,
      * 0.0, 0.01, 0);
@@ -110,6 +112,7 @@ public class ClimbSubsystem extends SubsystemBase {
                 PersistMode.kPersistParameters);
 
         lockFunnel();
+        isFunnelUnlocked = false;
     }
 
     public void setVoltage(double voltage) {
@@ -138,6 +141,7 @@ public class ClimbSubsystem extends SubsystemBase {
     public void unlockFunnel() {
         m_leftServo.setAngle(180);
         m_rightServo.setAngle(0);
+        isFunnelUnlocked = true;
     }
 
     public void stopFunnelServos() {
@@ -145,8 +149,12 @@ public class ClimbSubsystem extends SubsystemBase {
         m_rightServo.setAngle(90);
     }
 
+    public boolean isFunnelUnlocked() {
+        return isFunnelUnlocked;
+    }
+
     // public void setRightServo(double degrees) {
-    //     m_rightServo.setAngle(degrees);
+    // m_rightServo.setAngle(degrees);
     // }
 
     // This function returns the type of error the motor is experiencing should it

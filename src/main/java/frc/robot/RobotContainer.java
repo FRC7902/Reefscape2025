@@ -9,19 +9,22 @@ import java.util.Map;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.teleop.NullCommand;
 import frc.robot.commands.teleop.algae_manipulator.IntakeAlgaeCommand;
 import frc.robot.commands.teleop.algae_manipulator.OuttakeAlgaeCommand;
 import frc.robot.commands.teleop.climb.InitiateClimbCommand;
 import frc.robot.commands.teleop.climb.LockFunnelCommand;
+import frc.robot.commands.teleop.climb.MoveClimbDownCommand;
+import frc.robot.commands.teleop.climb.MoveClimbUpCommand;
 import frc.robot.commands.teleop.coral_indexer.CorrectCoralPositionCommand;
 import frc.robot.commands.teleop.coral_indexer.IntakeCoralCommand;
 import frc.robot.commands.teleop.coral_indexer.OuttakeCoralCommand;
-import frc.robot.commands.teleop.elevator.RelativeMoveElevatorCommand;
 import frc.robot.commands.teleop.elevator.SetElevatorPositionCommand;
 import frc.robot.subsystems.AlgaeManipulatorSubsystem;
 import frc.robot.subsystems.ClimbSubsystem;
@@ -152,6 +155,11 @@ public class RobotContainer {
         // Raise elevator (by height of Algae diameter) while intaking algae
         m_driverController.leftBumper().whileTrue(m_selectIntakeCommand);
         m_driverController.rightBumper().whileTrue(m_selectOuttakeCommand);
+
+        m_driverController.povUp().whileTrue(new ConditionalCommand(new MoveClimbUpCommand(),
+                new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
+        m_driverController.povDown().whileTrue(new ConditionalCommand(new MoveClimbDownCommand(),
+                new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
 
         m_indexSubsystem
                 .setDefaultCommand(
