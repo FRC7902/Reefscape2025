@@ -126,16 +126,14 @@ public final class Constants {
         public static final double kElevatorA = 0.04 * kElevatorMetersPerMotorRotation;
 
         // ===== Elevator Setpoints =====
-        public static final double kElevatorCoralStationHeight = 0.0;
+        public static final double kElevatorCoralStationAndProcessorHeight = 0.0;
 
         public static final double kElevatorCoralLevel1Height = 0.100; // TODO: Tune this
         public static final double kElevatorCoralLevel2Height = 0.188;
         public static final double kElevatorCoralLevel3Height = 0.548;
 
-        public static final double kElevatorAlgaeLowHeight = 0.65;
-        public static final double kElevatorAlgaeHighHeight = 0.87;
-
-        public static final double kElevatorProcessorHeight = 0.0;
+        public static final double kElevatorAlgaeLowHeight = 0.604;
+        public static final double kElevatorAlgaeHighHeight = 0.804;
         // ==============================
 
         // ===== Control Parameters =====
