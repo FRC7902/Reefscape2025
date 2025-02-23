@@ -160,8 +160,6 @@ public class RobotContainer {
                                 .andThen(new IntakeCoralCommand(
                                         Constants.CoralIndexerConstants.kCorrectionPower)
                                                 .withTimeout(1)));
-        // Coral indexer controls (default intake and manual outtake)
-        m_driverController.rightTrigger().whileTrue(new OuttakeCoralCommand());
 
         // Elevator coral positions
         m_operatorController.x().onTrue(
