@@ -37,7 +37,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     /** Enum representing elevator positions */
     public enum ElevatorPosition {
-        CORAL_L1, CORAL_L2, CORAL_L3, CORAL_STATION, ALGAE_HIGH, ALGAE_LOW, PROCESSOR
+        CORAL_L1, CORAL_L2, CORAL_L3, CORAL_STATION_AND_PROCESSOR, ALGAE_HIGH, ALGAE_LOW
     }
 
     /** TalonFX leader motor controller object */
@@ -310,9 +310,9 @@ public class ElevatorSubsystem extends SubsystemBase {
                         * 2) {
             return ElevatorPosition.CORAL_L3;
         } else if (Math.abs(currentPosition
-                - ElevatorConstants.kElevatorCoralStationHeight) < ElevatorConstants.kElevatorTargetError
+                - ElevatorConstants.kElevatorCoralStationAndProcessorHeight) < ElevatorConstants.kElevatorTargetError
                         * 2) {
-            return ElevatorPosition.CORAL_STATION;
+            return ElevatorPosition.CORAL_STATION_AND_PROCESSOR;
         } else if (Math.abs(currentPosition
                 - ElevatorConstants.kElevatorAlgaeHighHeight) < ElevatorConstants.kElevatorTargetError
                         * 2) {
@@ -321,10 +321,6 @@ public class ElevatorSubsystem extends SubsystemBase {
                 - ElevatorConstants.kElevatorAlgaeLowHeight) < ElevatorConstants.kElevatorTargetError
                         * 2) {
             return ElevatorPosition.ALGAE_LOW;
-        } else if (Math.abs(currentPosition
-                - ElevatorConstants.kElevatorProcessorHeight) < ElevatorConstants.kElevatorTargetError
-                        * 2) {
-            return ElevatorPosition.PROCESSOR;
         } else {
             // Return null or a default value if no position matches
             return null;
@@ -364,9 +360,8 @@ public class ElevatorSubsystem extends SubsystemBase {
         // m_elevatorFollowerMotor.getSupplyCurrent().getValueAsDouble());
         // SmartDashboard.putBoolean("Reverse limit switch", isAtRetractLimit());
 
-        // String elevatorEnumPosition =
-        // (getElevatorEnumPosition() != null) ? getElevatorEnumPosition().toString() :
-        // "N/A";
+        // String elevatorEnumPosition = (getElevatorEnumPosition() != null) ? getElevatorEnumPosition().toString()
+        //         : "N/A";
         // SmartDashboard.putString("Curr Position Name", elevatorEnumPosition);
 
         updateTelemetry();

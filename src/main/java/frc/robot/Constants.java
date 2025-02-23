@@ -29,7 +29,7 @@ public final class Constants {
     // // Check if this is
     // // correct
 
-    public static final double MAX_SPEED = Units.feetToMeters(12);
+    public static final double MAX_SPEED = Units.feetToMeters(15);
 
     public static class ClimbConstants {
         // CAN ID of the primary motor
@@ -106,7 +106,7 @@ public final class Constants {
         // Elevator Dimensions
         public static final double kElevatorHeightMeters = 0.0;
         public static final double kElevatorMinHeightMeters = 0.0;
-        public static final double kElevatorMaxHeightMeters = 0.85;
+        public static final double kElevatorMaxHeightMeters = 0.87;
 
         // Motion Constraints
         public static final double kElevatorMaxVelocity =
@@ -126,7 +126,7 @@ public final class Constants {
         public static final double kElevatorA = 0.04 * kElevatorMetersPerMotorRotation;
 
         // ===== Elevator Setpoints =====
-        public static final double kElevatorCoralStationHeight = 0.0;
+        public static final double kElevatorCoralStationAndProcessorHeight = 0.0;
 
         public static final double kElevatorCoralLevel1Height = 0.100; // TODO: Tune this
         public static final double kElevatorCoralLevel2Height = 0.188;
@@ -134,8 +134,6 @@ public final class Constants {
 
         public static final double kElevatorAlgaeLowHeight = 0.604;
         public static final double kElevatorAlgaeHighHeight = 0.804;
-
-        public static final double kElevatorProcessorHeight = 0.0;
         // ==============================
 
         // ===== Control Parameters =====
