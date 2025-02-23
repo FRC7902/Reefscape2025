@@ -150,8 +150,7 @@ public class RobotContainer {
         m_driverController.back().whileTrue(new InitiateClimbCommand());
 
         // Raise elevator (by height of Algae diameter) while intaking algae
-        m_driverController.leftBumper()
-                .whileTrue(m_selectIntakeCommand);
+        m_driverController.leftBumper().whileTrue(m_selectIntakeCommand);
         m_driverController.rightBumper().whileTrue(m_selectOuttakeCommand);
 
         m_indexSubsystem
@@ -173,6 +172,11 @@ public class RobotContainer {
                 new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel2Height));
         m_operatorController.y().onTrue(
                 new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel3Height));
+
+        m_operatorController.povUp()
+                .onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeHighHeight));
+        m_operatorController.povDown()
+                .onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeLowHeight));
     }
 
     /**
