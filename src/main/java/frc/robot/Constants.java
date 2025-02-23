@@ -4,9 +4,7 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
-import swervelib.math.Matter;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -29,7 +27,12 @@ public final class Constants {
     // // Check if this is
     // // correct
 
-    public static final double MAX_SPEED = Units.feetToMeters(15);
+    public static class DrivebaseConstants {
+        public static final double MAX_SPEED = Units.feetToMeters(15);
+
+        // Hold time on motor brakes when disabled
+        public static final double WHEEL_LOCK_TIME = 10; // seconds
+    }
 
     public static class ClimbConstants {
         // CAN ID of the primary motor
