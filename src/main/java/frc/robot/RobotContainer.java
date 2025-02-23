@@ -6,6 +6,10 @@ package frc.robot;
 
 import java.io.File;
 import java.util.Map;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -184,6 +188,10 @@ public class RobotContainer {
                 .onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeLowHeight));
         m_operatorController.povUp()
                 .onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeHighHeight));
+
+        m_driverController.x().whileTrue(drivebase.driveToPose(
+                new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0))
+        ));
 
         // Climb controls
         m_driverController.povUp().whileTrue(new MoveClimbUpCommand());

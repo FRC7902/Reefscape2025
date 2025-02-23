@@ -10,10 +10,20 @@ import java.util.Optional;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.photonvision.targeting.PhotonPipelineResult;
+
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathfindingCommand;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.path.PathConstraints;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -46,7 +56,7 @@ public class SwerveSubsystem extends SubsystemBase {
     public SwerveSubsystem(File directory) {
         // Configure the Telemetry before creating the SwerveDrive to avoid unnecessary
         // objects being created.
-        SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
+        SwerveDriveTelemetry.verbosity = TelemetryVerbosity.POSE;
         try {
             swerveDrive = new SwerveParser(directory).createSwerveDrive(Constants.MAX_SPEED,
                     new Pose2d(new Translation2d(Meter.of(1), Meter.of(4)),
@@ -83,8 +93,78 @@ public class SwerveSubsystem extends SubsystemBase {
             // better.
             swerveDrive.stopOdometryThread();
         }
+        setupPathPlanner();
 
     }
+
+
+  public void setupPathPlanner()
+  {
+    // Load the RobotConfig from the GUI settings. You should probably
+    // store this in your Constants file
+    RobotConfig config;
+    try
+    {
+      config = RobotConfig.fromGUISettings();
+
+      final boolean enableFeedforward = true;
+      // Configure AutoBuilder last
+      AutoBuilder.configure(
+          this::getPose,
+          // Robot pose supplier
+          this::resetOdometry,
+          // Method to reset odometry (will be called if your auto has a starting pose)
+          this::getRobotVelocity,
+          // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+          (speedsRobotRelative, moduleFeedForwards) -> {
+            if (enableFeedforward)
+            {
+              swerveDrive.drive(
+                  speedsRobotRelative,
+                  swerveDrive.kinematics.toSwerveModuleStates(speedsRobotRelative),
+                  moduleFeedForwards.linearForces()
+                               );
+            } else
+            {
+              swerveDrive.setChassisSpeeds(speedsRobotRelative);
+            }
+          },
+          // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
+          new PPHolonomicDriveController(
+              // PPHolonomicController is the built in path following controller for holonomic drive trains
+              new PIDConstants(5.0, 0.0, 0.0),
+              // Translation PID constants
+              new PIDConstants(5.0, 0.0, 0.0)
+              // Rotation PID constants
+          ),
+          config,
+          // The robot configuration
+          () -> {
+            // Boolean supplier that controls when the path will be mirrored for the red alliance
+            // This will flip the path being followed to the red side of the field.
+            // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+
+            var alliance = DriverStation.getAlliance();
+            if (alliance.isPresent())
+            {
+              return alliance.get() == DriverStation.Alliance.Red;
+            }
+            return false;
+          },
+          this
+          // Reference to this subsystem to set requirements
+                           );
+
+    } catch (Exception e)
+    {
+      // Handle exception as needed
+      e.printStackTrace();
+    }
+
+    //Preload PathPlanner Path finding
+    // IF USING CUSTOM PATHFINDER ADD BEFORE THIS LINE
+    PathfindingCommand.warmupCommand().schedule();
+  }    
 
     /**
      * Setup the photon vision class.
@@ -98,6 +178,12 @@ public class SwerveSubsystem extends SubsystemBase {
      *
      * @return A {@link Command} which will run the alignment.
      */
+
+
+    public SwerveSubsystem getSwerveObject() {
+        return this;
+    }
+
     public Command aimAtTarget(Cameras camera) {
 
         return run(() -> {
@@ -106,15 +192,20 @@ public class SwerveSubsystem extends SubsystemBase {
                 var result = resultO.get();
                 if (result.hasTargets()) {
                     drive(getTargetSpeeds(0, 0,
-                            Rotation2d.fromDegrees(result.getBestTarget().getYaw()))); // Not sure
-                                                                                       // if this
-                                                                                       // will work,
-                                                                                       // more math
-                                                                                       // may be
-                                                                                       // required.
+                            Rotation2d.fromDegrees(result.getBestTarget().getYaw())));
+                            double targetYaw = result.getBestTarget().getYaw();
+                            double targetDistance = result.getDistanceFromAprilTag();
+
                 }
             }
         });
+
+    }
+
+    public void driveToPosition(Translation2d translation, double targetYaw) {
+        ChassisSpeeds chassisSpeeds = new ChassisSpeeds(translation.getX(), translation.getY(), Math.toRadians(targetYaw));
+        swerveDrive.setChassisSpeeds(chassisSpeeds);
+
     }
 
     @Override
@@ -129,6 +220,7 @@ public class SwerveSubsystem extends SubsystemBase {
         // This method will be called once per scheduler run
         SmartDashboard.putNumber("Gyro angle rotation (rad)",
                 swerveDrive.getGyro().getRotation3d().getAngle());
+
     }
 
     /**
@@ -206,6 +298,23 @@ public class SwerveSubsystem extends SubsystemBase {
      *
      * @param velocity Velocity according to the field.
      */
+
+    public Command driveToPose(Pose2d pose)
+    {
+// Create the constraints to use while pathfinding
+        PathConstraints constraints = new PathConstraints(
+        swerveDrive.getMaximumChassisVelocity(), 4.0,
+        swerveDrive.getMaximumChassisAngularVelocity(), Units.degreesToRadians(720));
+
+// Since AutoBuilder is configured, we can use it to build pathfinding commands
+        return AutoBuilder.pathfindToPose(
+        pose,
+        constraints,
+        edu.wpi.first.units.Units.MetersPerSecond.of(0) // Goal end velocity in meters/sec
+                                     );
+    }
+
+
     public void driveFieldOriented(ChassisSpeeds velocity) {
         swerveDrive.driveFieldOriented(velocity);
     }
@@ -262,6 +371,14 @@ public class SwerveSubsystem extends SubsystemBase {
      */
     public Pose2d getPose() {
         return swerveDrive.getPose();
+    }
+
+    public void resetOdometry(Pose2d initialHolonomicPose2d) {
+        swerveDrive.resetOdometry(initialHolonomicPose2d);
+    }
+
+    public ChassisSpeeds getRobotVelocity() {
+        return swerveDrive.getRobotVelocity();
     }
 
     /**
