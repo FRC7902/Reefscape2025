@@ -51,7 +51,8 @@ public final class Constants {
         public static final int kOperatorControllerPort = 1;
 
         // Joystick Deadband
-        public static final double DEADBAND = 0.5;
+        // Also make sure to set the angleJoystickRadiusDeadband in controllerproperties.json
+        public static final double DEADBAND = 0.10;
     }
 
     public static class AlgaeManipulatorConstants {
