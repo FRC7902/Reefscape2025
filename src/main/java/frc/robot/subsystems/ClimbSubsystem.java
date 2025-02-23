@@ -1,3 +1,7 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package frc.robot.subsystems;
 
 import com.revrobotics.sim.SparkMaxSim;
@@ -8,7 +12,6 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
-
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
@@ -20,92 +23,61 @@ import frc.robot.Robot;
 
 public class ClimbSubsystem extends SubsystemBase {
 
-    // object creation of motors
-    private final SparkMax m_leaderMotor =
-            new SparkMax(ClimbConstants.kClimbLeaderMotorCANID, MotorType.kBrushless);
-    private final SparkMax m_followerMotor =
-            new SparkMax(ClimbConstants.kClimbFollowerMotorCANID, MotorType.kBrushless);
+    /** Spark Max leader motor controller object. */
+    private final SparkMax m_leaderMotor = new SparkMax(ClimbConstants.kClimbLeaderMotorCANID, MotorType.kBrushless);
+    
+    /** Spark Max follower motor controller object. */
+    private final SparkMax m_followerMotor = new SparkMax(ClimbConstants.kClimbFollowerMotorCANID, MotorType.kBrushless);
 
-    private final DCMotor m_simMotor = DCMotor.getNeo550(2);
+    /** Spark Max leader motor controller simulation object. */
+    private final SparkMaxSim s_simLeaderMotor = new SparkMaxSim(m_leaderMotor, DCMotor.getNeo550(2));
 
-    private final SparkMaxSim s_simLeaderMotor = new SparkMaxSim(m_leaderMotor, m_simMotor);
-
-    // object creation of motor configuration (used to configure tbe motors)
+    /** Spark Max leader motor controller configuration object. */
     private final SparkMaxConfig m_leaderMotorConfig = new SparkMaxConfig();
+
+    /** Spark Max follower motor controller configuration object. */
     private final SparkMaxConfig m_followerMotorConfig = new SparkMaxConfig();
 
-    // object creation of absolute encoder. The REV Through bore encoder is used for
-    // climb
-    private final DutyCycleEncoder m_absoluteEncoder =
-            new DutyCycleEncoder(ClimbConstants.kRevThroughBoreIO, 0, 0);
+    /** Absolute encoder object. */
+    private final DutyCycleEncoder m_absoluteEncoder = new DutyCycleEncoder(ClimbConstants.kRevThroughBoreIO, 0, 0);
 
+    /** Servo object for the left funnel servo. */        
     private final Servo m_leftServo = new Servo(ClimbConstants.kLeftServoID);
+
+    /** Servo object for the right funnel servo. */
     private final Servo m_rightServo = new Servo(ClimbConstants.kRightServoID);
 
+    /** Indicates whether the funnel is unlocked. */
     private boolean isFunnelUnlocked;
 
-    /*
-     * private final ElevatorSim m_climbSim = new ElevatorSim( motorSim, 5, 70, 6, 0, 100, true,
-     * 0.0, 0.01, 0);
-     */
-
-    // object creation of bangbang controller
-    // bang-bang controllers are used in high-inertia system. Considering the climb
-    // will be carrying the whole robot, it falls under "high inertia".
-    // bang-bang controllers have faster recovery times than pid controllers,
-    // resulting in the control effort in the front direction to be as large as
-    // possible
-    // we want this as the climb should move as fast as possible (as you will
-    // generally be climbing in the last few seconds of the match)
-    // BE SURE TO SET THE MOTORS TO COAST INSTEAD OF BRAKE FOR IDLE ACTION!!! BRAKE
-    // CAN CAUSE DESTRUCTIVE OSCILLATION and a very upset argoon
-    // ariana grande would love this controller
-    // private final BangBangController m_bangBang = new BangBangController();
-
+    /** Creates a new ClimbSubsystem. */
     public ClimbSubsystem() {
 
-        // clears any previous faults on motors
-        // do this so that any errors from previous usage are cleared
-        // if any errors persist, then we know there's an issue with the motors
+        // Clear any faults that may have been stored in the motor controllers
         m_leaderMotor.clearFaults();
         m_followerMotor.clearFaults();
 
-        // sets it so that the secondary motor (follower) follows any commands sent to
-        // the primary motor (leader).
-        // recommended as you will now only need to send commands to the primary motor
-        // instead of having to do both primary and secondary.
+        // Sets the follower motor to follow the leader motor
         m_followerMotorConfig.follow(m_leaderMotor);
 
-        // inverts motor run position (clockwise or counterclockwise).
-        // change booleans when necessary.
+        // Invert the motors
         m_leaderMotorConfig.inverted(false);
         m_followerMotorConfig.inverted(false);
 
-        // ensures motors stay at their current position when no power is being applied
-        // to them.
-        // we don't want the motors moving downwards when we want to it to stay up!
+        // Sets the idle mode of the motors to brake when no power is being applied 
         m_leaderMotorConfig.idleMode(IdleMode.kBrake);
         m_followerMotorConfig.idleMode(IdleMode.kBrake);
 
-        // sets current limits to motors to ensure they do not exceed a set current
-        // limit
-        // prevents damage towards motors from pulling too much current -- VERY
-        // IMPORTANT!
+        // Set current limits for the motors
         m_leaderMotorConfig.smartCurrentLimit(ClimbConstants.kMotorStallCurrent,
                 ClimbConstants.kMotorFreeSpeedCurrent);
         m_followerMotorConfig.smartCurrentLimit(ClimbConstants.kMotorStallCurrent,
                 ClimbConstants.kMotorFreeSpeedCurrent);
 
-        // inverts the encoder on true (if motor is spinning counter-clockwise)
+        // Invert the encoder
         m_absoluteEncoder.setInverted(false);
-        // similar to controller deadband, reduces sensitivity of inputs
-        // in this case, it is when the absolute encoder reaches the end of its range,
-        // which can result in instability.
 
-        // sets all configuration to the motors.
-        // any previous parameters are reset here to be overwritten with new parameters.
-        // these parameters will persist. This is incredibly important as without this,
-        // all parameters are wiped on reboot.
+        // Apply the configurations to the motors
         m_leaderMotor.configure(m_leaderMotorConfig, ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
         m_followerMotor.configure(m_followerMotorConfig, ResetMode.kResetSafeParameters,
@@ -115,50 +87,65 @@ public class ClimbSubsystem extends SubsystemBase {
         isFunnelUnlocked = false;
     }
 
+    /** Sets the voltage of the motor.
+     * 
+     * @param voltage The voltage to set the motor to.
+     */
     public void setVoltage(double voltage) {
         m_leaderMotor.setVoltage(voltage);
     }
 
-    // Returns the reading of the encoder.
+    /**
+     * Returns the encoder value.
+     * 
+     * @return The encoder value in rotations.
+     */
     public double getEncoderDistance() {
         return m_absoluteEncoder.get();
     }
 
-    // public double getSimEncoderDistance() {
-    // return s_absoluteEncoder.get();
-    // }
-
-    // Stops outputting to motors.
+    /** Stops the motor. */
     public void stopMotors() {
         m_leaderMotor.stopMotor();
     }
 
+    /** Locks the funnel. */
     public void lockFunnel() {
         m_leftServo.setAngle(80);
         m_rightServo.setAngle(95);
     }
 
+    /** Unlocks the funnel. */
     public void unlockFunnel() {
         m_leftServo.setAngle(180);
         m_rightServo.setAngle(0);
         isFunnelUnlocked = true;
     }
 
+    /** Stops the funnel servos. */
     public void stopFunnelServos() {
         m_leftServo.setAngle(90);
         m_rightServo.setAngle(90);
     }
 
+    /**
+     * Checks whether the funnel mechanism is unlocked.
+     * 
+     * @return True if the funnel is unlocked, false otherwise.
+    */
     public boolean isFunnelUnlocked() {
         return isFunnelUnlocked;
     }
 
-    // public void setRightServo(double degrees) {
-    // m_rightServo.setAngle(degrees);
-    // }
-
-    // This function returns the type of error the motor is experiencing should it
-    // have an error.
+    /**
+     * Checks the motor for faults and returns the type of error encountered.
+     * <p>
+     * The method checks for common motor faults such as communication issues, firmware errors, 
+     * or temperature problems. If no fault is detected, it returns {@code null}.
+     * 
+     * @param motor The motor to check for errors.
+     * @return A string representing the type of fault, or {@code null} if no fault is present.
+     */
     public String reportMotorError(SparkMax motor) {
         Faults motorFault = motor.getFaults();
         if (motorFault.can) {
@@ -179,12 +166,13 @@ public class ClimbSubsystem extends SubsystemBase {
         return null;
     }
 
-    // function that is constantly run in code every 20 ms.
     @Override
     public void periodic() {
-        // Displays live motor and limit switch metrics on SmartDashboard
-        if (!(Robot.isSimulation())) {
-            SmartDashboard.putNumber("Encoder reading", getEncoderDistance());
+        // This method will be called once per scheduler run
+
+        // Updates the SmartDashboard
+        if ((!Robot.isSimulation())) {
+            SmartDashboard.putNumber("Encoder reading", m_absoluteEncoder.get());
             SmartDashboard.putBoolean("Climb stopped", m_leaderMotor.get() == 0);
 
             SmartDashboard.putNumber("Leader Motor Speed", m_leaderMotor.get());
