@@ -158,38 +158,38 @@ public class RobotContainer {
         m_driverController.leftBumper().whileTrue(m_selectIntakeCommand);
         m_driverController.rightBumper().whileTrue(m_selectOuttakeCommand);
 
+        // Climb controls
         m_driverController.povUp().whileTrue(new ConditionalCommand(new MoveClimbUpCommand(),
                 new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
         m_driverController.povDown().whileTrue(new ConditionalCommand(new MoveClimbDownCommand(),
                 new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
 
-        m_indexSubsystem.setDefaultCommand(
-                new IntakeCoralCommand(Constants.CoralIndexerConstants.kIntakePower)
-                        .andThen(new CorrectCoralPositionCommand().withTimeout(1)));
+        m_indexSubsystem
+                .setDefaultCommand(
+                        new IntakeCoralCommand(Constants.CoralIndexerConstants.kIntakePower)
+                                .andThen(new CorrectCoralPositionCommand().withTimeout(1))
+                                .andThen(new IntakeCoralCommand(
+                                        Constants.CoralIndexerConstants.kCorrectionPower)
+                                                .withTimeout(1)));
 
         // Elevator coral positions
         m_operatorController.x().onTrue(
                 new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel1Height));
         m_operatorController.a().onTrue(new SetElevatorPositionCommand(
                 ElevatorConstants.kElevatorCoralStationAndProcessorHeight));
-        m_operatorController.povUp()
-                .onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeHighHeight));
-        m_operatorController.povDown()
-                .onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeLowHeight));
+        m_operatorController.b().onTrue(
+                new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel2Height));
+        m_operatorController.y().onTrue(
+                new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel3Height));
 
         m_driverController.leftTrigger(0.05).whileTrue(new StrafeLeftCommand());
         m_driverController.rightTrigger(0.05).whileTrue(new StrafeRightCommand());
-
 
         // Elevator algae positions
         m_operatorController.povDown()
                 .onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeLowHeight));
         m_operatorController.povUp()
                 .onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeHighHeight));
-
-        // Climb controls
-        m_driverController.povUp().whileTrue(new MoveClimbUpCommand());
-        m_driverController.povDown().whileTrue(new MoveClimbDownCommand());
 
         // ======= Test bindings =======
 
