@@ -4,9 +4,7 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
-import swervelib.math.Matter;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -18,16 +16,6 @@ import swervelib.math.Matter;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-
-    // public static final double ROBOT_MASS = (148 - 20.3) * 0.453592; // 32lbs * kg per pound //
-    // // TODO: Change this to
-    // // actual robot mass
-    // public static final Matter CHASSIS =
-    // new Matter(new Translation3d(0, 0, Units.inchesToMeters(8)), ROBOT_MASS);
-    // public static final double LOOP_TIME = 0.13; // s, 20ms + 110ms sprk max velocity lag //
-    // TODO:
-    // // Check if this is
-    // // correct
 
     public static final double MAX_SPEED = Units.feetToMeters(15);
 

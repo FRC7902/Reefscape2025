@@ -75,10 +75,11 @@ public class CoralIndexerSubsystem extends SubsystemBase {
     }
 
     /**
-     * Indicates if the subsystem has a coral 
+     * Indicates if the subsystem has a coral
+     * 
      * @return true if the coral has broken the beam for a significant amount of time
      */
-    public boolean hasCoral(){
+    public boolean hasCoral() {
         return m_debouncedBeamBreak.calculate(isBeamBroken());
     }
 
@@ -89,7 +90,7 @@ public class CoralIndexerSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Motor Velocity (Encoder)", m_encoder.getVelocity());
         SmartDashboard.putBoolean("Beam Sensor Broken", isBeamBroken());
 
-       // m_debouncedBeamBreak.calculate(m_beamSensor.get());
+        // m_debouncedBeamBreak.calculate(m_beamSensor.get());
 
 
 

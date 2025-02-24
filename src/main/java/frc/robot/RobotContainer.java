@@ -16,6 +16,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.teleop.NullCommand;
+import frc.robot.commands.teleop.SwerveCommands.StrafeLeftCommand;
+import frc.robot.commands.teleop.SwerveCommands.StrafeRightCommand;
 import frc.robot.commands.teleop.algae_manipulator.IntakeAlgaeCommand;
 import frc.robot.commands.teleop.algae_manipulator.OuttakeAlgaeCommand;
 import frc.robot.commands.teleop.climb.InitiateClimbCommand;
@@ -56,7 +58,7 @@ public class RobotContainer {
     public static final CommandXboxController m_operatorController =
             new CommandXboxController(OperatorConstants.kOperatorControllerPort);
 
-    private final SwerveSubsystem drivebase =
+    public static final SwerveSubsystem drivebase =
             new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
 
     /**
@@ -156,10 +158,16 @@ public class RobotContainer {
         m_driverController.leftBumper().whileTrue(m_selectIntakeCommand);
         m_driverController.rightBumper().whileTrue(m_selectOuttakeCommand);
 
+        // Strafe controls
+        m_driverController.leftTrigger(0.05).whileTrue(new StrafeLeftCommand());
+        m_driverController.rightTrigger(0.05).whileTrue(new StrafeRightCommand());
+
+        // Climb controls
         m_driverController.povUp().whileTrue(new ConditionalCommand(new MoveClimbUpCommand(),
                 new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
         m_driverController.povDown().whileTrue(new ConditionalCommand(new MoveClimbDownCommand(),
-                new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
+        new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
+        
 
         m_indexSubsystem
                 .setDefaultCommand(
@@ -179,10 +187,26 @@ public class RobotContainer {
         m_operatorController.y().onTrue(
                 new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel3Height));
 
-        m_operatorController.povUp()
-                .onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeHighHeight));
+
+        // Elevator algae positions
         m_operatorController.povDown()
                 .onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeLowHeight));
+        m_operatorController.povUp()
+                .onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeHighHeight));
+
+        // ======= Test bindings =======
+
+        // Micro elevator adjustment
+        // m_driverController.povUp().whileTrue(new
+        // RelativeMoveElevatorCommand(0.00635));
+        // m_driverController.povDown().whileTrue(new
+        // RelativeMoveElevatorCommand(-0.00635));
+
+        // Snap to angle
+        // m_driverController.a().onTrue(drivebase.snapToAngle(90, 1));
+        // m_driverController.b().onTrue(drivebase.snapToAngle(180, 1));
+        // m_driverController.y().onTrue(drivebase.snapToAngle(0, 1));
+        // m_driverController.x().onTrue(drivebase.snapToAngle(270, 1));
     }
 
     /**
