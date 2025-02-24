@@ -20,7 +20,6 @@ import frc.robot.commands.teleop.IntakeAlgaeCommand;
 import frc.robot.commands.teleop.IntakeCoralCommand;
 import frc.robot.commands.teleop.NullCommand;
 import frc.robot.commands.teleop.OuttakeAlgaeCommand;
-import frc.robot.commands.visions.DriveToAprilTag;
 import frc.robot.subsystems.AlgaeElevatorManipulatorSubsystem;
 import frc.robot.subsystems.CameraSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
@@ -45,7 +44,7 @@ public class RobotContainer {
 
     public static final IndexSubsystem m_indexSubsystem = new IndexSubsystem();
 
-    public static final CameraSubsystem m_cameraSubsystem = new CameraSubsystem();
+    public static final CameraSubsystem m_cameraSubsystem = new CameraSubsystem("skibidi");
 
     // Replace with CommandPS4Controller or CommandJoystick if needed
     private final CommandXboxController m_driverController = new CommandXboxController(
@@ -54,7 +53,7 @@ public class RobotContainer {
             OperatorConstants.kOperatorControllerPort);
 
     private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
-            "swerve"));
+            "swerve"), m_cameraSubsystem);
 
     /**
      * Converts driver input into a field-relative ChassisSpeeds that is controlled
@@ -158,8 +157,6 @@ public class RobotContainer {
         m_operatorController.b().onTrue(new ElevatorReefSetpoint(ElevatorConstants.kLevel2));
         m_operatorController.y().onTrue(new ElevatorReefSetpoint(ElevatorConstants.kLevel3));
         m_operatorController.x().onTrue(new ElevatorReefSetpoint(ElevatorConstants.kElevatorMinHeightMeters));
-
-        m_driverController.x().whileTrue(new DriveToAprilTag(m_cameraSubsystem, drivebase));
     }
 
     /**

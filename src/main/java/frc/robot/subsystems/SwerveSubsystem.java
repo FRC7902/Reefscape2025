@@ -25,7 +25,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.subsystems.Vision.Cameras;
 import swervelib.SwerveDrive;
 import swervelib.math.SwerveMath;
 import swervelib.parser.SwerveParser;
@@ -41,11 +40,10 @@ public class SwerveSubsystem extends SubsystemBase {
   private final SwerveDrive swerveDrive;
   private final boolean visionDriveTest = true;
   private Field2d robotPose;
-
-  private Vision vision;
+  private CameraSubsystem m_cameraSubsystem;
 
   /** Creates a new SwerveSubsystem. */
-  public SwerveSubsystem(File directory) {
+  public SwerveSubsystem(File directory, CameraSubsystem m_cameraSubsystem) {
     // Configure the Telemetry before creating the SwerveDrive to avoid unnecessary
     // objects being created.
 
@@ -74,17 +72,10 @@ public class SwerveSubsystem extends SubsystemBase {
         1); // Enable if you want to resynchronize your absolute encoders and motor encoders
             // periodically when they are not moving.
 
-    if (visionDriveTest) {
-      setupPhotonVision();
-      swerveDrive.stopOdometryThread();
-    }            
+    this.m_cameraSubsystem = m_cameraSubsystem;
 
   }
 
-
-  public void setupPhotonVision() {
-    vision = new Vision(swerveDrive::getPose, swerveDrive.field);
-  }
 
   public Pose2d getPose() {
     return swerveDrive.getPose();
@@ -107,39 +98,22 @@ public class SwerveSubsystem extends SubsystemBase {
   }
 
 
-  public Command aimAtTarget(Cameras camera)
-  {
-
-    return run(() -> {
-      Optional<PhotonPipelineResult> resultO = camera.getBestResult();
-      if (resultO.isPresent())
-      {
-        var result = resultO.get();
-        if (result.hasTargets())
-        {
-          drive(getTargetSpeeds(0,
-                                0,
-                                Rotation2d.fromDegrees(result.getBestTarget()
-                                                             .getYaw()))); // Not sure if this will work, more math may be required.
-        }
-      }
-    });
-  }
-
-
   @Override
   public void periodic() {
-    if (visionDriveTest) {
-      swerveDrive.updateOdometry();
-      vision.updatePoseEstimation(swerveDrive);
-      swerveDrive.addVisionMeasurement(getCurrentPose(), 0);
-    }
     //robotPose.setRobotPose(getCurrentPose());
 
     // This method will be called once per scheduler run
     SmartDashboard.putNumber("Gyro angle rotation (rad)", swerveDrive.getGyro().getRotation3d().getAngle());
     SmartDashboard.putNumber("X translation", swerveDrive.getPose().getX());
     SmartDashboard.putNumber("Y translation", swerveDrive.getPose().getY());
+    var visionEst = m_cameraSubsystem.getEstimatedGlobalPose();
+
+    visionEst.ifPresent(
+      est -> {
+        var estStdDevs = m_cameraSubsystem.getEstimationStdDevs();
+        swerveDrive.addVisionMeasurement(est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
+      }
+    );
     //SmartDashboard.putData("Robot", robotPose);
   }
 
