@@ -27,6 +27,7 @@ import frc.robot.commands.teleop.climb.MoveClimbUpCommand;
 import frc.robot.commands.teleop.coral_indexer.CorrectCoralPositionCommand;
 import frc.robot.commands.teleop.coral_indexer.IntakeCoralCommand;
 import frc.robot.commands.teleop.coral_indexer.OuttakeCoralCommand;
+import frc.robot.commands.teleop.elevator.HomeElevatorCommand;
 import frc.robot.commands.teleop.elevator.SetElevatorPositionCommand;
 import frc.robot.subsystems.AlgaeManipulatorSubsystem;
 import frc.robot.subsystems.ClimbSubsystem;
@@ -166,8 +167,8 @@ public class RobotContainer {
         m_driverController.povUp().whileTrue(new ConditionalCommand(new MoveClimbUpCommand(),
                 new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
         m_driverController.povDown().whileTrue(new ConditionalCommand(new MoveClimbDownCommand(),
-        new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
-        
+                new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
+
 
         m_indexSubsystem
                 .setDefaultCommand(
@@ -193,6 +194,9 @@ public class RobotContainer {
                 .onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeLowHeight));
         m_operatorController.povUp()
                 .onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeHighHeight));
+
+        // Home elevator
+        m_operatorController.start().onTrue(new HomeElevatorCommand());
 
         // ======= Test bindings =======
 

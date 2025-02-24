@@ -5,7 +5,7 @@
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Volts;
-
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -66,11 +66,13 @@ public class ElevatorSubsystem extends SubsystemBase {
             ElevatorConstants.kElevatorHeightMeters, 0.01, // add some noise
             0);
 
-    private final Mechanism2d m_mech2d = new Mechanism2d(Units.inchesToMeters(10), Units.inchesToMeters(50));
-    private final MechanismRoot2d m_mech2dRoot = m_mech2d.getRoot("Elevator Root", Units.inchesToMeters(5),
-            Units.inchesToMeters(0.5));
-    private final MechanismLigament2d m_elevatorMech2d = m_mech2dRoot.append(new MechanismLigament2d("Elevator",
-            m_elevatorSim.getPositionMeters(), 90, 7, new Color8Bit(Color.kAntiqueWhite)));
+    private final Mechanism2d m_mech2d =
+            new Mechanism2d(Units.inchesToMeters(10), Units.inchesToMeters(50));
+    private final MechanismRoot2d m_mech2dRoot =
+            m_mech2d.getRoot("Elevator Root", Units.inchesToMeters(5), Units.inchesToMeters(0.5));
+    private final MechanismLigament2d m_elevatorMech2d =
+            m_mech2dRoot.append(new MechanismLigament2d("Elevator",
+                    m_elevatorSim.getPositionMeters(), 90, 7, new Color8Bit(Color.kAntiqueWhite)));
 
     // System identification routine
     private final SysIdRoutine m_sysIdRoutine = new SysIdRoutine(
@@ -83,7 +85,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     private double m_setpoint;
     private boolean m_homed;
 
-    private String[] m_songs = new String[] { "song1.chrp", "song2.chrp" };
+    private String[] m_songs = new String[] {"song1.chrp", "song2.chrp"};
 
     /** Creates a new ElevatorSubsystem */
     public ElevatorSubsystem() {
@@ -109,9 +111,10 @@ public class ElevatorSubsystem extends SubsystemBase {
         m_motorConfig.Slot0.GravityType = GravityTypeValue.Elevator_Static;
 
         // Set motion magic
-        m_motorConfig.MotionMagic.MotionMagicCruiseVelocity = ElevatorConstants.kElevatorMaxVelocity; // Target cruise
-                                                                                                      // velocity of 80
-                                                                                                      // rps
+        m_motorConfig.MotionMagic.MotionMagicCruiseVelocity =
+                ElevatorConstants.kElevatorMaxVelocity; // Target cruise
+                                                        // velocity of 80
+                                                        // rps
         m_motorConfig.MotionMagic.MotionMagicAcceleration = 160; // Target acceleration of 160 rps/s
                                                                  // (0.5 seconds)
         // m_motorConfig.MotionMagic.MotionMagicJerk = 1600; // Target jerk of 1600
@@ -119,8 +122,9 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         // Set safety limits
         m_motorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-        m_motorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = ElevatorConstants.kElevatorMaxHeightMeters
-                / ElevatorConstants.kElevatorMetersPerMotorRotation;
+        m_motorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
+                ElevatorConstants.kElevatorMaxHeightMeters
+                        / ElevatorConstants.kElevatorMetersPerMotorRotation;
         m_motorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
         m_motorConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0;
 
@@ -237,8 +241,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     /**
-     * Returns a command that will execute a quasistatic test in the given
-     * direction.
+     * Returns a command that will execute a quasistatic test in the given direction.
      *
      * @param direction The direction (forward or reverse) to run the test in
      */
@@ -296,6 +299,14 @@ public class ElevatorSubsystem extends SubsystemBase {
         }
     }
 
+    public double getMotorCurrent() {
+        return m_leaderMotor.getStatorCurrent().getValueAsDouble();
+    }
+
+    public TalonFX getLeaderMotor() {
+        return m_leaderMotor;
+    }
+
     @Override
     public void periodic() {
         if (m_leaderMotor.getClosedLoopReference().getValueAsDouble() == 0
@@ -329,8 +340,9 @@ public class ElevatorSubsystem extends SubsystemBase {
         // m_elevatorFollowerMotor.getSupplyCurrent().getValueAsDouble());
         // SmartDashboard.putBoolean("Reverse limit switch", isAtRetractLimit());
 
-        // String elevatorEnumPosition = (getElevatorEnumPosition() != null) ? getElevatorEnumPosition().toString()
-        //         : "N/A";
+        // String elevatorEnumPosition = (getElevatorEnumPosition() != null) ?
+        // getElevatorEnumPosition().toString()
+        // : "N/A";
         // SmartDashboard.putString("Curr Position Name", elevatorEnumPosition);
 
         updateTelemetry();

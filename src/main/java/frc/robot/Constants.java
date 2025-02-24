@@ -128,5 +128,7 @@ public final class Constants {
         public static final double kElevatorTargetError = 0.005;
         public static final double kElevatorMotorResistance = 0.002; // Assume 2mOhm resistance for
                                                                      // voltage drop calculation
+
+        public static final double kCurrentSpikeThreshold = 30.0;
     }
 }
