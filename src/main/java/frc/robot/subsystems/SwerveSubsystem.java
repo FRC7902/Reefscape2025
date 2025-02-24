@@ -5,11 +5,10 @@
 package frc.robot.subsystems;
 
 import java.io.File;
-import java.util.Optional;
 import java.util.function.DoubleSupplier;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
-import org.photonvision.targeting.PhotonPipelineResult;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathfindingCommand;
@@ -25,15 +24,14 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.networktables.NTSendableBuilder;
-import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.subsystems.visions.Camera;
+import frc.robot.subsystems.visions.POI;
+import frc.robot.subsystems.visions.ReefSide;
 import swervelib.SwerveDrive;
 import swervelib.math.SwerveMath;
 import swervelib.parser.SwerveParser;
@@ -47,12 +45,11 @@ public class SwerveSubsystem extends SubsystemBase {
    */
 
   private final SwerveDrive swerveDrive;
-  private final boolean visionDriveTest = true;
-  private Field2d robotPose;
-  private CameraSubsystem m_cameraSubsystem;
+  private Camera m_cameraSubsystem;
+  private PathConstraints constraints;
 
   /** Creates a new SwerveSubsystem. */
-  public SwerveSubsystem(File directory, CameraSubsystem m_cameraSubsystem) {
+  public SwerveSubsystem(File directory, Camera m_cameraSubsystem) {
     // Configure the Telemetry before creating the SwerveDrive to avoid unnecessary
     // objects being created.
 
@@ -83,6 +80,10 @@ public class SwerveSubsystem extends SubsystemBase {
 
     this.m_cameraSubsystem = m_cameraSubsystem;
     setupPathPlanner();
+
+    constraints = new PathConstraints(
+      swerveDrive.getMaximumChassisVelocity(), 4.0,
+      swerveDrive.getMaximumChassisAngularVelocity(), Units.degreesToRadians(720));
 
   }
 
@@ -174,6 +175,35 @@ public class SwerveSubsystem extends SubsystemBase {
   public Rotation2d getHeading()
   {
     return getPose().getRotation();
+  }
+
+
+  public ReefSide closestSide() {
+    var reef = POI.REEF_CENTER.flipped();
+    var pose = swerveDrive.getPose();
+    var direction = pose.relativeTo(reef).getTranslation().getAngle().getRadians();
+    if (direction < -5 * Math.PI / 6 || direction > 5 * Math.PI / 6) {
+      return ReefSide.R1;
+    }
+    if (direction >= -5 * Math.PI / 6 && direction < -3 * Math.PI / 6) {
+      return ReefSide.R2;
+    }
+    if (direction >= -3 * Math.PI / 6 && direction < -1 * Math.PI / 6) {
+      return ReefSide.R3;
+    }
+    if (direction >= -1 * Math.PI / 6 && direction < 1 * Math.PI / 6) {
+      return ReefSide.R4;
+    }
+    if (direction >= 1 * Math.PI / 6 && direction < 3 * Math.PI / 6) {
+      return ReefSide.R5;
+    } else {
+      return ReefSide.R6;
+    }
+  }
+
+
+  public Command pathFindToClosestReef(Function<ReefSide, POI>point) {
+    return AutoBuilder.pathfindToPose(point.apply(closestSide()).flipped(), constraints);
   }
 
   public ChassisSpeeds getTargetSpeeds(double xInput, double yInput, Rotation2d angle)

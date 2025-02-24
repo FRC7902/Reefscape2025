@@ -1,6 +1,5 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.visions;
 
-import java.awt.Robot;
 import java.util.List;
 import java.util.Optional;
 
@@ -9,21 +8,18 @@ import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.targeting.PhotonTrackedTarget;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
-import org.photonvision.PhotonUtils;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.VisionConstants;
 
-public class CameraSubsystem extends SubsystemBase {
+public class Camera {
 
     private final PhotonCamera camera;
     private final PhotonPoseEstimator photonEstimator;
@@ -31,7 +27,7 @@ public class CameraSubsystem extends SubsystemBase {
     private Matrix<N3, N1> curStdDevs;
 
 
-    public CameraSubsystem(String cameraName) {
+    public Camera(String cameraName) {
        this.camera = new PhotonCamera(cameraName);
        photonEstimator = new PhotonPoseEstimator(AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark), PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, VisionConstants.kRobotToCam);
        photonEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);

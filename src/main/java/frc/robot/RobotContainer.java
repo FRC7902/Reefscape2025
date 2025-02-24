@@ -5,6 +5,7 @@
 package frc.robot;
 
 import java.io.File;
+import java.util.Set;
 
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -20,12 +21,13 @@ import frc.robot.commands.teleop.IntakeAlgaeCommand;
 import frc.robot.commands.teleop.IntakeCoralCommand;
 import frc.robot.commands.teleop.NullCommand;
 import frc.robot.commands.teleop.OuttakeAlgaeCommand;
-import frc.robot.commands.visions.DriveToTag;
 import frc.robot.subsystems.AlgaeElevatorManipulatorSubsystem;
-import frc.robot.subsystems.CameraSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.IndexSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.subsystems.visions.Camera;
+import frc.robot.subsystems.visions.POI;
+import frc.robot.subsystems.visions.ReefSide;
 import swervelib.SwerveInputStream;
 
 /**
@@ -45,7 +47,7 @@ public class RobotContainer {
 
     public static final IndexSubsystem m_indexSubsystem = new IndexSubsystem();
 
-    public static final CameraSubsystem m_cameraSubsystem = new CameraSubsystem("skibidi");
+    public static final Camera m_camera = new Camera("skibidi");
 
     // Replace with CommandPS4Controller or CommandJoystick if needed
     private final CommandXboxController m_driverController = new CommandXboxController(
@@ -54,7 +56,7 @@ public class RobotContainer {
             OperatorConstants.kOperatorControllerPort);
 
     private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
-            "swerve"), m_cameraSubsystem);
+            "swerve"), m_camera);
 
     /**
      * Converts driver input into a field-relative ChassisSpeeds that is controlled
@@ -159,9 +161,10 @@ public class RobotContainer {
         m_operatorController.y().onTrue(new ElevatorReefSetpoint(ElevatorConstants.kLevel3));
         m_operatorController.x().onTrue(new ElevatorReefSetpoint(ElevatorConstants.kElevatorMinHeightMeters));
 
-        m_operatorController.povLeft().onTrue(new DriveToTag(m_cameraSubsystem, drivebase, 0));
-        m_operatorController.povRight().onTrue(new DriveToTag(m_cameraSubsystem, drivebase, 1));
+        m_operatorController.povLeft().onTrue(Commands.defer(() -> drivebase.pathFindToClosestReef(ReefSide::left), Set.of(drivebase)));
+        m_operatorController.povRight().onTrue(Commands.defer(() -> drivebase.pathFindToClosestReef(ReefSide::right), Set.of(drivebase)));
 
+        drivebase.closestSide().left.flipped();
     }
 
     /**

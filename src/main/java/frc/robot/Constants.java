@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -41,6 +43,7 @@ public final class Constants {
     public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(2, 2, 4); // to test
     public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(1, 1, 1); // to test
     public static final double kTagMiddleToTagEdge = 0.5; // to calculate
+    public static final AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
   }
 
   public static class OperatorConstants {
