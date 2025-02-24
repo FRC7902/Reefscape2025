@@ -1,0 +1,49 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Start Middle Leave"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Middle to Score IJ"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Coral to IJ"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "IJ to Coral Station"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Coral to IJ"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "IJ to Coral Station"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}
