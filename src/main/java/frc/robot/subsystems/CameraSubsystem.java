@@ -1,31 +1,33 @@
 package frc.robot.subsystems;
 
+import java.awt.Robot;
 import java.util.List;
 import java.util.Optional;
 
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
-import org.photonvision.PhotonUtils;
 import org.photonvision.targeting.PhotonTrackedTarget;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.photonvision.PhotonUtils;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.VisionConstants;
-import frc.robot.Robot;
 
 public class CameraSubsystem extends SubsystemBase {
 
     private final PhotonCamera camera;
     private final PhotonPoseEstimator photonEstimator;
+    private final AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
     private Matrix<N3, N1> curStdDevs;
 
 
@@ -44,8 +46,48 @@ public class CameraSubsystem extends SubsystemBase {
         return visionEst;
     }
 
-   private void updateEstimationStdDevs(
-            Optional<EstimatedRobotPose> estimatedPose, List<PhotonTrackedTarget> targets) {
+
+    public boolean isReefAprilTag(int aprilTagID) {
+        switch (aprilTagID) {
+            case -1: return false;
+            case 1: return false;
+            case 2: return false;
+            case 3: return false;
+            case 4: return false;
+            case 5: return false;
+            case 12: return false;
+            case 13: return false;
+            case 14: return false;
+            case 15: return false;
+            case 16: return false;
+            default: return true;
+        }
+    }
+
+    public Pose2d getAprilTagPose() {
+        Pose2d tagPose = null;
+        var results = camera.getAllUnreadResults();
+        if (!results.isEmpty()) {
+            // Camera processed a new frame since last
+            // Get the last one in the list.
+            var result = results.get(results.size() - 1);
+            if (result.hasTargets()) {
+                // At least one AprilTag was seen by the camera
+                for (var target : result.getTargets()) {
+                    int aprilTagID = target.getFiducialId();
+                    if (aprilTagFieldLayout.getTagPose(target.getFiducialId()).isPresent() && isReefAprilTag(aprilTagID)) {
+                        Transform3d tagTrans = target.getBestCameraToTarget();
+                        tagPose = new Pose2d(tagTrans.getX(), tagTrans.getY(), tagTrans.getRotation().toRotation2d());
+                        break;
+                    }
+                }
+            }        
+        }        
+        return tagPose;
+    }
+
+    private void updateEstimationStdDevs(
+        Optional<EstimatedRobotPose> estimatedPose, List<PhotonTrackedTarget> targets) {
         if (estimatedPose.isEmpty()) {
             // No pose input. Default to single-tag std devs
             curStdDevs = VisionConstants.kSingleTagStdDevs;

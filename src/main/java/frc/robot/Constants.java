@@ -37,9 +37,10 @@ public final class Constants {
 
 
   public static class VisionConstants {
-    public static final Transform3d kRobotToCam = new Transform3d(new Translation3d(0.5, 0.5, 0), new Rotation3d(0, 0, 0));
-    public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(4, 4, 8);
-    public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(0.5, 0.5, 1);
+    public static final Transform3d kRobotToCam = new Transform3d(new Translation3d(0.5, 0.5, 0), new Rotation3d(0, 0, 0)); // to measure
+    public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(2, 2, 4); // to test
+    public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(1, 1, 1); // to test
+    public static final double kTagMiddleToTagEdge = 0.5; // to calculate
   }
 
   public static class OperatorConstants {

@@ -20,6 +20,7 @@ import frc.robot.commands.teleop.IntakeAlgaeCommand;
 import frc.robot.commands.teleop.IntakeCoralCommand;
 import frc.robot.commands.teleop.NullCommand;
 import frc.robot.commands.teleop.OuttakeAlgaeCommand;
+import frc.robot.commands.visions.DriveToTag;
 import frc.robot.subsystems.AlgaeElevatorManipulatorSubsystem;
 import frc.robot.subsystems.CameraSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
@@ -157,6 +158,10 @@ public class RobotContainer {
         m_operatorController.b().onTrue(new ElevatorReefSetpoint(ElevatorConstants.kLevel2));
         m_operatorController.y().onTrue(new ElevatorReefSetpoint(ElevatorConstants.kLevel3));
         m_operatorController.x().onTrue(new ElevatorReefSetpoint(ElevatorConstants.kElevatorMinHeightMeters));
+
+        m_operatorController.povLeft().onTrue(new DriveToTag(m_cameraSubsystem, drivebase, 0));
+        m_operatorController.povRight().onTrue(new DriveToTag(m_cameraSubsystem, drivebase, 1));
+
     }
 
     /**
