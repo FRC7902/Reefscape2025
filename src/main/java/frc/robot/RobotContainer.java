@@ -178,21 +178,25 @@ public class RobotContainer {
                                                 .withTimeout(1)));
 
         // Elevator coral positions
-        m_operatorController.x().onTrue(
-                new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel1Height));
-        m_operatorController.a().onTrue(new SetElevatorPositionCommand(
-                ElevatorConstants.kElevatorCoralStationAndProcessorHeight));
-        m_operatorController.b().onTrue(
-                new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel2Height));
-        m_operatorController.y().onTrue(
-                new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel3Height));
+        m_operatorController.x().onTrue(new ConditionalCommand(new SetElevatorPositionCommand(
+                ElevatorConstants.kElevatorCoralLevel1Height), new NullCommand(),
+                () -> !m_climbSubsystem.isFunnelUnlocked()));
+        m_operatorController.a().onTrue(new ConditionalCommand(new SetElevatorPositionCommand(
+                ElevatorConstants.kElevatorCoralStationAndProcessorHeight), new NullCommand(),
+                () -> m_climbSubsystem.isFunnelUnlocked()));
+        m_operatorController.b().onTrue(new ConditionalCommand(new SetElevatorPositionCommand(
+                ElevatorConstants.kElevatorCoralLevel2Height), new NullCommand(),
+                () -> m_climbSubsystem.isFunnelUnlocked()));
+        m_operatorController.y().onTrue(new ConditionalCommand(new SetElevatorPositionCommand(
+                ElevatorConstants.kElevatorCoralLevel3Height), new NullCommand(),
+                () -> m_climbSubsystem.isFunnelUnlocked()));
 
-
-        // Elevator algae positions
-        m_operatorController.povDown()
-                .onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeLowHeight));
-        m_operatorController.povUp()
-                .onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeHighHeight));
+        m_operatorController.povUp().onTrue(new ConditionalCommand(new SetElevatorPositionCommand(
+                ElevatorConstants.kElevatorAlgaeHighHeight), new NullCommand(),
+                () -> !m_climbSubsystem.isFunnelUnlocked()));
+         m_operatorController.povDown().onTrue(new ConditionalCommand(new SetElevatorPositionCommand(
+                ElevatorConstants.kElevatorAlgaeLowHeight), new NullCommand(),
+                () -> !m_climbSubsystem.isFunnelUnlocked()));
 
         // ======= Test bindings =======
 
