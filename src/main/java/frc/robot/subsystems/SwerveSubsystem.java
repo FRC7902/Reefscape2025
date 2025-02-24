@@ -8,6 +8,7 @@ import static edu.wpi.first.units.Units.Meter;
 import java.io.File;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+import com.ctre.phoenix6.swerve.SimSwerveDrivetrain.SimSwerveModule;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
@@ -16,6 +17,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -28,6 +31,12 @@ import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 
+import com.pathplanner.lib.util.PathPlannerLogging;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+
+
 public class SwerveSubsystem extends SubsystemBase {
 
     /**
@@ -36,7 +45,7 @@ public class SwerveSubsystem extends SubsystemBase {
     private final SwerveDrive swerveDrive;
 
     private RobotConfig robotConfig;
-
+  
     /** Creates a new SwerveSubsystem. */
     public SwerveSubsystem(File directory) {
         // Configure the Telemetry before creating the SwerveDrive to avoid unnecessary
@@ -75,7 +84,10 @@ public class SwerveSubsystem extends SubsystemBase {
         } catch (Exception e) {
             // Handle exception as needed
             e.printStackTrace();
+
         }
+
+        
 
         AutoBuilder.configure(this::getPose, // Robot pose supplier
                 this::resetOdometry, // Method to reset odometry (will be called if your auto has a
