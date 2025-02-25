@@ -117,8 +117,9 @@ public class RobotContainer {
                      NamedCommands.registerCommand("Coral Intake", new IntakeCoralCommand(Constants.CoralIndexerConstants.kIntakePower));
                      NamedCommands.registerCommand("Coral Correcter", new CorrectCoralPositionCommand());
                      NamedCommands.registerCommand("Coral Outake", new OuttakeCoralCommand());
-
-
+                     NamedCommands.registerCommand("Low Algae", new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeLowHeight));
+                     NamedCommands.registerCommand("High Algae", new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeHighHeight));
+                     NamedCommands.registerCommand("Lowest Height", new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralStationHeight));
 
                     // preloads the path
                     autoChooser.setDefaultOption("Full KL", new PathPlannerAuto("Start_Left_Full_KL"));
