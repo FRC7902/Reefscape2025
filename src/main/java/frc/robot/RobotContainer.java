@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ElevatorConstants;
@@ -55,8 +56,10 @@ public class RobotContainer {
     // Replace with CommandPS4Controller or CommandJoystick if needed
     public static final CommandXboxController m_driverController =
             new CommandXboxController(OperatorConstants.kDriverControllerPort);
-    public static final CommandXboxController m_operatorController =
-            new CommandXboxController(OperatorConstants.kOperatorControllerPort);
+    // public static final CommandXboxController m_operatorController =
+    // new CommandXboxController(OperatorConstants.kOperatorControllerPort);
+    public static final CommandPS5Controller m_operatorController =
+            new CommandPS5Controller(OperatorConstants.kOperatorControllerPort);
 
     public static final SwerveSubsystem drivebase =
             new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
@@ -166,8 +169,8 @@ public class RobotContainer {
         m_driverController.povUp().whileTrue(new ConditionalCommand(new MoveClimbUpCommand(),
                 new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
         m_driverController.povDown().whileTrue(new ConditionalCommand(new MoveClimbDownCommand(),
-        new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
-        
+                new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
+
 
         m_indexSubsystem
                 .setDefaultCommand(
@@ -178,13 +181,25 @@ public class RobotContainer {
                                                 .withTimeout(1)));
 
         // Elevator coral positions
-        m_operatorController.x().onTrue(
+
+        // Xbox Controller
+        // m_operatorController.x().onTrue(
+        // new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel1Height));
+        // m_operatorController.a().onTrue(new SetElevatorPositionCommand(
+        // ElevatorConstants.kElevatorCoralStationAndProcessorHeight));
+        // m_operatorController.b().onTrue(
+        // new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel2Height));
+        // m_operatorController.y().onTrue(
+        // new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel3Height));
+
+        // PS5 Controller
+        m_operatorController.square().onTrue(
                 new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel1Height));
-        m_operatorController.a().onTrue(new SetElevatorPositionCommand(
+        m_operatorController.cross().onTrue(new SetElevatorPositionCommand(
                 ElevatorConstants.kElevatorCoralStationAndProcessorHeight));
-        m_operatorController.b().onTrue(
+        m_operatorController.circle().onTrue(
                 new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel2Height));
-        m_operatorController.y().onTrue(
+        m_operatorController.triangle().onTrue(
                 new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel3Height));
 
 
