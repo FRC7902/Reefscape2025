@@ -43,7 +43,7 @@ public class ClimbSubsystem extends SubsystemBase {
 
     // Object creation of absolute encoder. The REV Through bore encoder is used for climb
     // The DutyCycleEncoder is used as the REV Through bore encoder is an absolute encoder that uses PWM via one of the DI (Digital IO) pins on the RIO
-    private final DutyCycleEncoder m_absoluteEncoder = new DutyCycleEncoder(ClimbConstants.kRevThroughBoreIO);
+    private final DutyCycleEncoder m_absoluteEncoder = new DutyCycleEncoder(ClimbConstants.kRevThroughBoreIO, 360, 0); //need to find exact angle where climb is 90 degrees to the horizontal
     private final DutyCycleEncoderSim s_absoluteEncoder = new DutyCycleEncoderSim(m_absoluteEncoder);
 
     //variable used during initialization of robot to ensure initialization functions stop running when they are no longer needed
