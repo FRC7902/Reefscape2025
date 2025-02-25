@@ -11,6 +11,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.DutyCycleEncoderSim;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
@@ -28,8 +29,8 @@ public class ClimbSubsystem extends SubsystemBase {
     private final SparkMax m_climbLeaderMotor = new SparkMax(ClimbConstants.kClimbLeaderMotorCANID, MotorType.kBrushless);
     private final SparkMax m_climbFollowerMotor = new SparkMax(ClimbConstants.kClimbFollowerMotorCANID, MotorType.kBrushless);
 
-    //object creation of controller (reference to m_operatorController in RobotContainer)
-    private final CommandXboxController m_operatorController;
+    private final Servo m_leftServo = new Servo(ClimbConstants.kLeftServoID);
+    private final Servo m_rightServo = new Servo(ClimbConstants.kRightServoID);
 
     //object creation of simulation placeholder motor
     private final DCMotor motorSim = DCMotor.getNeo550(2);
@@ -45,6 +46,8 @@ public class ClimbSubsystem extends SubsystemBase {
     // The DutyCycleEncoder is used as the REV Through bore encoder is an absolute encoder that uses PWM via one of the DI (Digital IO) pins on the RIO
     private final DutyCycleEncoder m_absoluteEncoder = new DutyCycleEncoder(ClimbConstants.kRevThroughBoreIO, 360, 0); //need to find exact angle where climb is 90 degrees to the horizontal
     private final DutyCycleEncoderSim s_absoluteEncoder = new DutyCycleEncoderSim(m_absoluteEncoder);
+
+    private boolean isFunnelUnlocked;
 
     //variable used during initialization of robot to ensure initialization functions stop running when they are no longer needed
     private int setupClimb = 0; 
@@ -64,7 +67,7 @@ public class ClimbSubsystem extends SubsystemBase {
         0);
     
 
-    public ClimbSubsystem(CommandXboxController m_operatorController) {
+    public ClimbSubsystem() {
         //clears any previous faults on motors
         //do this so that any errors from previous usage are cleared
         //if any errors persist, then we know there's an issue with the motors
@@ -104,9 +107,8 @@ public class ClimbSubsystem extends SubsystemBase {
         m_climbLeaderMotor.configure(m_climbLeaderMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         m_climbFollowerMotor.configure(m_climbFollowerMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         
-        //creates a reference to the operator controller object stored in RobotContainer
-        //to be used to rumble controller when climb reaches limit
-        this.m_operatorController = m_operatorController;
+        lockFunnel();
+        isFunnelUnlocked = false;
     }
 
     //powers motors with set voltage
@@ -136,13 +138,24 @@ public class ClimbSubsystem extends SubsystemBase {
     // -1 -> counter clockwise
     //  1 - > clockwise
     // do not put any other values in direction or you risk damaging the motors
+
+    public void runToAngle(CommandXboxController m_operatorController, double currentAngle, double targetAngle, double direction) {
+        if (currentAngle * direction < targetAngle * direction) {
+            driveMotors(12 * direction);
+        }
+        else if (currentAngle * direction >= targetAngle * direction) {
+            stopMotors();
+            m_operatorController.setRumble(RumbleType.kBothRumble, 1);
+            setupClimb = 2;
+        }
+    }
+
     public void runToAngle(double currentAngle, double targetAngle, double direction) {
         if (currentAngle * direction < targetAngle * direction) {
             driveMotors(12 * direction);
         }
         else if (currentAngle * direction >= targetAngle * direction) {
             stopMotors();
-            rumbleOperatorController();
             setupClimb = 2;
         }
     }
@@ -171,19 +184,24 @@ public class ClimbSubsystem extends SubsystemBase {
         }
     }
 
-    //moves the climb clockwise to the angle specified upon the operator pressing the POV UP button (scheduled in RobotContainer)
-    public Command MoveClimbForward() {
-        return run(() -> runToAngle(getClimbArmAngle(), ClimbConstants.kClimbForwardLimit, 1));         
+    public void lockFunnel() {
+        m_leftServo.setAngle(80);
+        m_rightServo.setAngle(95);
     }
 
-    //moves the climb counter-clockwise to the angle specified upon the operator pressing the POV UP button (scheduled in RobotContainer)
-    public Command MoveClimbBackwards() {
-        return run(() -> runToAngle(getClimbArmAngle(), ClimbConstants.kClimbBackwardLimit, -1));         
-    }    
+    public void unlockFunnel() {
+        m_leftServo.setAngle(180);
+        m_rightServo.setAngle(0);
+        isFunnelUnlocked = true;
+    }
 
-    //rumbles the operator controller to indicate the climb has reached the forward/backward limit.
-    public void rumbleOperatorController() {
-        m_operatorController.setRumble(RumbleType.kBothRumble, 1);
+    public void stopFunnelServos() {
+        m_leftServo.setAngle(90);
+        m_rightServo.setAngle(90);
+    }
+
+    public boolean isFunnelUnlocked() {
+        return isFunnelUnlocked;
     }
 
     //function that is constantly run in code every 20 ms.

@@ -56,6 +56,8 @@ public final class Constants {
     //these values are used to ensure accuracy of the encoder's data
     public static final double kRevThroughBoreMinPulse = 0.000975609756; 
     public static final double kRevThroughBoreMaxPulse = 0.99902439;
+    public static final int kLeftServoID = 9;
+    public static final int kRightServoID = 8;
                                                                 }
                                                                 
   public static class OperatorConstants {

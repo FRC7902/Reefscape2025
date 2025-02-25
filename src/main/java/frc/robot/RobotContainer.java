@@ -27,6 +27,8 @@ import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.IndexSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.commands.climb.MoveClimbUpCommand;
+import frc.robot.commands.climb.MoveClimbDownCommand;
 import swervelib.SwerveInputStream;
 
 /**
@@ -46,7 +48,7 @@ public class RobotContainer {
     public static final AlgaeElevatorManipulatorSubsystem m_algaeElevatorManipulatorSubsystem = new AlgaeElevatorManipulatorSubsystem();
     // The robot's subsystems and commands are defined here...
     public static final ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
-    public final ClimbSubsystem m_climbSubsystem = new ClimbSubsystem(m_operatorController);
+    public static final ClimbSubsystem m_climbSubsystem = new ClimbSubsystem();
 
     public static final IndexSubsystem m_indexSubsystem = new IndexSubsystem();
 
@@ -161,10 +163,10 @@ public class RobotContainer {
 
         // runs the climb motors up when the up button is pressed on the POV buttons of
         // the controller.
-        m_operatorController.povUp().whileTrue(Commands.defer(() -> m_climbSubsystem.MoveClimbForward(), Set.of(m_climbSubsystem)));
+        m_operatorController.povUp().whileTrue(new MoveClimbUpCommand(m_climbSubsystem, m_operatorController));
         // runs the climb motors down when the down button is pressed on the POV buttons
         // of the controller.
-        m_operatorController.povDown().whileTrue(Commands.defer(() -> m_climbSubsystem.MoveClimbBackwards(), Set.of(m_climbSubsystem)));
+        m_operatorController.povDown().whileTrue(new MoveClimbDownCommand(m_climbSubsystem, m_operatorController));
     }
 
     /**
