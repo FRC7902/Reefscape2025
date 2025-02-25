@@ -30,7 +30,7 @@ public final class Constants {
     // // Check if this is
     // // correct
 
-    public static final double MAX_SPEED = Units.feetToMeters(12);
+    public static final double MAX_SPEED = Units.feetToMeters(15);
 
     public static class PathPlanner {
         public static final double kPDrive = 0.9;
