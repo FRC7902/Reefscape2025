@@ -13,73 +13,39 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import frc.robot.Constants.VisionConstants;
 
 public class Camera {
 
-    private final PhotonCamera camera;
-    private final PhotonPoseEstimator photonEstimator;
-    private final AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
-    private Matrix<N3, N1> curStdDevs;
+    private final PhotonCamera camera; //creates camera object
+    private final PhotonPoseEstimator photonEstimator; //creates pose estimator object
+    private Matrix<N3, N1> curStdDevs; //creates matrix for current standard deviations
 
 
     public Camera(String cameraName) {
-       this.camera = new PhotonCamera(cameraName);
+       this.camera = new PhotonCamera(cameraName); 
+       //creates a new camera object which is created in RobotContainer
        photonEstimator = new PhotonPoseEstimator(AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark), PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, VisionConstants.kRobotToCam);
+       //creates a PhotonPoseEstimator object which fuses the camera odometry and estimates the robot's position based on the april tag field layout
+       //the camera will combine the poses of the april tags it detects into one pose estimate
+       //an offset must be set if the camera is not centered
        photonEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+       //if the camera only detects one april tag, it will use the april tag that has the lowest ambiguity
     }
 
     public Optional<EstimatedRobotPose> getEstimatedGlobalPose() {
         Optional<EstimatedRobotPose> visionEst = Optional.empty();
+        //creates a new container object that can hold null values and non-null values
         for (var change : camera.getAllUnreadResults()) {
+            //gets the latest results from the camera
             visionEst = photonEstimator.update(change);
+            //updates vision estimates. will not update if no april tags have been detected
             updateEstimationStdDevs(visionEst, change.getTargets());
+            //updates the estimated standard deviations with the results
         }
         return visionEst;
-    }
-
-
-    public boolean isReefAprilTag(int aprilTagID) {
-        switch (aprilTagID) {
-            case -1: return false;
-            case 1: return false;
-            case 2: return false;
-            case 3: return false;
-            case 4: return false;
-            case 5: return false;
-            case 12: return false;
-            case 13: return false;
-            case 14: return false;
-            case 15: return false;
-            case 16: return false;
-            default: return true;
-        }
-    }
-
-    public Pose2d getAprilTagPose() {
-        Pose2d tagPose = null;
-        var results = camera.getAllUnreadResults();
-        if (!results.isEmpty()) {
-            // Camera processed a new frame since last
-            // Get the last one in the list.
-            var result = results.get(results.size() - 1);
-            if (result.hasTargets()) {
-                // At least one AprilTag was seen by the camera
-                for (var target : result.getTargets()) {
-                    int aprilTagID = target.getFiducialId();
-                    if (aprilTagFieldLayout.getTagPose(target.getFiducialId()).isPresent() && isReefAprilTag(aprilTagID)) {
-                        Transform3d tagTrans = target.getBestCameraToTarget();
-                        tagPose = new Pose2d(tagTrans.getX(), tagTrans.getY(), tagTrans.getRotation().toRotation2d());
-                        break;
-                    }
-                }
-            }        
-        }        
-        return tagPose;
     }
 
     private void updateEstimationStdDevs(
@@ -96,9 +62,13 @@ public class Camera {
 
             // Precalculation - see how many tags we found, and calculate an average-distance metric
             for (var tgt : targets) {
+                //gets the raw data from the camera
                 var tagPose = photonEstimator.getFieldTags().getTagPose(tgt.getFiducialId());
-                if (tagPose.isEmpty()) continue;
-                numTags++;
+                //obtains the pose value from the april tag that is detected by the camera
+                if (tagPose.isEmpty()) continue; //skips current iteration if there is no target detected
+                numTags++; //counts the number of tags the camera saw
+                //adds the average distance from the robot to the april tag
+                //to be used to calculate the average distance
                 avgDist += tagPose.get().toPose2d().getTranslation().getDistance(estimatedPose.get().estimatedPose.toPose2d().getTranslation());
             }
 
@@ -108,6 +78,7 @@ public class Camera {
             } else {
                 // One or more tags visible, run the full heuristic.
                 avgDist /= numTags;
+                //find saverage distance from robot to camera
                 // Decrease std devs if multiple targets are visible
                 if (numTags > 1) estStdDevs = VisionConstants.kMultiTagStdDevs;
                 // Increase std devs based on (average) distance

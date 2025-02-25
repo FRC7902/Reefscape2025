@@ -201,7 +201,6 @@ public class SwerveSubsystem extends SubsystemBase {
     }
   }
 
-
   public Command pathFindToClosestReef(Function<ReefSide, POI>point) {
     return AutoBuilder.pathfindToPose(point.apply(closestSide()).flipped(), constraints);
   }
@@ -220,7 +219,6 @@ public class SwerveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    //robotPose.setRobotPose(getCurrentPose());
     // This method will be called once per scheduler run
     SmartDashboard.putNumber("Gyro angle rotation (rad)", swerveDrive.getGyro().getRotation3d().getAngle());
     SmartDashboard.putNumber("X translation", swerveDrive.getPose().getX());
