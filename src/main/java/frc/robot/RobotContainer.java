@@ -7,6 +7,7 @@ package frc.robot;
 import java.io.File;
 import java.util.Map;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -109,6 +110,16 @@ public class RobotContainer {
                  * The container for the robot. Contains subsystems, OI devices, and commands.
                  */
                 public RobotContainer() {
+
+                     NamedCommands.registerCommand("Elevator L2", new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel2Height));
+                     NamedCommands.registerCommand("Elevator L3", new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel3Height));
+                     NamedCommands.registerCommand("Intake Algae", new IntakeAlgaeCommand());
+                     NamedCommands.registerCommand("Coral Intake", new IntakeCoralCommand(Constants.CoralIndexerConstants.kIntakePower));
+                     NamedCommands.registerCommand("Coral Correcter", new CorrectCoralPositionCommand());
+                     NamedCommands.registerCommand("Coral Outake", new OuttakeCoralCommand());
+
+
+
                     // preloads the path
                     autoChooser.setDefaultOption("Full KL", new PathPlannerAuto("Start_Left_Full_KL"));
                     autoChooser.addOption("Full IJ", new PathPlannerAuto("Start_Left_Full_IJ"));

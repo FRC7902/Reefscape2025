@@ -11,6 +11,18 @@
           }
         },
         {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Coral Outake"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "KL to Coral Station"
