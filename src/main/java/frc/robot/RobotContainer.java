@@ -5,8 +5,10 @@
 package frc.robot;
 
 import java.io.File;
+import java.util.Set;
 
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
@@ -20,8 +22,6 @@ import frc.robot.commands.teleop.IntakeAlgaeCommand;
 import frc.robot.commands.teleop.IntakeCoralCommand;
 import frc.robot.commands.teleop.NullCommand;
 import frc.robot.commands.teleop.OuttakeAlgaeCommand;
-import frc.robot.commands.teleopCommands.climb.MoveClimbBackwards;
-import frc.robot.commands.teleopCommands.climb.MoveClimbForward;
 import frc.robot.subsystems.AlgaeElevatorManipulatorSubsystem;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
@@ -39,19 +39,18 @@ import swervelib.SwerveInputStream;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
+    // Replace with CommandPS4Controller or CommandJoystick if needed       
+    public final CommandXboxController m_driverController = new CommandXboxController(OperatorConstants.kDriverControllerPort);
+    public final CommandXboxController m_operatorController = new CommandXboxController(OperatorConstants.kOperatorControllerPort);        
     // The robot's subsystems and commands are defined here...
     public static final AlgaeElevatorManipulatorSubsystem m_algaeElevatorManipulatorSubsystem = new AlgaeElevatorManipulatorSubsystem();
     // The robot's subsystems and commands are defined here...
     public static final ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
-    public static final ClimbSubsystem m_climbSubsystem = new ClimbSubsystem();
+    public final ClimbSubsystem m_climbSubsystem = new ClimbSubsystem(m_operatorController);
 
     public static final IndexSubsystem m_indexSubsystem = new IndexSubsystem();
 
-    // Replace with CommandPS4Controller or CommandJoystick if needed
-    public final CommandXboxController m_driverController = new CommandXboxController(
-            OperatorConstants.kDriverControllerPort);
-    public final CommandXboxController m_operatorController = new CommandXboxController(
-            OperatorConstants.kOperatorControllerPort);
+
 
     private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
             "swerve"));
@@ -162,10 +161,10 @@ public class RobotContainer {
 
         // runs the climb motors up when the up button is pressed on the POV buttons of
         // the controller.
-        m_operatorController.povUp().whileTrue(new MoveClimbForward(this));
+        m_operatorController.povUp().whileTrue(Commands.defer(() -> m_climbSubsystem.MoveClimbForward(), Set.of(m_climbSubsystem)));
         // runs the climb motors down when the down button is pressed on the POV buttons
         // of the controller.
-        m_operatorController.povDown().whileTrue(new MoveClimbBackwards(this));
+        m_operatorController.povDown().whileTrue(Commands.defer(() -> m_climbSubsystem.MoveClimbBackwards(), Set.of(m_climbSubsystem)));
     }
 
     /**
@@ -177,6 +176,7 @@ public class RobotContainer {
     // // An example command will be run in autonomous
     // return Autos.exampleAuto(m_exampleSubsystem);
     // }
+
 
     public void setMotorBrake(boolean brake) {
         drivebase.setMotorBrake(brake);

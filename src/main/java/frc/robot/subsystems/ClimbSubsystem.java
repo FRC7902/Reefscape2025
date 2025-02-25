@@ -1,6 +1,5 @@
 package frc.robot.subsystems;
 import com.revrobotics.sim.SparkMaxSim;
-import com.revrobotics.spark.SparkBase.Faults;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -9,15 +8,17 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.DutyCycleEncoderSim;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.ClimbConstants;
 import frc.robot.Robot;
 
@@ -26,6 +27,9 @@ public class ClimbSubsystem extends SubsystemBase {
     //object creation of motors
     private final SparkMax m_climbLeaderMotor = new SparkMax(ClimbConstants.kClimbLeaderMotorCANID, MotorType.kBrushless);
     private final SparkMax m_climbFollowerMotor = new SparkMax(ClimbConstants.kClimbFollowerMotorCANID, MotorType.kBrushless);
+
+    //object creation of controller (reference to m_operatorController in RobotContainer)
+    private final CommandXboxController m_operatorController;
 
     //object creation of simulation placeholder motor
     private final DCMotor motorSim = DCMotor.getNeo550(2);
@@ -42,7 +46,10 @@ public class ClimbSubsystem extends SubsystemBase {
     private final DutyCycleEncoder m_absoluteEncoder = new DutyCycleEncoder(ClimbConstants.kRevThroughBoreIO);
     private final DutyCycleEncoderSim s_absoluteEncoder = new DutyCycleEncoderSim(m_absoluteEncoder);
 
-     
+    //variable used during initialization of robot to ensure initialization functions stop running when they are no longer needed
+    private int setupClimb = 0; 
+
+    //to be updated
     private final ElevatorSim m_climbSim =
     new ElevatorSim(
         motorSim,
@@ -57,8 +64,7 @@ public class ClimbSubsystem extends SubsystemBase {
         0);
     
 
-    public ClimbSubsystem() {
-    
+    public ClimbSubsystem(CommandXboxController m_operatorController) {
         //clears any previous faults on motors
         //do this so that any errors from previous usage are cleared
         //if any errors persist, then we know there's an issue with the motors
@@ -97,6 +103,10 @@ public class ClimbSubsystem extends SubsystemBase {
         //these parameters will persist. This is incredibly important as without this, all parameters are wiped on reboot.        
         m_climbLeaderMotor.configure(m_climbLeaderMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         m_climbFollowerMotor.configure(m_climbFollowerMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        
+        //creates a reference to the operator controller object stored in RobotContainer
+        //to be used to rumble controller when climb reaches limit
+        this.m_operatorController = m_operatorController;
     }
 
     //powers motors with set voltage
@@ -104,19 +114,16 @@ public class ClimbSubsystem extends SubsystemBase {
         m_climbLeaderMotor.setVoltage(voltage);
     }
 
-    //Returns the reading of the encoder.
+    //Returns the reading of the encoder in degrees.
     public double getClimbArmAngle() {
         return m_absoluteEncoder.get() * 360;
     } 
 
     //315.1 degrees - true 90
-
-    public double getEncoderOffset() {
-        return 315.1;
-    }
-
-    public double getSimEncoderDistance() {
-        return (s_absoluteEncoder.get() * 360) - getEncoderOffset();
+    //110.1 degrees - angle of attack
+    //205.1 degrees - angle limit when climbing up
+    public double getSimClimbArmAngle() {
+        return (s_absoluteEncoder.get() * 360);
     }
 
     //Stops outputting to motors.
@@ -124,82 +131,103 @@ public class ClimbSubsystem extends SubsystemBase {
         m_climbLeaderMotor.stopMotor();
     }
     
-    //This function returns the type of error the motor is experiencing should it have an error.
-    public String reportMotorError(SparkMax motor) {
-        Faults motorFault = motor.getFaults();
-        if (motorFault.can) {
-            return "CAN";
+    //drives arm to specified angle
+    //direction determines which way the arm should go
+    // -1 -> counter clockwise
+    //  1 - > clockwise
+    // do not put any other values in direction or you risk damaging the motors
+    public void runToAngle(double currentAngle, double targetAngle, double direction) {
+        if (currentAngle * direction < targetAngle * direction) {
+            driveMotors(12 * direction);
         }
-        else if (motorFault.escEeprom) {
-            return "ESC_EEPROM";
+        else if (currentAngle * direction >= targetAngle * direction) {
+            stopMotors();
+            rumbleOperatorController();
+            setupClimb = 2;
         }
-        else if (motorFault.firmware) {
-            return "FIRMWARE";
+    }
+
+    //positions the climb to the attack position after being homed
+    //this is only called once during initialization of the robot and is run after the climb is homed
+    public void setClimbToAttack() {
+        runToAngle(getClimbArmAngle(), ClimbConstants.kClimbForwardLimit, 1);
+    }
+
+    //drives the climb to its default position, which is 90 degrees from the horizontal
+    public void homeClimb() {
+        if (setupClimb == 0) {
+            if (getClimbArmAngle() == ClimbConstants.kClimbHomePose) { //to test, may require rounding
+                //ensures the homeClimb function will stop running as it is no longer necessary
+                setupClimb = 1;         
+            }
+            else if (getClimbArmAngle() > ClimbConstants.kClimbHomePose) { //adjustment of encoder is necessary for this to work
+                //moves climb backwards
+                runToAngle(getClimbArmAngle(), ClimbConstants.kClimbHomePose, -1);
+            }
+            else if (getClimbArmAngle() < ClimbConstants.kClimbHomePose) {
+                //moves climb forward
+                runToAngle(getClimbArmAngle(), ClimbConstants.kClimbHomePose, 1); //adjustment of encoder is necessary for this to work
+            }
         }
-        else if (motorFault.gateDriver) {
-            return "GATE_DRIVER";
-        }
-        else if (motorFault.motorType) {
-            return "MOTOR_TYPE";
-        }
-        else if (motorFault.sensor) {
-            return "SENSOR";
-        } 
-        else if (motorFault.temperature) {
-            return "TEMPERATURE";
-        }
-        return null;        
+    }
+
+    //moves the climb clockwise to the angle specified upon the operator pressing the POV UP button (scheduled in RobotContainer)
+    public Command MoveClimbForward() {
+        return run(() -> runToAngle(getClimbArmAngle(), ClimbConstants.kClimbForwardLimit, 1));         
+    }
+
+    //moves the climb counter-clockwise to the angle specified upon the operator pressing the POV UP button (scheduled in RobotContainer)
+    public Command MoveClimbBackwards() {
+        return run(() -> runToAngle(getClimbArmAngle(), ClimbConstants.kClimbBackwardLimit, -1));         
+    }    
+
+    //rumbles the operator controller to indicate the climb has reached the forward/backward limit.
+    public void rumbleOperatorController() {
+        m_operatorController.setRumble(RumbleType.kBothRumble, 1);
     }
 
     //function that is constantly run in code every 20 ms.
     @Override
     public void periodic() {
-        //Displays live motor and limit switch metrics on SmartDashboard
+        //determines if robot is being simulated. if so, will not display the metrics below
         if (!(Robot.isSimulation())) {
+            //Displays live motor and limit switch metrics on SmartDashboard
             SmartDashboard.putNumber("Climb Arm Angle", getClimbArmAngle());
-            SmartDashboard.putBoolean("Climb Arm Stopped", m_climbLeaderMotor.get() == 0);
-
-            SmartDashboard.putNumber("Climb Motor (" + ClimbConstants.kClimbLeaderMotorCANID + ") Speed", m_climbLeaderMotor.get());
-            SmartDashboard.putNumber("Climb Motor (" + ClimbConstants.kClimbLeaderMotorCANID + ") Bus Voltage", m_climbLeaderMotor.getBusVoltage());
+            SmartDashboard.putNumber("Climb Motor Speed", m_climbLeaderMotor.get());
             SmartDashboard.putNumber("Climb Motor (" + ClimbConstants.kClimbLeaderMotorCANID + ") Current", m_climbLeaderMotor.getOutputCurrent());
-            SmartDashboard.putNumber("Climb Motor (" + ClimbConstants.kClimbLeaderMotorCANID + ") Temperature", m_climbLeaderMotor.getMotorTemperature());
-
-            SmartDashboard.putNumber("Climb Motor (" + ClimbConstants.kClimbFollowerMotorCANID + ") Speed", m_climbLeaderMotor.get());
-            SmartDashboard.putNumber("Climb Motor (" + ClimbConstants.kClimbFollowerMotorCANID + ") Bus Voltage", m_climbLeaderMotor.getBusVoltage());
             SmartDashboard.putNumber("Climb Motor (" + ClimbConstants.kClimbFollowerMotorCANID + ") Current", m_climbLeaderMotor.getOutputCurrent());
-            SmartDashboard.putNumber("Climb Motor (" + ClimbConstants.kClimbFollowerMotorCANID + ") Temperature", m_climbLeaderMotor.getMotorTemperature());
 
-            if (m_climbLeaderMotor.hasActiveFault()) {
-            DriverStation.reportWarning("MOTOR WARNING: Climb SPARK MAX ID " + ClimbConstants.kClimbLeaderMotorCANID + " is currently reporting an error with: \"" + reportMotorError(m_climbLeaderMotor) + "\"", true);
+            //home the climb when the robot boots up
+            if (setupClimb == 0) {
+                homeClimb();
             }
-            if (m_climbFollowerMotor.hasActiveFault()) {
-            DriverStation.reportWarning("MOTOR WARNING: Climb SPARK MAX ID " + ClimbConstants.kClimbFollowerMotorCANID + " is currently reporting an error with: \"" + reportMotorError(m_climbFollowerMotor) + "\"", true);
+            //sets climb to attack position after being homed
+            else if (setupClimb == 1) {
+                setClimbToAttack();
             }
         }
     }
 
+    //simulation code to be updated
     @Override
     public void simulationPeriodic() {
         //Displays live motor and limit switch metrics on SmartDashboard
-        if (Robot.isSimulation()) { 
-            //SmartDashboard.putNumber("Encoder reading", getEncoderDistance());
-            SmartDashboard.putBoolean("Climb stopped", s_climbLeaderMotor.getAppliedOutput() == 0);
-            SmartDashboard.putNumber("Motor Bus Voltage", s_climbLeaderMotor.getBusVoltage());
-            SmartDashboard.putNumber("Motor Current", s_climbLeaderMotor.getMotorCurrent());
-            SmartDashboard.putNumber("Climb Setpoint", s_climbLeaderMotor.getSetpoint());
-            SmartDashboard.putNumber("Applied Output", s_climbLeaderMotor.getAppliedOutput());
-            SmartDashboard.putNumber("Climb Velocity", s_climbLeaderMotor.getVelocity());
-            SmartDashboard.putNumber("Climb Position", s_climbLeaderMotor.getPosition());
+        //SmartDashboard.putNumber("Encoder reading", getEncoderDistance());
+        SmartDashboard.putBoolean("Climb stopped", s_climbLeaderMotor.getAppliedOutput() == 0);
+        SmartDashboard.putNumber("Motor Bus Voltage", s_climbLeaderMotor.getBusVoltage());
+        SmartDashboard.putNumber("Motor Current", s_climbLeaderMotor.getMotorCurrent());
+        SmartDashboard.putNumber("Climb Setpoint", s_climbLeaderMotor.getSetpoint());
+        SmartDashboard.putNumber("Applied Output", s_climbLeaderMotor.getAppliedOutput());
+        SmartDashboard.putNumber("Climb Velocity", s_climbLeaderMotor.getVelocity());
+        SmartDashboard.putNumber("Climb Position", s_climbLeaderMotor.getPosition());
 
 
-            //Checks to see if motors are going upwards and if the encoder has reached the set limit
-
-            s_climbLeaderMotor.iterate(m_climbLeaderMotor.getAppliedOutput(), 12, 0.02);
-            m_climbSim.setInput(s_climbLeaderMotor.getVelocity() * RobotController.getBatteryVoltage());
-            m_climbSim.update(0.020);
-            s_absoluteEncoder.set(m_climbSim.getPositionMeters());
-            RoboRioSim.setVInVoltage(
-                        BatterySim.calculateDefaultBatteryLoadedVoltage(m_climbSim.getCurrentDrawAmps()));
-            }
+        s_climbLeaderMotor.iterate(m_climbLeaderMotor.getAppliedOutput(), 12, 0.02);
+        m_climbSim.setInput(s_climbLeaderMotor.getVelocity() * RobotController.getBatteryVoltage());
+        m_climbSim.update(0.020);
+        s_absoluteEncoder.set(m_climbSim.getPositionMeters());
+        RoboRioSim.setVInVoltage(
+                    BatterySim.calculateDefaultBatteryLoadedVoltage(m_climbSim.getCurrentDrawAmps()));
+            
     }
 }
