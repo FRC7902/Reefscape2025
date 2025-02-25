@@ -8,7 +8,8 @@ import java.io.File;
 import java.util.Map;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.events.EventTrigger;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -123,6 +124,17 @@ public class RobotContainer {
 
         // Another option that allows you to specify the default auto by its name
         // autoChooser = AutoBuilder.buildAutoChooser("My Default Auto");
+
+        // Register Named Commands
+        // NamedCommands.registerCommand("exampleCommand", exampleSubsystem.exampleCommand());
+        // NamedCommands.registerCommand("someOtherCommand", new SomeOtherCommand());
+
+        // Register Event Triggers
+        // new EventTrigger("run intake").whileTrue(Commands.print("running intake"));
+        // new EventTrigger("shoot note").and(new Trigger(exampleSubsystem::someCondition)).onTrue(Commands.print("shoot note");
+
+        // Point Towards Zone Triggers
+        // new PointTowardsZoneTrigger("Speaker").whileTrue(Commands.print("aiming at speaker"));
 
         SmartDashboard.putData("Auto Chooser", autoChooser);
     }
