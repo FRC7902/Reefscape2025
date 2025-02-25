@@ -8,7 +8,6 @@ import static edu.wpi.first.units.Units.Meter;
 import java.io.File;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
-import com.ctre.phoenix6.swerve.SimSwerveDrivetrain.SimSwerveModule;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
@@ -34,7 +33,10 @@ import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+
 
 
 public class SwerveSubsystem extends SubsystemBase {
@@ -43,8 +45,14 @@ public class SwerveSubsystem extends SubsystemBase {
      * Swerve drive object.
      */
     private final SwerveDrive swerveDrive;
+    SwerveModuleState[] states;
 
+    private final StructArrayPublisher<SwerveModuleState> m_moduleStatePublisher;
+    private Pose2d swervePose2D;
     private RobotConfig robotConfig;
+
+   
+
   
     /** Creates a new SwerveSubsystem. */
     public SwerveSubsystem(File directory) {
@@ -127,14 +135,41 @@ public class SwerveSubsystem extends SubsystemBase {
                 }, this // Reference to this subsystem to set requirements
         );
 
+        m_moduleStatePublisher = NetworkTableInstance.getDefault()
+        .getStructArrayTopic("/SwerveStates", SwerveModuleState.struct).publish();
+
+       
+
+
 
     }
+
 
     @Override
     public void periodic() {
         // This method will be called once per scheduler run
         SmartDashboard.putNumber("Gyro angle rotation (rad)",
                 swerveDrive.getGyro().getRotation3d().getAngle());
+
+                states = swerveDrive.getStates();
+
+                swervePose2D = getPose();
+                
+                SmartDashboard.putNumber("FL Angle (deg)", states[0].angle.getDegrees());
+                SmartDashboard.putNumber("FR Angle (deg)", states[1].angle.getDegrees());
+                SmartDashboard.putNumber("BL Angle (deg)", states[2].angle.getDegrees());
+                SmartDashboard.putNumber("BR Angle (deg)", states[3].angle.getDegrees());
+            
+                SmartDashboard.putNumber("FL Speed (m/s)", states[0].speedMetersPerSecond);
+                SmartDashboard.putNumber("FR Speed (m/s)", states[1].speedMetersPerSecond);
+                SmartDashboard.putNumber("BL Speed (m/s)", states[2].speedMetersPerSecond);
+                SmartDashboard.putNumber("BR Speed (m/s)", states[3].speedMetersPerSecond);
+            
+                SwerveModuleState[] states = swerveDrive.getStates();
+                SmartDashboard.putNumber("Swerve Yaw", swerveDrive.getGyroRotation3d().getZ());
+            
+            
+                m_moduleStatePublisher.set(states);
     }
 
     /**

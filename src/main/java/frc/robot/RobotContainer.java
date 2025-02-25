@@ -7,6 +7,7 @@ package frc.robot;
 import java.io.File;
 import java.util.Map;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -47,8 +48,8 @@ public class RobotContainer {
     // The robot's subsystems and commands are defined here...
     public static final ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
     public static final ClimbSubsystem m_climbSubsystem = new ClimbSubsystem();
-
     public static final CoralIndexerSubsystem m_indexSubsystem = new CoralIndexerSubsystem();
+
 
     // Replace with CommandPS4Controller or CommandJoystick if needed
     private final CommandXboxController m_driverController =
@@ -58,61 +59,70 @@ public class RobotContainer {
 
     private final SwerveSubsystem drivebase =
             new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
-    private final SendableChooser<Command> autoChooser;
-
-    private boolean isInComp = false;
-
-
-    /**
-     * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular
-     * velocity.
-     */
-    SwerveInputStream driveAngularVelocity = SwerveInputStream
-            .of(drivebase.getSwerveDrive(), () -> m_driverController.getLeftY() * -1,
-                    () -> m_driverController.getLeftX() * -1)
-            .withControllerRotationAxis(m_driverController::getRightX)
-            .deadband(OperatorConstants.DEADBAND).scaleTranslation(0.8)
-            .allianceRelativeControl(true);
-
-    /**
-     * Clone's the angular velocity input stream and converts it to a fieldRelative input stream.
-     */
-    SwerveInputStream driveDirectAngle = driveAngularVelocity.copy()
-            .withControllerHeadingAxis(m_driverController::getRightX, m_driverController::getRightY)
-            .headingWhile(true);
-
-    /**
-     * Clone's the angular velocity input stream and converts it to a robotRelative input stream.
-     */
-    SwerveInputStream driveRobotOriented =
-            driveAngularVelocity.copy().robotRelative(true).allianceRelativeControl(false);
-
-    SwerveInputStream driveAngularVelocityKeyboard = SwerveInputStream
-            .of(drivebase.getSwerveDrive(), () -> -m_driverController.getLeftY(),
-                    () -> -m_driverController.getLeftX())
-            .withControllerRotationAxis(() -> m_driverController.getRawAxis(2))
-            .deadband(OperatorConstants.DEADBAND).scaleTranslation(0.8)
-            .allianceRelativeControl(true);
-
-    // Derive the heading axis with math!
-    SwerveInputStream driveDirectAngleKeyboard = driveAngularVelocityKeyboard.copy()
-            .withControllerHeadingAxis(
-                    () -> Math.sin(m_driverController.getRawAxis(2) * Math.PI) * (Math.PI * 2),
-                    () -> Math.cos(m_driverController.getRawAxis(2) * Math.PI) * (Math.PI * 2))
-            .headingWhile(true);
-
-    /**
-     * The container for the robot. Contains subsystems, OI devices, and commands.
-     */
-    public RobotContainer() {
-        // Configure the trigger bindings
-        configureBindings();
-        autoChooser = AutoBuilder.buildAutoChooserWithOptionsModifier(
+            private SendableChooser<Command> autoChooser = new SendableChooser<>(); // Initialize here
+            
+            
+                private boolean isInComp = false;
+            
+            
+            
+            
+                /**
+                 * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular
+                 * velocity.
+                 */
+                SwerveInputStream driveAngularVelocity = SwerveInputStream
+                        .of(drivebase.getSwerveDrive(), () -> m_driverController.getLeftY() * -1,
+                                () -> m_driverController.getLeftX() * -1)
+                        .withControllerRotationAxis(m_driverController::getRightX)
+                        .deadband(OperatorConstants.DEADBAND).scaleTranslation(0.8)
+                        .allianceRelativeControl(true);
+            
+                /**
+                 * Clone's the angular velocity input stream and converts it to a fieldRelative input stream.
+                 */
+                SwerveInputStream driveDirectAngle = driveAngularVelocity.copy()
+                        .withControllerHeadingAxis(m_driverController::getRightX, m_driverController::getRightY)
+                        .headingWhile(true);
+            
+                /**
+                 * Clone's the angular velocity input stream and converts it to a robotRelative input stream.
+                 */
+                SwerveInputStream driveRobotOriented =
+                        driveAngularVelocity.copy().robotRelative(true).allianceRelativeControl(false);
+            
+                SwerveInputStream driveAngularVelocityKeyboard = SwerveInputStream
+                        .of(drivebase.getSwerveDrive(), () -> -m_driverController.getLeftY(),
+                                () -> -m_driverController.getLeftX())
+                        .withControllerRotationAxis(() -> m_driverController.getRawAxis(2))
+                        .deadband(OperatorConstants.DEADBAND).scaleTranslation(0.8)
+                        .allianceRelativeControl(true);
+            
+                // Derive the heading axis with math!
+                SwerveInputStream driveDirectAngleKeyboard = driveAngularVelocityKeyboard.copy()
+                        .withControllerHeadingAxis(
+                                () -> Math.sin(m_driverController.getRawAxis(2) * Math.PI) * (Math.PI * 2),
+                                () -> Math.cos(m_driverController.getRawAxis(2) * Math.PI) * (Math.PI * 2))
+                        .headingWhile(true);
+            
+                /**
+                 * The container for the robot. Contains subsystems, OI devices, and commands.
+                 */
+                public RobotContainer() {
+                    // preloads the path
+                    autoChooser.setDefaultOption("Full KL", new PathPlannerAuto("Start_Left_Full_KL"));
+                    autoChooser.addOption("Full IJ", new PathPlannerAuto("Start_Left_Full_IJ"));
+                    
+                    SmartDashboard.putData("Auto Selector", autoChooser);
+                    // Configure the trigger bindings
+                    configureBindings();
+            
+                    autoChooser = AutoBuilder.buildAutoChooserWithOptionsModifier(
                 (stream) -> isInComp ? stream.filter(auto -> auto.getName().startsWith("comp"))
                         : stream);
-
+        
         SmartDashboard.putData("Auto Chooser", autoChooser);
-
+        
     }
 
     /**
