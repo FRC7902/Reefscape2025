@@ -108,7 +108,6 @@ public final class Constants {
         public static final double kElevatorD = 0.01;
 
         // Elevator Gains
-        // set all to 0 during testing
         public static final double kElevatorS = 0.0; // negligible
         public static final double kElevatorG = 0.2;
         public static final double kElevatorV = 6.85 * kElevatorMetersPerMotorRotation;

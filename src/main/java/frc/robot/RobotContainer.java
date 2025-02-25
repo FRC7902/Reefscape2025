@@ -183,13 +183,13 @@ public class RobotContainer {
                 () -> !m_climbSubsystem.isFunnelUnlocked()));
         m_operatorController.a().onTrue(new ConditionalCommand(new SetElevatorPositionCommand(
                 ElevatorConstants.kElevatorCoralStationAndProcessorHeight), new NullCommand(),
-                () -> m_climbSubsystem.isFunnelUnlocked()));
+                () -> !m_climbSubsystem.isFunnelUnlocked()));
         m_operatorController.b().onTrue(new ConditionalCommand(new SetElevatorPositionCommand(
                 ElevatorConstants.kElevatorCoralLevel2Height), new NullCommand(),
-                () -> m_climbSubsystem.isFunnelUnlocked()));
+                () -> !m_climbSubsystem.isFunnelUnlocked()));
         m_operatorController.y().onTrue(new ConditionalCommand(new SetElevatorPositionCommand(
                 ElevatorConstants.kElevatorCoralLevel3Height), new NullCommand(),
-                () -> m_climbSubsystem.isFunnelUnlocked()));
+                () -> !m_climbSubsystem.isFunnelUnlocked()));
 
         m_operatorController.povUp().onTrue(new ConditionalCommand(new SetElevatorPositionCommand(
                 ElevatorConstants.kElevatorAlgaeHighHeight), new NullCommand(),
