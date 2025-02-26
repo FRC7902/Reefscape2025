@@ -18,21 +18,21 @@ class ReefSideConstants {
     // leftTransform needs +X, -Y, rightTransform needs +X, +Y
     // Front of robot faces reef, so need a 180 degree turn
     public static final Transform2d leftTransform = new Transform2d(
-            kXOffsetDistanceMeters, frc.robot.Constants.VisionConstants.kTagMiddleToTagEdge, Rotation2d.k180deg);
+            kXOffsetDistanceMeters, VisionConstants.kTagMiddleToLeftEdge, Rotation2d.k180deg); //the transformation towards the left side of the april tag
     public static final Transform2d rightTransform = new Transform2d(
-            kXOffsetDistanceMeters, VisionConstants.kTagMiddleToTagEdge, Rotation2d.k180deg);
+            kXOffsetDistanceMeters, VisionConstants.kTagMiddleToRightEdge, Rotation2d.k180deg); //the transformation towards the right side of the april tag
 }
 
 public enum ReefSide {
-    R1(18),
+    R1(18), 
     R2(17),
     R3(22),
     R4(21),
     R5(20),
     R6(19); // Put these in whatever order matches an R1-6 mapping that makes sense for you.
 
-    public final POI left;
-    public final POI right;
+    public final POI left; //left point of intersection object
+    public final POI right; //right point of intersection object
 
     private ReefSide(POI left, POI right) {
         this.left = left;
