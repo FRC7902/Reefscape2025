@@ -5,17 +5,21 @@
 package frc.robot.commands.teleop.climb;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.RobotContainer;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class ReadyClimberAngle extends Command {
+public class ReadyClimberAngleCommand extends Command {
   /** Creates a new DeepClimb. */
-  public ReadyClimberAngle() {
+  public ReadyClimberAngleCommand() {
     // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(RobotContainer.m_climbSubsystem);
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    RobotContainer.m_climbSubsystem.setClimbToAttack();
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
@@ -23,11 +27,13 @@ public class ReadyClimberAngle extends Command {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    RobotContainer.m_climbSubsystem.stopMotors();
+  }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return RobotContainer.m_climbSubsystem.atAngle();    
   }
 }

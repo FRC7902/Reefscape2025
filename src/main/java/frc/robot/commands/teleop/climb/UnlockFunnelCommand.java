@@ -19,7 +19,6 @@ public class UnlockFunnelCommand extends Command {
   @Override
   public void initialize() {
     RobotContainer.m_climbSubsystem.unlockFunnel();
-    // TODO: Move climber to 155
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -35,7 +34,6 @@ public class UnlockFunnelCommand extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    // TODO: End command when climb reaches angle (155), and servo reaches unlocked angle
     return false;
   }
 }

@@ -4,7 +4,9 @@
 
 package frc.robot.commands.teleop.climb;
 
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.commands.teleop.elevator.SetElevatorPositionCommand;
 
@@ -16,9 +18,11 @@ public class InitiateClimbCommand extends SequentialCommandGroup {
   public InitiateClimbCommand() {
     
     addCommands(
-      new SetElevatorPositionCommand(ElevatorConstants.kElevatorMinHeightMeters).withTimeout(0.05),
-      new UnlockFunnelCommand(),
-      new ReadyClimberAngle() 
+      new SetElevatorPositionCommand(ElevatorConstants.kElevatorMinHeightMeters).withTimeout(1),
+      new ParallelCommandGroup(
+        new UnlockFunnelCommand(),  
+        new ReadyClimberAngleCommand() 
+      )
     );
   }
 }
