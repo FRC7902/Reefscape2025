@@ -7,37 +7,31 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Start Left Leave"
+            "pathName": "LeftLeaveToAB"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": " Start Left to AB"
+            "pathName": "ABLeftToCoralStation"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "AB to Coral Station"
+            "pathName": "CoralStationToABLeft"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Coral Station to AB"
+            "pathName": "ABLeftToCoralStation"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "AB to Coral Station"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Coral Station to AB"
+            "pathName": "CoralStationToABRight"
           }
         }
       ]
