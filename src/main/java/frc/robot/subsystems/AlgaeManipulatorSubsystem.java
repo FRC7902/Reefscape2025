@@ -9,7 +9,7 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
-
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -22,6 +22,7 @@ public class AlgaeManipulatorSubsystem extends SubsystemBase {
     private SparkMaxConfig m_motorConfig = new SparkMaxConfig();
 
     private DigitalInput m_beamBreak = new DigitalInput(AlgaeManipulatorConstants.kbeamBreakPortId);
+    private Debouncer m_debouncedBeamBreak = new Debouncer(1);
 
     /** Creates a new AlgaeElevatorManipulatorSubsystem. */
     public AlgaeManipulatorSubsystem() {
@@ -49,7 +50,8 @@ public class AlgaeManipulatorSubsystem extends SubsystemBase {
     }
 
     public boolean hasAlgae() {
-        return m_beamBreak.get();
+        // return m_beamBreak.get();
+        return m_debouncedBeamBreak.calculate(m_beamBreak.get());
     }
 
     @Override
