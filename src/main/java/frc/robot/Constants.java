@@ -91,7 +91,8 @@ public final class Constants {
         public static double kS = 1;
         public static double kV = 1;
 
-        public static final int kBeamSensorPort = 9;
+        public static final int kShallowBeamBreakPort = 9;
+        public static final int kDeepBeamBreakPort = -1;
 
     }
 

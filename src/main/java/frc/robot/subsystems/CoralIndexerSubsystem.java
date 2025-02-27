@@ -22,8 +22,9 @@ public class CoralIndexerSubsystem extends SubsystemBase {
             Constants.CoralIndexerConstants.kS, Constants.CoralIndexerConstants.kV);
 
     private RelativeEncoder m_encoder;
-    private DigitalInput m_beamSensor;
-    private Debouncer m_debouncedBeamBreak;
+
+    private DigitalInput m_shallowBeamBreak; // Beam break closer to funnel
+    private DigitalInput m_deepBeamBreak; // Beam break closer to exit
 
     public double m_indexSpeed = 0;
     public double m_volts = 0;
@@ -40,8 +41,9 @@ public class CoralIndexerSubsystem extends SubsystemBase {
                 PersistMode.kPersistParameters);
 
         m_encoder = m_indexMotor.getEncoder();
-        m_beamSensor = new DigitalInput(Constants.CoralIndexerConstants.kBeamSensorPort);
-        m_debouncedBeamBreak = new Debouncer(1);
+        m_shallowBeamBreak =
+                new DigitalInput(Constants.CoralIndexerConstants.kShallowBeamBreakPort);
+        m_deepBeamBreak = new DigitalInput(Constants.CoralIndexerConstants.kDeepBeamBreakPort);
     }
 
     public void setSpeed(double speed) {
@@ -70,8 +72,12 @@ public class CoralIndexerSubsystem extends SubsystemBase {
         m_indexMotorConfig.idleMode(IdleMode.kBrake);
     }
 
-    public boolean isBeamBroken() {
-        return !m_beamSensor.get();
+    public boolean isShallowBeamBroken() {
+        return !m_shallowBeamBreak.get();
+    }
+
+    public boolean isDeepBeamBroken() {
+        return !m_deepBeamBreak.get();
     }
 
     /**
@@ -80,7 +86,7 @@ public class CoralIndexerSubsystem extends SubsystemBase {
      * @return true if the coral has broken the beam for a significant amount of time
      */
     public boolean hasCoral() {
-        return m_debouncedBeamBreak.calculate(isBeamBroken());
+        return isDeepBeamBroken();
     }
 
     @Override
@@ -88,12 +94,8 @@ public class CoralIndexerSubsystem extends SubsystemBase {
         // This code runs in both real and simulation modes.
         // SmartDashboard.putNumber("Index Speed", m_indexSpeed);
         // SmartDashboard.putNumber("Motor Velocity (Encoder)", m_encoder.getVelocity());
-        SmartDashboard.putBoolean("Beam Sensor Broken", isBeamBroken());
-
-        // m_debouncedBeamBreak.calculate(m_beamSensor.get());
-
-
-
+        SmartDashboard.putBoolean("Shallow Beam Sensor Broken", isShallowBeamBroken());
+        SmartDashboard.putBoolean("Deep Beam Sensor Broken", isDeepBeamBroken());
     }
 
     @Override
