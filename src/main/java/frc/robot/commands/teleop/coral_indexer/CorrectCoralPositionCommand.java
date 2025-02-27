@@ -30,7 +30,7 @@ public class CorrectCoralPositionCommand extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (!RobotContainer.m_indexSubsystem.isBeamBroken()) {
+    if (!RobotContainer.m_indexSubsystem.isShallowBeamBroken()) {
       RobotContainer.m_indexSubsystem.setPower(-Constants.CoralIndexerConstants.kCorrectionPower);
     } else {
       RobotContainer.m_indexSubsystem.stop();
@@ -48,6 +48,6 @@ public class CorrectCoralPositionCommand extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return RobotContainer.m_indexSubsystem.hasCoral();
+    return RobotContainer.m_indexSubsystem.isShallowBeamBroken();
   }
 }

@@ -14,7 +14,6 @@ import frc.robot.RobotContainer;
  */
 public class IntakeCoralCommand extends Command {
 
-    private boolean beamBrokenInitially = false;
     private double m_power;
 
     /** Creates a new IntakeCoralCommand. */
@@ -27,15 +26,13 @@ public class IntakeCoralCommand extends Command {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        beamBrokenInitially = false;
     }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        if (RobotContainer.m_indexSubsystem.isBeamBroken()) {
+        if (RobotContainer.m_indexSubsystem.isShallowBeamBroken()) {
             RobotContainer.m_indexSubsystem.setPower(m_power);
-            beamBrokenInitially = true;
         } else {
             RobotContainer.m_indexSubsystem.stop();
         }
@@ -50,6 +47,6 @@ public class IntakeCoralCommand extends Command {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return beamBrokenInitially && !RobotContainer.m_indexSubsystem.isBeamBroken();
+        return !RobotContainer.m_indexSubsystem.isShallowBeamBroken() && RobotContainer.m_indexSubsystem.isDeepBeamBroken();
     }
 }
