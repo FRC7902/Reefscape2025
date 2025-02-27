@@ -78,8 +78,8 @@ public class RobotContainer {
      * velocity.
      */
     SwerveInputStream driveAngularVelocity = SwerveInputStream
-            .of(drivebase.getSwerveDrive(), () -> m_driverController.getLeftY() * -1,
-                    () -> m_driverController.getLeftX() * -1)
+            .of(drivebase.getSwerveDrive(), () -> m_driverController.getLeftY() * 1,
+                    () -> m_driverController.getLeftX() * 1)
             .withControllerRotationAxis(m_driverController::getRightX)
             .deadband(OperatorConstants.DEADBAND).scaleTranslation(0.8)
             .allianceRelativeControl(true);
@@ -134,7 +134,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("Coral Outake", new OuttakeCoralCommand());
         NamedCommands.registerCommand("Low Algae", new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeLowHeight));
         NamedCommands.registerCommand("High Algae", new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeHighHeight));
-        NamedCommands.registerCommand("Lowest Height", new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralStationHeight));
+        NamedCommands.registerCommand("Lowest Height", new SetElevatorPositionCommand(0));
 
        // preloads the path
        autoChooser.setDefaultOption("Full KL", new PathPlannerAuto("Start_Left_Full_KL"));
