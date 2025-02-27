@@ -41,6 +41,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
+import frc.robot.Constants.PathPlanner;
 import frc.robot.Robot;
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
@@ -170,9 +171,9 @@ public class SwerveSubsystem extends SubsystemBase {
                     new PPHolonomicDriveController(
                             // PPHolonomicController is the built in path following controller for
                             // holonomic drive trains
-                            new PIDConstants(5.0, 0.0, 0.0),
+                            new PIDConstants(PathPlanner.kPDrive, PathPlanner.kIDrive,PathPlanner.kDDrive),
                             // Translation PID constants
-                            new PIDConstants(5.0, 0.0, 0.0)
+                            new PIDConstants(PathPlanner.kPAngle, PathPlanner.kIAngle,PathPlanner.kDAngle)
                     // Rotation PID constants
                     ), config,
                     // The robot configuration
