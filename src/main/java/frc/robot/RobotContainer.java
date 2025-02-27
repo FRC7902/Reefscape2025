@@ -9,6 +9,7 @@ import java.util.Map;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.events.EventTrigger;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -125,9 +126,19 @@ public class RobotContainer {
         // Another option that allows you to specify the default auto by its name
         // autoChooser = AutoBuilder.buildAutoChooser("My Default Auto");
 
-        // Register Named Commands
-        // NamedCommands.registerCommand("exampleCommand", exampleSubsystem.exampleCommand());
-        // NamedCommands.registerCommand("someOtherCommand", new SomeOtherCommand());
+        NamedCommands.registerCommand("Elevator L2", new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel2Height));
+        NamedCommands.registerCommand("Elevator L3", new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel3Height));
+        NamedCommands.registerCommand("Intake Algae", new IntakeAlgaeCommand());
+        NamedCommands.registerCommand("Coral Intake", new IntakeCoralCommand(Constants.CoralIndexerConstants.kIntakePower));
+        NamedCommands.registerCommand("Coral Correcter", new CorrectCoralPositionCommand());
+        NamedCommands.registerCommand("Coral Outake", new OuttakeCoralCommand());
+        NamedCommands.registerCommand("Low Algae", new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeLowHeight));
+        NamedCommands.registerCommand("High Algae", new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeHighHeight));
+        NamedCommands.registerCommand("Lowest Height", new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralStationHeight));
+
+       // preloads the path
+       autoChooser.setDefaultOption("Full KL", new PathPlannerAuto("Start_Left_Full_KL"));
+       autoChooser.addOption("Full IJ", new PathPlannerAuto("Start_Left_Full_IJ"));
 
         // Register Event Triggers
         // new EventTrigger("run intake").whileTrue(Commands.print("running intake"));
