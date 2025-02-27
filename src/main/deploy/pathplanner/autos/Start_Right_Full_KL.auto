@@ -7,25 +7,31 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Start Left Leave"
+            "pathName": "LeftLeaveToKL"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Start Left to IJ"
+            "pathName": "KLeftToCoralStation"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Coral to IJ"
+            "pathName": "CoralStationToKLLeft"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "IJ to Coral Station"
+            "pathName": "KLeftToCoralStation"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": " CoralStationToKLRight"
           }
         }
       ]

@@ -7,37 +7,31 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Start Middle Leave"
+            "pathName": "LeftLeaveToAB"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Middle to Score IJ"
+            "pathName": "ABLeftToCoralStation"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Coral to IJ"
+            "pathName": "CoralStationToABLeft"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "IJ to Coral Station"
+            "pathName": "ABLeftToCoralStation"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Coral to IJ"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "IJ to Coral Station"
+            "pathName": "CoralStationToABRight"
           }
         }
       ]
