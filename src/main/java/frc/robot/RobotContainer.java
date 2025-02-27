@@ -166,8 +166,8 @@ public class RobotContainer {
         m_driverController.povUp().whileTrue(new ConditionalCommand(new MoveClimbUpCommand(),
                 new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
         m_driverController.povDown().whileTrue(new ConditionalCommand(new MoveClimbDownCommand(),
-        new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
-        
+                new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
+
 
         m_indexSubsystem
                 .setDefaultCommand(
