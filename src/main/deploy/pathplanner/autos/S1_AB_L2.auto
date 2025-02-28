@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "LeftLeaveToAB"
+            "pathName": "L2S1A"
           }
         },
         {
@@ -17,9 +17,15 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "coraloutakeoff"
+          }
+        },
+        {
           "type": "path",
           "data": {
-            "pathName": "ABLeftToCoralStation"
+            "pathName": "L2ACS"
           }
         },
         {
@@ -31,7 +37,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "CoralStationToARight"
+            "pathName": "L2CSB"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "coraloutakeoff"
           }
         }
       ]

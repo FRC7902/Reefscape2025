@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "L1LeftLeaveToKL"
+            "pathName": "L1S1K"
           }
         },
         {
@@ -19,7 +19,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "L1KLeftToCoralStation"
+            "pathName": "L1KCS"
           }
         },
         {
@@ -37,7 +37,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "L1CoralStationToKLRight"
+            "pathName": "L1CSL"
           }
         },
         {
