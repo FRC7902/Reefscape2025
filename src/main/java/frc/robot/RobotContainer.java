@@ -78,9 +78,9 @@ public class RobotContainer {
      * velocity.
      */
     SwerveInputStream driveAngularVelocity = SwerveInputStream
-            .of(drivebase.getSwerveDrive(), () -> m_driverController.getLeftY() * 1,
-                    () -> m_driverController.getLeftX() * 1)
-            .withControllerRotationAxis(m_driverController::getRightX)
+            .of(drivebase.getSwerveDrive(), () -> m_driverController.getLeftY() * -1,
+                    () -> m_driverController.getLeftX() * -1)
+            .withControllerRotationAxis(() -> m_driverController.getRightX() * -1)
             .deadband(OperatorConstants.DEADBAND).scaleTranslation(0.8)
             .allianceRelativeControl(true);
 
@@ -126,7 +126,7 @@ public class RobotContainer {
         // Another option that allows you to specify the default auto by its name
         // autoChooser = AutoBuilder.buildAutoChooser("My Default Auto");
 
-        NamedCommands.registerCommand("Elevator L2", new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel2Height));
+        NamedCommands.registerCommand("ElevatorL2", new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel2Height));
         NamedCommands.registerCommand("Elevator L3", new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel3Height));
         NamedCommands.registerCommand("Intake Algae", new IntakeAlgaeCommand());
         NamedCommands.registerCommand("Coral Intake", new IntakeCoralCommand(Constants.CoralIndexerConstants.kIntakePower));
@@ -141,7 +141,22 @@ public class RobotContainer {
        autoChooser.addOption("Full IJ", new PathPlannerAuto("Start_Left_Full_IJ"));
 
         // Register Event Triggers
-        // new EventTrigger("run intake").whileTrue(Commands.print("running intake"));
+        new EventTrigger("ElevatorL2").onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel2Height));
+        new EventTrigger("ElevatorL3").onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel3Height));
+        new EventTrigger("intakealgae").onTrue(new IntakeAlgaeCommand());
+        new EventTrigger("coralintake").onTrue(new IntakeCoralCommand(Constants.CoralIndexerConstants.kIntakePower));
+        new EventTrigger("coralcorrecter").onTrue(new CorrectCoralPositionCommand());
+        new EventTrigger("coraloutake").toggleOnTrue(new OuttakeCoralCommand());
+        new EventTrigger("lowalgae").onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeLowHeight));
+        new EventTrigger("highalgae").onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeHighHeight));
+        new EventTrigger("lowestheight").onTrue(new SetElevatorPositionCommand(0));
+
+
+
+
+
+
+
         // new EventTrigger("shoot note").and(new Trigger(exampleSubsystem::someCondition)).onTrue(Commands.print("shoot note");
 
         // Point Towards Zone Triggers

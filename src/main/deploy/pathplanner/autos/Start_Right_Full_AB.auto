@@ -11,27 +11,15 @@
           }
         },
         {
-          "type": "path",
+          "type": "wait",
           "data": {
-            "pathName": "ABLeftToCoralStation"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "CoralStationToABLeft"
+            "waitTime": 1.0
           }
         },
         {
           "type": "path",
           "data": {
             "pathName": "ABLeftToCoralStation"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "CoralStationToABRight"
           }
         }
       ]
