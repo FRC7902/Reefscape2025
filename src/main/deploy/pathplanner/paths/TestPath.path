@@ -33,7 +33,7 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "lowestheight",
+      "name": "",
       "waypointRelativePos": 0.25498575498575426,
       "endWaypointRelativePos": null,
       "command": null

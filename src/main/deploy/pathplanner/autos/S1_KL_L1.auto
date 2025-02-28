@@ -7,37 +7,49 @@
         {
           "type": "path",
           "data": {
-            "pathName": "LeftLeaveToKL"
+            "pathName": "L1LeftLeaveToKL"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "KLeftToCoralStation"
+            "pathName": "L1KLeftToCoralStation"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "coraloutakeoff"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "CoralStationToKLLeft"
+            "pathName": "L1CoralStationToKLRight"
           }
         },
         {
-          "type": "path",
+          "type": "wait",
           "data": {
-            "pathName": "KLeftToCoralStation"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": null
+            "waitTime": 2.0
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "KL",
   "choreoAuto": false
 }

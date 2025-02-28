@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.138587731811698,
-        "y": 7.4298858773181164
+        "x": 7.205250000000001,
+        "y": 7.48625
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.39493580599144,
-        "y": 4.777175463623394
+        "x": 5.719158746514238,
+        "y": 6.592245026231831
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 3.165263908701854,
-        "y": 4.168544935805992
+        "x": 3.8360655737704916,
+        "y": 5.1698258196721305
       },
       "prevControl": {
-        "x": 2.8552068473609125,
-        "y": 6.258559201141227
+        "x": 4.412445917434514,
+        "y": 5.521230484681911
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,13 +33,13 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "ElevatorL2",
-      "waypointRelativePos": 0.49810066476732695,
+      "name": "lowalgae",
+      "waypointRelativePos": 0.4996623902768337,
       "endWaypointRelativePos": null,
       "command": null
     },
     {
-      "name": "coraloutakeon",
+      "name": "intakealgaeon",
       "waypointRelativePos": 1.0,
       "endWaypointRelativePos": null,
       "command": null
@@ -55,7 +55,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -60.70863782901574
   },
   "reversed": false,
   "folder": null,

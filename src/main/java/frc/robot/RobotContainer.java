@@ -141,15 +141,17 @@ public class RobotContainer {
        autoChooser.addOption("Full IJ", new PathPlannerAuto("Start_Left_Full_IJ"));
 
         // Register Event Triggers
+        new EventTrigger("ElevatorL1").onTrue(new SetElevatorPositionCommand(0));
         new EventTrigger("ElevatorL2").onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel2Height));
         new EventTrigger("ElevatorL3").onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel3Height));
-        new EventTrigger("intakealgae").onTrue(new IntakeAlgaeCommand());
-        new EventTrigger("coralintake").onTrue(new IntakeCoralCommand(Constants.CoralIndexerConstants.kIntakePower));
-        new EventTrigger("coralcorrecter").onTrue(new CorrectCoralPositionCommand());
-        new EventTrigger("coraloutake").toggleOnTrue(new OuttakeCoralCommand());
+        new EventTrigger("intakealgaeon").toggleOnTrue(new IntakeAlgaeCommand());
+        new EventTrigger("intakealgaeoff").toggleOnTrue(new IntakeAlgaeCommand());
+        new EventTrigger("coraloutakeon").toggleOnTrue(new OuttakeCoralCommand());
+        new EventTrigger("coraloutakeoff").toggleOnFalse(new OuttakeCoralCommand());
         new EventTrigger("lowalgae").onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeLowHeight));
         new EventTrigger("highalgae").onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeHighHeight));
-        new EventTrigger("lowestheight").onTrue(new SetElevatorPositionCommand(0));
+        new EventTrigger("ElevatorL1").onTrue(new SetElevatorPositionCommand(0));
+
 
 
 
