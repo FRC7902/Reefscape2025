@@ -1,5 +1,8 @@
 {
-    "field_size": { "x": 17.548, "y": 8.052 },
+    "field_size": {
+        "x": 17.548,
+        "y": 8.052
+    },
     "nodeSizeMeters": 0.3,
     "grid": [
         [
