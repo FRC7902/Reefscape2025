@@ -5,44 +5,43 @@
 package frc.robot.commands.teleop.climb;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.ClimbConstants;
+import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.RobotContainer;
 
 public class MoveClimbUpCommand extends Command {
 
-    public MoveClimbUpCommand() {
+    private ClimbSubsystem m_climbSubsystem;
+    
+    public MoveClimbUpCommand(ClimbSubsystem m_climbSubsystem) {
         addRequirements(RobotContainer.m_climbSubsystem);
+        this.m_climbSubsystem = m_climbSubsystem;
     }
 
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        RobotContainer.m_climbSubsystem.stopMotors();
+        m_climbSubsystem.stopMotors();
     }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        /*
-         * if (RobotContainer.m_climbSubsystem.getEncoderDistance() <
-         * ClimbConstants.kClimbRaisedPosition) {
-         * RobotContainer.m_climbSubsystem.driveMotors(ClimbConstants. kClimbRaisedPosition); } else
-         * if (RobotContainer.m_climbSubsystem.getEncoderDistance() >=
-         * ClimbConstants.kClimbRaisedPosition) { RobotContainer.m_climbSubsystem.stopMotors();
-         * m_robotContainer.m_operatorController.setRumble(RumbleType.kBothRumble, 1); }
-         */
-        RobotContainer.m_climbSubsystem.setVoltage(ClimbConstants.kMotorVoltageUp);
+        //m_climbSubsystem.runToAngle(m_operatorController, m_climbSubsystem.getClimbArmAngle(), ClimbConstants.kClimbForwardLimit, 1);
+        m_climbSubsystem.driveMotors(-12);
     }
 
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-        RobotContainer.m_climbSubsystem.stopMotors();
+        m_climbSubsystem.stopMotors();
     }
 
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return false;
+     //   return m_climbSubsystem.isAtTargetAngle(m_climbSubsystem.getClimbArmAngle(), ClimbConstants.kClimbForwardLimit, 1);
+        return m_climbSubsystem.getClimbArmAngle() <= 90;
     }
 }

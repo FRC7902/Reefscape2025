@@ -41,6 +41,7 @@ import frc.robot.subsystems.CoralIndexerSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem.ElevatorPosition;
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.commands.teleop.climb.ManualClimb;
 import swervelib.SwerveInputStream;
 
 /**
@@ -218,10 +219,14 @@ public class RobotContainer {
         m_driverController.rightTrigger(0.05).whileTrue(new StrafeRightCommand());
 
         // Climb controls
-        m_driverController.povUp().whileTrue(new ConditionalCommand(new MoveClimbUpCommand(),
+        m_driverController.povUp().whileTrue(new ConditionalCommand(new ManualClimb(m_climbSubsystem, 12),
                 new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
-        m_driverController.povDown().whileTrue(new ConditionalCommand(new MoveClimbDownCommand(),
+        m_driverController.povDown().whileTrue(new ConditionalCommand(new ManualClimb(m_climbSubsystem, -12),
                 new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
+                m_driverController.povLeft().onTrue(new ConditionalCommand(new MoveClimbUpCommand(m_climbSubsystem),
+                new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
+        m_driverController.povRight().onTrue(new ConditionalCommand(new MoveClimbDownCommand(m_climbSubsystem),
+                new NullCommand(), m_climbSubsystem::isFunnelUnlocked));                
 
         m_indexSubsystem
                 .setDefaultCommand(

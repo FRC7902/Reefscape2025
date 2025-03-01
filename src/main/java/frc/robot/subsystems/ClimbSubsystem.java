@@ -1,7 +1,6 @@
 package frc.robot.subsystems;
-
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.sim.SparkMaxSim;
-import com.revrobotics.spark.SparkBase.Faults;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -10,127 +9,215 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Servo;
+import edu.wpi.first.wpilibj.simulation.BatterySim;
+import edu.wpi.first.wpilibj.simulation.DutyCycleEncoderSim;
+import edu.wpi.first.wpilibj.simulation.ElevatorSim;
+import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.ClimbConstants;
 import frc.robot.Robot;
 
 public class ClimbSubsystem extends SubsystemBase {
 
-    // object creation of motors
-    private final SparkMax m_leaderMotor =
-            new SparkMax(ClimbConstants.kClimbLeaderMotorCANID, MotorType.kBrushless);
-    private final SparkMax m_followerMotor =
-            new SparkMax(ClimbConstants.kClimbFollowerMotorCANID, MotorType.kBrushless);
+    //object creation of motors
+    private final SparkMax m_climbLeaderMotor = new SparkMax(ClimbConstants.kClimbLeaderMotorCANID, MotorType.kBrushless);
+    private final SparkMax m_climbFollowerMotor = new SparkMax(ClimbConstants.kClimbFollowerMotorCANID, MotorType.kBrushless);
 
-    private final DCMotor m_simMotor = DCMotor.getNeo550(2);
-
-    private final SparkMaxSim s_simLeaderMotor = new SparkMaxSim(m_leaderMotor, m_simMotor);
-
-    // object creation of motor configuration (used to configure tbe motors)
-    private final SparkMaxConfig m_leaderMotorConfig = new SparkMaxConfig();
-    private final SparkMaxConfig m_followerMotorConfig = new SparkMaxConfig();
-
-    // object creation of absolute encoder. The REV Through bore encoder is used for
-    // climb
-    private final DutyCycleEncoder m_absoluteEncoder =
-            new DutyCycleEncoder(ClimbConstants.kRevThroughBoreIO, 0, 0);
+    private final RelativeEncoder m_climbLeaderEncoder = m_climbLeaderMotor.getEncoder();
 
     private final Servo m_leftServo = new Servo(ClimbConstants.kLeftServoID);
     private final Servo m_rightServo = new Servo(ClimbConstants.kRightServoID);
 
+    //object creation of simulation placeholder motor
+    private final DCMotor motorSim = DCMotor.getNeo550(2);
+
+    //object creation of simulation SPARK MAX
+    private final SparkMaxSim s_climbLeaderMotor = new SparkMaxSim(m_climbLeaderMotor, motorSim);
+
+    //object creation of motor configuration (used to configure tbe motors)
+    private final SparkMaxConfig m_climbLeaderMotorConfig = new SparkMaxConfig();
+    private final SparkMaxConfig m_climbFollowerMotorConfig = new SparkMaxConfig();
+
+    // Object creation of absolute encoder. The REV Through bore encoder is used for climb
+    // The DutyCycleEncoder is used as the REV Through bore encoder is an absolute encoder that uses PWM via one of the DI (Digital IO) pins on the RIO
+    private final DutyCycleEncoder m_absoluteEncoder = new DutyCycleEncoder(ClimbConstants.kRevThroughBoreIO); //need to find exact angle where climb is 90 degrees to the horizontal
+    private final DutyCycleEncoderSim s_absoluteEncoder = new DutyCycleEncoderSim(m_absoluteEncoder);
+
     private boolean isFunnelUnlocked;
 
-    /*
-     * private final ElevatorSim m_climbSim = new ElevatorSim( motorSim, 5, 70, 6, 0, 100, true,
-     * 0.0, 0.01, 0);
-     */
+    //variable used during initialization of robot to ensure initialization functions stop running when they are no longer needed
+    private int setupClimb = 0; 
 
-    // object creation of bangbang controller
-    // bang-bang controllers are used in high-inertia system. Considering the climb
-    // will be carrying the whole robot, it falls under "high inertia".
-    // bang-bang controllers have faster recovery times than pid controllers,
-    // resulting in the control effort in the front direction to be as large as
-    // possible
-    // we want this as the climb should move as fast as possible (as you will
-    // generally be climbing in the last few seconds of the match)
-    // BE SURE TO SET THE MOTORS TO COAST INSTEAD OF BRAKE FOR IDLE ACTION!!! BRAKE
-    // CAN CAUSE DESTRUCTIVE OSCILLATION and a very upset argoon
-    // ariana grande would love this controller
-    // private final BangBangController m_bangBang = new BangBangController();
+    //to be updated
+    private final ElevatorSim m_climbSim =
+    new ElevatorSim(
+        motorSim,
+        5,
+        70,
+        6,
+        0,
+        100,
+        true,
+        0.0, 
+        0.01,
+        0);
+    
 
     public ClimbSubsystem() {
+        //clears any previous faults on motors
+        //do this so that any errors from previous usage are cleared
+        //if any errors persist, then we know there's an issue with the motors
+        m_climbLeaderMotor.clearFaults();
+        m_climbFollowerMotor.clearFaults();
 
-        // clears any previous faults on motors
-        // do this so that any errors from previous usage are cleared
-        // if any errors persist, then we know there's an issue with the motors
-        m_leaderMotor.clearFaults();
-        m_followerMotor.clearFaults();
+        //sets it so that the secondary motor (follower) follows any commands sent to the primary motor (leader).
+        //recommended as you will now only need to send commands to the primary motor instead of having to do both primary and secondary.
+        m_climbFollowerMotorConfig.follow(m_climbLeaderMotor);
 
-        // sets it so that the secondary motor (follower) follows any commands sent to
-        // the primary motor (leader).
-        // recommended as you will now only need to send commands to the primary motor
-        // instead of having to do both primary and secondary.
-        m_followerMotorConfig.follow(m_leaderMotor);
+        //inverts motor run position (clockwise or counterclockwise).
+        //change booleans when necessary.
+        m_climbLeaderMotorConfig.inverted(true);
+        m_climbFollowerMotorConfig.inverted(true);
 
-        // inverts motor run position (clockwise or counterclockwise).
-        // change booleans when necessary.
-        m_leaderMotorConfig.inverted(false);
-        m_followerMotorConfig.inverted(false);
+        //ensures motors stay at their current position when no power is being applied to them.
+        //we don't want the motors moving downwards when we want to it to stay up!
+        m_climbLeaderMotorConfig.idleMode(IdleMode.kBrake);
+        m_climbFollowerMotorConfig.idleMode(IdleMode.kBrake);       
 
-        // ensures motors stay at their current position when no power is being applied
-        // to them.
-        // we don't want the motors moving downwards when we want to it to stay up!
-        m_leaderMotorConfig.idleMode(IdleMode.kBrake);
-        m_followerMotorConfig.idleMode(IdleMode.kBrake);
+        //sets current limits to motors to ensure they do not exceed a set current limit
+        //prevents damage towards motors from pulling too much current -- VERY IMPORTANT!
+        m_climbLeaderMotorConfig.smartCurrentLimit(ClimbConstants.kMotorStallCurrent, ClimbConstants.kMotorFreeSpeedCurrent);
+        m_climbFollowerMotorConfig.smartCurrentLimit(ClimbConstants.kMotorStallCurrent, ClimbConstants.kMotorFreeSpeedCurrent);
 
-        // sets current limits to motors to ensure they do not exceed a set current
-        // limit
-        // prevents damage towards motors from pulling too much current -- VERY
-        // IMPORTANT!
-        m_leaderMotorConfig.smartCurrentLimit(ClimbConstants.kMotorStallCurrent,
-                ClimbConstants.kMotorFreeSpeedCurrent);
-        m_followerMotorConfig.smartCurrentLimit(ClimbConstants.kMotorStallCurrent,
-                ClimbConstants.kMotorFreeSpeedCurrent);
-
-        // inverts the encoder on true (if motor is spinning counter-clockwise)
+        //inverts the encoder on true (if motor is spinning counter-clockwise)
         m_absoluteEncoder.setInverted(false);
-        // similar to controller deadband, reduces sensitivity of inputs
-        // in this case, it is when the absolute encoder reaches the end of its range,
-        // which can result in instability.
-
-        // sets all configuration to the motors.
-        // any previous parameters are reset here to be overwritten with new parameters.
-        // these parameters will persist. This is incredibly important as without this,
-        // all parameters are wiped on reboot.
-        m_leaderMotor.configure(m_leaderMotorConfig, ResetMode.kResetSafeParameters,
-                PersistMode.kPersistParameters);
-        m_followerMotor.configure(m_followerMotorConfig, ResetMode.kResetSafeParameters,
-                PersistMode.kPersistParameters);
-
+        //sets the duty cycle of the encoder to ensure accuracy (much match with encoder specifications)
+        m_absoluteEncoder.setDutyCycleRange(ClimbConstants.kRevThroughBoreMinPulse, ClimbConstants.kRevThroughBoreMaxPulse);
+        //sets the expected frequency the encoder will output to the RIO (must match with encoder specifications)
+        //recommended to set this as it improves the reliability of the encoder's output
+        m_absoluteEncoder.setAssumedFrequency(ClimbConstants.kRevThroughBoreFrequency);
+        
+        //sets all configuration to the motors.
+        //any previous parameters are reset here to be overwritten with new parameters.
+        //these parameters will persist. This is incredibly important as without this, all parameters are wiped on reboot.        
+        m_climbLeaderMotor.configure(m_climbLeaderMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        m_climbFollowerMotor.configure(m_climbFollowerMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        
         lockFunnel();
         isFunnelUnlocked = false;
     }
 
-    public void setVoltage(double voltage) {
-        m_leaderMotor.setVoltage(voltage);
+    //powers motors with set voltage
+    public void driveMotors (double voltage) {
+        m_climbLeaderMotor.setVoltage(voltage);
     }
 
-    // Returns the reading of the encoder.
-    public double getEncoderDistance() {
-        return m_absoluteEncoder.get();
+    //Returns the reading of the encoder in degrees.
+    public double getClimbArmAngle() {
+        return m_absoluteEncoder.get() * 360;
+    }
+     
+    public double getClimbMotorPosition() {
+        return m_climbLeaderEncoder.getPosition();
+        
     }
 
-    // public double getSimEncoderDistance() {
-    // return s_absoluteEncoder.get();
-    // }
+    //315.1 degrees - true 90
+    //110.1 degrees - angle of attack
+    //205.1 degrees - angle limit when climbing up
+    public double getSimClimbArmAngle() {
+        return (s_absoluteEncoder.get() * 360);
+    }
 
-    // Stops outputting to motors.
+    //Stops outputting to motors.
     public void stopMotors() {
-        m_leaderMotor.stopMotor();
+        m_climbLeaderMotor.stopMotor();
+    }
+    
+    //drives arm to specified angle
+    //direction determines which way the arm should go
+    // -1 -> counter clockwise
+    //  1 - > clockwise
+    // do not put any other values in direction or you risk damaging the motors
+
+
+    public boolean isAtForwardLimit() {
+        return getClimbArmAngle() >= ClimbConstants.kClimbForwardLimit;
+    }
+
+    public boolean isAtBackwardsLimit() {
+        return getClimbArmAngle() <= ClimbConstants.kClimbBackwardLimit;
+    }
+
+    public void runForward(CommandXboxController m_operatorController) {
+        if (getClimbArmAngle() < ClimbConstants.kClimbForwardLimit) {
+            driveMotors(12);
+        }
+        else if (getClimbArmAngle() >= ClimbConstants.kClimbForwardLimit) {
+            stopMotors();
+        }
+    }
+
+    public void runBack(CommandXboxController m_operatorController) {
+        if (getClimbArmAngle() > ClimbConstants.kClimbBackwardLimit) {
+            driveMotors(-12);
+        }
+        else if (getClimbArmAngle() <= ClimbConstants.kClimbForwardLimit) {
+            stopMotors();
+        }
+    }
+
+
+    public void runToAngle(CommandXboxController m_operatorController, double currentAngle, double targetAngle, double direction) {
+        if (currentAngle * direction < targetAngle * direction) {
+            driveMotors(12 * direction);
+        }
+        else if (currentAngle * direction >= targetAngle * direction) {
+            stopMotors();
+            m_operatorController.setRumble(RumbleType.kBothRumble, 1);
+            setupClimb = 2;
+        }
+    }
+
+    public void runToAngle(double currentAngle, double targetAngle, double direction) {
+        if (currentAngle * direction < targetAngle * direction) {
+            driveMotors(12 * direction);
+        }
+        else if (currentAngle * direction >= targetAngle * direction) {
+            stopMotors();
+            setupClimb = 2;
+        }
+    }
+
+    //positions the climb to the attack position after being homed
+    //this is only called once during initialization of the robot and is run after the climb is homed
+    public void setClimbToAttack() {
+        runToAngle(getClimbArmAngle(), ClimbConstants.kClimbForwardLimit, 1);
+    }
+
+    //drives the climb to its default position, which is 90 degrees from the horizontal
+    public void homeClimb() {
+        if (setupClimb == 0) {
+            if (getClimbArmAngle() == ClimbConstants.kClimbHomePose) { //to test, may require rounding
+                //ensures the homeClimb function will stop running as it is no longer necessary
+                setupClimb = 1;         
+            }
+            else if (getClimbArmAngle() > ClimbConstants.kClimbHomePose) { //adjustment of encoder is necessary for this to work
+                //moves climb backwards
+                runToAngle(getClimbArmAngle(), ClimbConstants.kClimbHomePose, -1);
+            }
+            else if (getClimbArmAngle() < ClimbConstants.kClimbHomePose) {
+                //moves climb forward
+                runToAngle(getClimbArmAngle(), ClimbConstants.kClimbHomePose, 1); //adjustment of encoder is necessary for this to work
+            }
+        }
     }
 
     public void lockFunnel() {
@@ -153,92 +240,50 @@ public class ClimbSubsystem extends SubsystemBase {
         return isFunnelUnlocked;
     }
 
-    // public void setRightServo(double degrees) {
-    // m_rightServo.setAngle(degrees);
-    // }
-
-    // This function returns the type of error the motor is experiencing should it
-    // have an error.
-    public String reportMotorError(SparkMax motor) {
-        Faults motorFault = motor.getFaults();
-        if (motorFault.can) {
-            return "CAN";
-        } else if (motorFault.escEeprom) {
-            return "ESC_EEPROM";
-        } else if (motorFault.firmware) {
-            return "FIRMWARE";
-        } else if (motorFault.gateDriver) {
-            return "GATE_DRIVER";
-        } else if (motorFault.motorType) {
-            return "MOTOR_TYPE";
-        } else if (motorFault.sensor) {
-            return "SENSOR";
-        } else if (motorFault.temperature) {
-            return "TEMPERATURE";
-        }
-        return null;
-    }
-
-    // function that is constantly run in code every 20 ms.
+    //function that is constantly run in code every 20 ms.
     @Override
     public void periodic() {
-        // Displays live motor and limit switch metrics on SmartDashboard
+        //determines if robot is being simulated. if so, will not display the metrics below
         if (!(Robot.isSimulation())) {
-            SmartDashboard.putNumber("Encoder reading", getEncoderDistance());
-            SmartDashboard.putBoolean("Climb stopped", m_leaderMotor.get() == 0);
+            //Displays live motor and limit switch metrics on SmartDashboard
+            SmartDashboard.putNumber("Climb Arm Angle", getClimbArmAngle());
+            SmartDashboard.putNumber("Climb Motor Speed", m_climbLeaderMotor.get());
+            SmartDashboard.putNumber("Climb Motor (" + ClimbConstants.kClimbLeaderMotorCANID + ") Current", m_climbLeaderMotor.getOutputCurrent());
+            SmartDashboard.putNumber("Climb Motor (" + ClimbConstants.kClimbFollowerMotorCANID + ") Current", m_climbLeaderMotor.getOutputCurrent());
 
-            SmartDashboard.putNumber("Leader Motor Speed", m_leaderMotor.get());
-            SmartDashboard.putNumber("Leader Motor Voltage", m_leaderMotor.getBusVoltage());
-            SmartDashboard.putNumber("Leader Motor Current", m_leaderMotor.getOutputCurrent());
-            SmartDashboard.putNumber("Leader Motor Temperature",
-                    m_leaderMotor.getMotorTemperature());
-
-            SmartDashboard.putNumber("Follower Motor Speed", m_followerMotor.get());
-            SmartDashboard.putNumber("Follower Motor Voltage", m_followerMotor.getBusVoltage());
-            SmartDashboard.putNumber("Follower Motor Current", m_followerMotor.getOutputCurrent());
-            SmartDashboard.putNumber("Follower Motor Temperature",
-                    m_followerMotor.getMotorTemperature());
-
-            if (m_leaderMotor.hasActiveFault()) {
-                DriverStation.reportWarning(
-                        "MOTOR WARNING: SparkMax ID " + ClimbConstants.kClimbLeaderMotorCANID
-                                + " is currently reporting an error with: \""
-                                + reportMotorError(m_leaderMotor) + "\"",
-                        true);
+            //home the climb when the robot boots up
+            /* 
+            if (setupClimb == 0) {
+                homeClimb();
             }
-            if (m_followerMotor.hasActiveFault()) {
-                DriverStation.reportWarning(
-                        "MOTOR WARNING: SparkMax ID " + ClimbConstants.kClimbFollowerMotorCANID
-                                + " is currently reporting an error with: \""
-                                + reportMotorError(m_followerMotor) + "\"",
-                        true);
+            //sets climb to attack position afte    r being homed
+            else if (setupClimb == 1) {
+                setClimbToAttack();
             }
+            */
         }
     }
 
+    //simulation code to be updated
     @Override
     public void simulationPeriodic() {
-        // Displays live motor and limit switch metrics on SmartDashboard
-        if (Robot.isSimulation()) {
-            // SmartDashboard.putNumber("Encoder reading", getEncoderDistance());
-            SmartDashboard.putBoolean("Climb stopped", s_simLeaderMotor.getAppliedOutput() == 0);
-            SmartDashboard.putNumber("Motor Bus Voltage", s_simLeaderMotor.getBusVoltage());
-            SmartDashboard.putNumber("Motor Current", s_simLeaderMotor.getMotorCurrent());
-            SmartDashboard.putNumber("Climb Setpoint", s_simLeaderMotor.getSetpoint());
-            SmartDashboard.putNumber("Applied Output", s_simLeaderMotor.getAppliedOutput());
-            SmartDashboard.putNumber("Climb Velocity", s_simLeaderMotor.getVelocity());
-            SmartDashboard.putNumber("Climb Position", s_simLeaderMotor.getPosition());
+        //Displays live motor and limit switch metrics on SmartDashboard
+        //SmartDashboard.putNumber("Encoder reading", getEncoderDistance());
+        SmartDashboard.putBoolean("Climb stopped", s_climbLeaderMotor.getAppliedOutput() == 0);
+        SmartDashboard.putNumber("Motor Bus Voltage", s_climbLeaderMotor.getBusVoltage());
+        SmartDashboard.putNumber("Motor Current", s_climbLeaderMotor.getMotorCurrent());
+        SmartDashboard.putNumber("Climb Setpoint", s_climbLeaderMotor.getSetpoint());
+        SmartDashboard.putNumber("Applied Output", s_climbLeaderMotor.getAppliedOutput());
+        SmartDashboard.putNumber("Climb Velocity", s_climbLeaderMotor.getVelocity());
+        SmartDashboard.putNumber("Climb Position", s_climbLeaderMotor.getPosition());
 
-            // Checks to see if motors are going upwards and if the encoder has reached the
-            // set limit
 
-            s_simLeaderMotor.iterate(m_leaderMotor.getAppliedOutput(), 12, 0.02);
-            // m_climbSim.setInput(s_climbLeaderMotor.getVelocity() *
-            // RobotController.getBatteryVoltage());
-            // m_climbSim.update(0.020);
-            // s_absoluteEncoder.set(m_climbSim.getPositionMeters());
-            // RoboRioSim.setVInVoltage(
-            // BatterySim.calculateDefaultBatteryLoadedVoltage(m_climbSim.getCurrentDrawAmps()));
-        }
+        s_climbLeaderMotor.iterate(m_climbLeaderMotor.getAppliedOutput(), 12, 0.02);
+        m_climbSim.setInput(s_climbLeaderMotor.getVelocity() * RobotController.getBatteryVoltage());
+        m_climbSim.update(0.020);
+        s_absoluteEncoder.set(m_climbSim.getPositionMeters());
+        RoboRioSim.setVInVoltage(
+                    BatterySim.calculateDefaultBatteryLoadedVoltage(m_climbSim.getCurrentDrawAmps()));
+            
     }
 }
