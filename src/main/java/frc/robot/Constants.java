@@ -80,7 +80,7 @@ public final class Constants {
         public static int kIndexMotorCAN = 35;
         public static final double kRampRate = 0;
 
-        public static final double kOuttakePower = 1;
+        public static final double kOuttakePower = 0.75;
         public static final double kIntakePower = 1;
         public static final double kCorrectionPower = 0.2;
 
