@@ -7,13 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "S2HG"
+            "pathName": "S1L1"
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 2.0
+            "waitTime": 1.0
           }
         },
         {
