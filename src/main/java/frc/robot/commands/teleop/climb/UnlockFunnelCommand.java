@@ -12,23 +12,24 @@ public class UnlockFunnelCommand extends Command {
   /** Creates a new InitiateClimbCommand. */
   public UnlockFunnelCommand() {
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(RobotContainer.m_climbSubsystem);
+    addRequirements(RobotContainer.m_funnelSubsystem);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    RobotContainer.m_climbSubsystem.unlockFunnel();
+    RobotContainer.m_funnelSubsystem.unlockFunnel();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+  }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    RobotContainer.m_climbSubsystem.stopFunnelServos();
+    RobotContainer.m_funnelSubsystem.stopFunnelServos();
   }
 
   // Returns true when the command should end.

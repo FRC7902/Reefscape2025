@@ -23,7 +23,7 @@ public class LockFunnelCommand extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    RobotContainer.m_climbSubsystem.lockFunnel();
+    RobotContainer.m_funnelSubsystem.lockFunnel();
   }
 
   // Called once the command ends or is interrupted.

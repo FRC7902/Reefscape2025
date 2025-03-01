@@ -6,6 +6,7 @@ package frc.robot;
 
 import java.io.File;
 import java.util.Map;
+
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -20,10 +21,11 @@ import frc.robot.commands.teleop.SwerveCommands.StrafeLeftCommand;
 import frc.robot.commands.teleop.SwerveCommands.StrafeRightCommand;
 import frc.robot.commands.teleop.algae_manipulator.IntakeAlgaeCommand;
 import frc.robot.commands.teleop.algae_manipulator.OuttakeAlgaeCommand;
-import frc.robot.commands.teleop.climb.InitiateClimbCommand;
 import frc.robot.commands.teleop.climb.LockFunnelCommand;
 import frc.robot.commands.teleop.climb.MoveClimbDownCommand;
 import frc.robot.commands.teleop.climb.MoveClimbUpCommand;
+import frc.robot.commands.teleop.climb.ReadyClimberAngleCommand;
+import frc.robot.commands.teleop.climb.UnlockFunnelCommand;
 import frc.robot.commands.teleop.coral_indexer.CorrectCoralPositionCommand;
 import frc.robot.commands.teleop.coral_indexer.IntakeCoralCommand;
 import frc.robot.commands.teleop.coral_indexer.OuttakeCoralCommand;
@@ -32,37 +34,42 @@ import frc.robot.subsystems.AlgaeManipulatorSubsystem;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.CoralIndexerSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.FunnelSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem.ElevatorPosition;
 import frc.robot.subsystems.SwerveSubsystem;
 import swervelib.SwerveInputStream;
 
 /**
- * This class is where the bulk of the robot should be declared. Since Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
+ * This class is where the bulk of the robot should be declared. Since
+ * Command-based is a
+ * "declarative" paradigm, very little robot logic should actually be handled in
+ * the {@link Robot}
+ * periodic methods (other than the scheduler calls). Instead, the structure of
+ * the robot (including
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
     // The robot's subsystems and commands are defined here...
-    public static final AlgaeManipulatorSubsystem m_algaeElevatorManipulatorSubsystem =
-            new AlgaeManipulatorSubsystem();
+    public static final AlgaeManipulatorSubsystem m_algaeElevatorManipulatorSubsystem = new AlgaeManipulatorSubsystem();
     // The robot's subsystems and commands are defined here...
     public static final ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
     public static final ClimbSubsystem m_climbSubsystem = new ClimbSubsystem();
+    public static final FunnelSubsystem m_funnelSubsystem = new FunnelSubsystem();
 
     public static final CoralIndexerSubsystem m_indexSubsystem = new CoralIndexerSubsystem();
 
     // Replace with CommandPS4Controller or CommandJoystick if needed
-    public static final CommandXboxController m_driverController =
-            new CommandXboxController(OperatorConstants.kDriverControllerPort);
-    public static final CommandXboxController m_operatorController =
-            new CommandXboxController(OperatorConstants.kOperatorControllerPort);
+    public static final CommandXboxController m_driverController = new CommandXboxController(
+            OperatorConstants.kDriverControllerPort);
+    public static final CommandXboxController m_operatorController = new CommandXboxController(
+            OperatorConstants.kOperatorControllerPort);
 
-    public static final SwerveSubsystem drivebase =
-            new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
+    public static final SwerveSubsystem drivebase = new SwerveSubsystem(
+            new File(Filesystem.getDeployDirectory(), "swerve"));
 
     /**
-     * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular
+     * Converts driver input into a field-relative ChassisSpeeds that is controlled
+     * by angular
      * velocity.
      */
     SwerveInputStream driveAngularVelocity = SwerveInputStream
@@ -73,17 +80,19 @@ public class RobotContainer {
             .allianceRelativeControl(true);
 
     /**
-     * Clone's the angular velocity input stream and converts it to a fieldRelative input stream.
+     * Clone's the angular velocity input stream and converts it to a fieldRelative
+     * input stream.
      */
     SwerveInputStream driveDirectAngle = driveAngularVelocity.copy()
             .withControllerHeadingAxis(m_driverController::getRightX, m_driverController::getRightY)
             .headingWhile(true);
 
     /**
-     * Clone's the angular velocity input stream and converts it to a robotRelative input stream.
+     * Clone's the angular velocity input stream and converts it to a robotRelative
+     * input stream.
      */
-    SwerveInputStream driveRobotOriented =
-            driveAngularVelocity.copy().robotRelative(true).allianceRelativeControl(false);
+    SwerveInputStream driveRobotOriented = driveAngularVelocity.copy().robotRelative(true)
+            .allianceRelativeControl(false);
 
     SwerveInputStream driveAngularVelocityKeyboard = SwerveInputStream
             .of(drivebase.getSwerveDrive(), () -> -m_driverController.getLeftY(),
@@ -125,25 +134,27 @@ public class RobotContainer {
             this::select);
 
     /**
-     * Use this method to define your trigger->command mappings. Triggers can be created via the
-     * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary
+     * Use this method to define your trigger->command mappings. Triggers can be
+     * created via the
+     * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with
+     * an arbitrary
      * predicate, or via the named factories in
-     * {@link edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for
+     * {@link edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses
+     * for
      * {@link CommandXboxController
-     * Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller PS4} controllers or
-     * {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight joysticks}.
+     * Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller PS4}
+     * controllers or
+     * {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
+     * joysticks}.
      */
     private void configureBindings() {
         // Swerve drive controls
         Command driveFieldOrientedDirectAngle = drivebase.driveFieldOriented(driveDirectAngle);
-        Command driveFieldOrientedAnglularVelocity =
-                drivebase.driveFieldOriented(driveAngularVelocity);
-        Command driveRobotOrientedAngularVelocity =
-                drivebase.driveFieldOriented(driveRobotOriented);
-        Command driveFieldOrientedDirectAngleKeyboard =
-                drivebase.driveFieldOriented(driveDirectAngleKeyboard);
-        Command driveFieldOrientedAnglularVelocityKeyboard =
-                drivebase.driveFieldOriented(driveAngularVelocityKeyboard);
+        Command driveFieldOrientedAnglularVelocity = drivebase.driveFieldOriented(driveAngularVelocity);
+        Command driveRobotOrientedAngularVelocity = drivebase.driveFieldOriented(driveRobotOriented);
+        Command driveFieldOrientedDirectAngleKeyboard = drivebase.driveFieldOriented(driveDirectAngleKeyboard);
+        Command driveFieldOrientedAnglularVelocityKeyboard = drivebase
+                .driveFieldOriented(driveAngularVelocityKeyboard);
 
         // Default to field-centric swerve drive
         drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
@@ -152,7 +163,15 @@ public class RobotContainer {
 
         // Zero gyro
         m_driverController.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-        m_driverController.back().whileTrue(new InitiateClimbCommand());
+        // m_driverController.back().whileTrue(new InitiateClimbCommand());
+
+        m_driverController.back()
+                .onTrue(
+                        Commands.parallel(
+                                new SetElevatorPositionCommand(
+                                        ElevatorConstants.kElevatorMinHeightMeters)
+                                        .andThen(new UnlockFunnelCommand()),
+                                new ReadyClimberAngleCommand()));
 
         // Raise elevator (by height of Algae diameter) while intaking algae
         m_driverController.leftBumper().whileTrue(m_selectIntakeCommand);
@@ -164,39 +183,39 @@ public class RobotContainer {
 
         // Climb controls
         m_driverController.povUp().whileTrue(new ConditionalCommand(new MoveClimbUpCommand(),
-                new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
+                new NullCommand(), m_funnelSubsystem::isFunnelUnlocked));
         m_driverController.povDown().whileTrue(new ConditionalCommand(new MoveClimbDownCommand(),
-        new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
-        
+                new NullCommand(), m_funnelSubsystem::isFunnelUnlocked));
 
         m_indexSubsystem
                 .setDefaultCommand(
                         new IntakeCoralCommand(Constants.CoralIndexerConstants.kIntakePower)
-                                .andThen(new CorrectCoralPositionCommand().withTimeout(1))
+                                .andThen(new CorrectCoralPositionCommand()
+                                        .withTimeout(1))
                                 .andThen(new IntakeCoralCommand(
                                         Constants.CoralIndexerConstants.kCorrectionPower)
-                                                .withTimeout(1)));
+                                        .withTimeout(1)));
 
         // Elevator coral positions
         m_operatorController.x().onTrue(new ConditionalCommand(new SetElevatorPositionCommand(
                 ElevatorConstants.kElevatorCoralLevel1Height), new NullCommand(),
-                () -> !m_climbSubsystem.isFunnelUnlocked()));
+                () -> !m_funnelSubsystem.isFunnelUnlocked()));
         m_operatorController.a().onTrue(new ConditionalCommand(new SetElevatorPositionCommand(
                 ElevatorConstants.kElevatorCoralStationAndProcessorHeight), new NullCommand(),
-                () -> !m_climbSubsystem.isFunnelUnlocked()));
+                () -> !m_funnelSubsystem.isFunnelUnlocked()));
         m_operatorController.b().onTrue(new ConditionalCommand(new SetElevatorPositionCommand(
                 ElevatorConstants.kElevatorCoralLevel2Height), new NullCommand(),
-                () -> !m_climbSubsystem.isFunnelUnlocked()));
+                () -> !m_funnelSubsystem.isFunnelUnlocked()));
         m_operatorController.y().onTrue(new ConditionalCommand(new SetElevatorPositionCommand(
                 ElevatorConstants.kElevatorCoralLevel3Height), new NullCommand(),
-                () -> !m_climbSubsystem.isFunnelUnlocked()));
+                () -> !m_funnelSubsystem.isFunnelUnlocked()));
 
         m_operatorController.povUp().onTrue(new ConditionalCommand(new SetElevatorPositionCommand(
                 ElevatorConstants.kElevatorAlgaeHighHeight), new NullCommand(),
-                () -> !m_climbSubsystem.isFunnelUnlocked()));
-         m_operatorController.povDown().onTrue(new ConditionalCommand(new SetElevatorPositionCommand(
+                () -> !m_funnelSubsystem.isFunnelUnlocked()));
+        m_operatorController.povDown().onTrue(new ConditionalCommand(new SetElevatorPositionCommand(
                 ElevatorConstants.kElevatorAlgaeLowHeight), new NullCommand(),
-                () -> !m_climbSubsystem.isFunnelUnlocked()));
+                () -> !m_funnelSubsystem.isFunnelUnlocked()));
 
         // ======= Test bindings =======
 
