@@ -1,4 +1,5 @@
 package frc.robot.subsystems;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.sim.SparkMaxSim;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -29,6 +30,8 @@ public class ClimbSubsystem extends SubsystemBase {
     private final SparkMax m_climbLeaderMotor = new SparkMax(ClimbConstants.kClimbLeaderMotorCANID, MotorType.kBrushless);
     private final SparkMax m_climbFollowerMotor = new SparkMax(ClimbConstants.kClimbFollowerMotorCANID, MotorType.kBrushless);
 
+    private final RelativeEncoder m_climbLeaderEncoder = m_climbLeaderMotor.getEncoder();
+
     private final Servo m_leftServo = new Servo(ClimbConstants.kLeftServoID);
     private final Servo m_rightServo = new Servo(ClimbConstants.kRightServoID);
 
@@ -44,7 +47,7 @@ public class ClimbSubsystem extends SubsystemBase {
 
     // Object creation of absolute encoder. The REV Through bore encoder is used for climb
     // The DutyCycleEncoder is used as the REV Through bore encoder is an absolute encoder that uses PWM via one of the DI (Digital IO) pins on the RIO
-    private final DutyCycleEncoder m_absoluteEncoder = new DutyCycleEncoder(ClimbConstants.kRevThroughBoreIO, 360, 0); //need to find exact angle where climb is 90 degrees to the horizontal
+    private final DutyCycleEncoder m_absoluteEncoder = new DutyCycleEncoder(ClimbConstants.kRevThroughBoreIO); //need to find exact angle where climb is 90 degrees to the horizontal
     private final DutyCycleEncoderSim s_absoluteEncoder = new DutyCycleEncoderSim(m_absoluteEncoder);
 
     private boolean isFunnelUnlocked;
@@ -119,7 +122,12 @@ public class ClimbSubsystem extends SubsystemBase {
     //Returns the reading of the encoder in degrees.
     public double getClimbArmAngle() {
         return m_absoluteEncoder.get() * 360;
-    } 
+    }
+     
+    public double getClimbMotorPosition() {
+        return m_climbLeaderEncoder.getPosition();
+        
+    }
 
     //315.1 degrees - true 90
     //110.1 degrees - angle of attack
@@ -138,6 +146,10 @@ public class ClimbSubsystem extends SubsystemBase {
     // -1 -> counter clockwise
     //  1 - > clockwise
     // do not put any other values in direction or you risk damaging the motors
+
+    public boolean isAtTargetAngle(double currentAngle, double targetAngle, double direction) {
+        return (currentAngle * direction >= targetAngle * direction);
+    }
 
     public void runToAngle(CommandXboxController m_operatorController, double currentAngle, double targetAngle, double direction) {
         if (currentAngle * direction < targetAngle * direction) {
@@ -216,13 +228,15 @@ public class ClimbSubsystem extends SubsystemBase {
             SmartDashboard.putNumber("Climb Motor (" + ClimbConstants.kClimbFollowerMotorCANID + ") Current", m_climbLeaderMotor.getOutputCurrent());
 
             //home the climb when the robot boots up
+            /* 
             if (setupClimb == 0) {
                 homeClimb();
             }
-            //sets climb to attack position after being homed
+            //sets climb to attack position afte    r being homed
             else if (setupClimb == 1) {
                 setClimbToAttack();
             }
+            */
         }
     }
 

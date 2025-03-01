@@ -41,9 +41,9 @@ public final class Constants {
     // current limit when motor rpm is at 5700 (unique to NEO motors) (in amps)
     public static final int kMotorFreeSpeedCurrent = 50;
     // climb arm angle limiter when arm is moving outwards from the robot (in degrees)
-    public static final double kClimbBackwardLimit = 205.1; 
+    public static final double kClimbBackwardLimit = 0; 
     // climb arm angle limiter when arm is moving inwards to the robot (in degrees)
-    public static final double kClimbForwardLimit = 430.1; 
+    public static final double kClimbForwardLimit = 263.1; 
     public static final double kClimbHomePose = 315.1;
     // motor voltage applied when climb arm is set to move foward
     public static final double kMotorVoltageUp = 12;

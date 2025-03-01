@@ -28,6 +28,7 @@ import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.IndexSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.commands.climb.MoveClimbUpCommand;
+import frc.robot.commands.climb.ManualClimb;
 import frc.robot.commands.climb.MoveClimbDownCommand;
 import swervelib.SwerveInputStream;
 
@@ -163,10 +164,13 @@ public class RobotContainer {
 
         // runs the climb motors up when the up button is pressed on the POV buttons of
         // the controller.
-        m_operatorController.povUp().whileTrue(new MoveClimbUpCommand(m_climbSubsystem, m_operatorController));
+        m_operatorController.povUp().whileTrue(new ManualClimb(m_climbSubsystem, 1));
+        m_operatorController.povDown().whileTrue(new ManualClimb(m_climbSubsystem, -1));
+
+        m_operatorController.povRight().whileTrue(new MoveClimbUpCommand(m_climbSubsystem, m_operatorController));
         // runs the climb motors down when the down button is pressed on the POV buttons
         // of the controller.
-        m_operatorController.povDown().whileTrue(new MoveClimbDownCommand(m_climbSubsystem, m_operatorController));
+        m_operatorController.povLeft().whileTrue(new MoveClimbDownCommand(m_climbSubsystem, m_operatorController));
     }
 
     /**
