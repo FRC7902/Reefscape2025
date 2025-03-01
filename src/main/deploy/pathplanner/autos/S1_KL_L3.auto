@@ -11,15 +11,45 @@
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "L3KLAlgaebackwards"
+            "name": "intakealgaeon"
           }
         },
         {
           "type": "wait",
           "data": {
             "waitTime": 2.0
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "L3KLAlgaebackwards"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "intakealgaeoff"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ElevatorL3"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "L3KLAlgaeforward"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
           }
         },
         {
@@ -31,31 +61,25 @@
         {
           "type": "path",
           "data": {
-            "pathName": "L3KLAlgaeforward"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
             "pathName": "L3KLCS"
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 2.0
+            "waitTime": 1.5
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "L3CSKL"
+            "pathName": "L3CSL"
           }
         },
         {
-          "type": "wait",
+          "type": "named",
           "data": {
-            "waitTime": 2.0
+            "name": "coraloutakeoff"
           }
         }
       ]
