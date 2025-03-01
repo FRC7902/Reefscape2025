@@ -16,11 +16,11 @@
     },
     {
       "anchor": {
-        "x": 5.528250000000001,
+        "x": 5.1786885245901635,
         "y": 4.05
       },
       "prevControl": {
-        "x": 5.793191177713497,
+        "x": 5.443629702303659,
         "y": 4.061218520975472
       },
       "nextControl": null,
@@ -31,7 +31,14 @@
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "coraloutakeon",
+      "waypointRelativePos": 1.0,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 3.0,
