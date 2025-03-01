@@ -292,7 +292,7 @@ public class ElevatorSubsystem extends SubsystemBase {
             return ElevatorPosition.ALGAE_LOW;
         } else {
             // Return null or a default value if no position matches
-            return null;
+            return ElevatorPosition.CORAL_STATION_AND_PROCESSOR;
         }
     }
 
