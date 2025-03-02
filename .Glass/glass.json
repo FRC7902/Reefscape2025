@@ -1,0 +1,23 @@
+{
+    "NetworkTables": {
+        "types": {
+            "/FMSInfo": "FMSInfo",
+            "/SmartDashboard/Elevator Sim": "Mechanism2d"
+        },
+        "windows": {
+            "/SmartDashboard/Elevator Sim": {
+                "window": {
+                    "visible": true
+                }
+            }
+        }
+    },
+    "NetworkTables Info": {
+        "visible": true
+    },
+    "NetworkTables Settings": {
+        "dsClient": false,
+        "mode": "Client (NT4)",
+        "serverTeam": "localhost"
+    }
+}
