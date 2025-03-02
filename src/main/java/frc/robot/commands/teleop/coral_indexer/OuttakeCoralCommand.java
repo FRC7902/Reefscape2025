@@ -10,21 +10,29 @@ import frc.robot.RobotContainer;
 
 public class OuttakeCoralCommand extends Command {
 
+    private double m_power;
+
     public OuttakeCoralCommand() {
         addRequirements(RobotContainer.m_indexSubsystem);
+        m_power = Constants.CoralIndexerConstants.kOuttakePower;
+    }
+
+    public OuttakeCoralCommand(double power) {
+        addRequirements(RobotContainer.m_indexSubsystem);
+        m_power = power;
     }
 
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        RobotContainer.m_indexSubsystem.setPower(Constants.CoralIndexerConstants.kOuttakePower);
+        RobotContainer.m_indexSubsystem.setPower(m_power);
 
     }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        RobotContainer.m_indexSubsystem.setPower(Constants.CoralIndexerConstants.kOuttakePower);
+        RobotContainer.m_indexSubsystem.setPower(m_power);
     }
 
     // Called once the command ends or is interrupted.
