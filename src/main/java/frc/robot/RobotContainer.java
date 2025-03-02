@@ -156,8 +156,8 @@ public class RobotContainer {
         new EventTrigger("coraloutakeoff").toggleOnTrue(new OuttakeCoralCommand());
         new EventTrigger("lowalgae")
                 .onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeLowHeight));
-        // new EventTrigger("highalgae")
-        //         .onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeHighHeight));
+        new EventTrigger("highalgae")
+                .onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeHighHeight));
 
 
 
@@ -265,8 +265,8 @@ public class RobotContainer {
         // Elevator algae positions
         m_operatorController.povDown()
                 .onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeLowHeight));
-        // m_operatorController.povUp()
-        //         .onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeHighHeight));
+        m_operatorController.povUp()
+                .onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeHighHeight));
 
         // ======= Test bindings =======
 
