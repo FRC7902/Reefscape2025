@@ -86,8 +86,8 @@ public class CoralIndexerSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         // This code runs in both real and simulation modes.
-        SmartDashboard.putNumber("Index Speed", m_indexSpeed);
-        SmartDashboard.putNumber("Motor Velocity (Encoder)", m_encoder.getVelocity());
+        // SmartDashboard.putNumber("Index Speed", m_indexSpeed);
+        // SmartDashboard.putNumber("Motor Velocity (Encoder)", m_encoder.getVelocity());
         SmartDashboard.putBoolean("Beam Sensor Broken", isBeamBroken());
 
         // m_debouncedBeamBreak.calculate(m_beamSensor.get());
@@ -100,21 +100,21 @@ public class CoralIndexerSubsystem extends SubsystemBase {
     public void simulationPeriodic() {
         SmartDashboard.putNumber("Encoder Reading", m_encoder.getPosition());
 
-        SmartDashboard.putBoolean("Index Stopped", m_indexMotor.getAppliedOutput() == 0);
+        // SmartDashboard.putBoolean("Index Stopped", m_indexMotor.getAppliedOutput() == 0);
 
-        SmartDashboard.putNumber("Motor Voltage", m_indexMotor.getBusVoltage());
-        // SmartDashboard.putNumber("Motor Current", indexMotor.getMotorCurrent());
+        // SmartDashboard.putNumber("Motor Voltage", m_indexMotor.getBusVoltage());
+        // // SmartDashboard.putNumber("Motor Current", indexMotor.getMotorCurrent());
 
-        SmartDashboard.putNumber("Index Setpoint", m_indexSpeed);
+        // SmartDashboard.putNumber("Index Setpoint", m_indexSpeed);
 
-        SmartDashboard.putNumber("Applied Output", m_indexMotor.getAppliedOutput());
-        SmartDashboard.putNumber("Index Velocity", m_encoder.getVelocity());
+        // SmartDashboard.putNumber("Applied Output", m_indexMotor.getAppliedOutput());
+        // SmartDashboard.putNumber("Index Velocity", m_encoder.getVelocity());
 
         double dt = 0.02;
         double tau = 0.5;
         double deltaV = (m_indexSpeed - m_simMotorVelocity) * dt / tau;
         m_simMotorVelocity += deltaV;
-        SmartDashboard.putNumber("Simulated Motor Velocity", m_simMotorVelocity);
+        // SmartDashboard.putNumber("Simulated Motor Velocity", m_simMotorVelocity);
     }
 
 }

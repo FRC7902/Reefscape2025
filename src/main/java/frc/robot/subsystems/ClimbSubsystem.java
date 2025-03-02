@@ -248,8 +248,8 @@ public class ClimbSubsystem extends SubsystemBase {
             //Displays live motor and limit switch metrics on SmartDashboard
             SmartDashboard.putNumber("Climb Arm Angle", getClimbArmAngle());
             SmartDashboard.putNumber("Climb Motor Speed", m_climbLeaderMotor.get());
-            SmartDashboard.putNumber("Climb Motor (" + ClimbConstants.kClimbLeaderMotorCANID + ") Current", m_climbLeaderMotor.getOutputCurrent());
-            SmartDashboard.putNumber("Climb Motor (" + ClimbConstants.kClimbFollowerMotorCANID + ") Current", m_climbLeaderMotor.getOutputCurrent());
+            // SmartDashboard.putNumber("Climb Motor (" + ClimbConstants.kClimbLeaderMotorCANID + ") Current", m_climbLeaderMotor.getOutputCurrent());
+            // SmartDashboard.putNumber("Climb Motor (" + ClimbConstants.kClimbFollowerMotorCANID + ") Current", m_climbLeaderMotor.getOutputCurrent());
 
             //home the climb when the robot boots up
             /* 
@@ -269,12 +269,12 @@ public class ClimbSubsystem extends SubsystemBase {
     public void simulationPeriodic() {
         //Displays live motor and limit switch metrics on SmartDashboard
         //SmartDashboard.putNumber("Encoder reading", getEncoderDistance());
-        SmartDashboard.putBoolean("Climb stopped", s_climbLeaderMotor.getAppliedOutput() == 0);
-        SmartDashboard.putNumber("Motor Bus Voltage", s_climbLeaderMotor.getBusVoltage());
-        SmartDashboard.putNumber("Motor Current", s_climbLeaderMotor.getMotorCurrent());
-        SmartDashboard.putNumber("Climb Setpoint", s_climbLeaderMotor.getSetpoint());
-        SmartDashboard.putNumber("Applied Output", s_climbLeaderMotor.getAppliedOutput());
-        SmartDashboard.putNumber("Climb Velocity", s_climbLeaderMotor.getVelocity());
+        // SmartDashboard.putBoolean("Climb stopped", s_climbLeaderMotor.getAppliedOutput() == 0);
+        // SmartDashboard.putNumber("Motor Bus Voltage", s_climbLeaderMotor.getBusVoltage());
+        // SmartDashboard.putNumber("Motor Current", s_climbLeaderMotor.getMotorCurrent());
+        // SmartDashboard.putNumber("Climb Setpoint", s_climbLeaderMotor.getSetpoint());
+        // SmartDashboard.putNumber("Applied Output", s_climbLeaderMotor.getAppliedOutput());
+        // SmartDashboard.putNumber("Climb Velocity", s_climbLeaderMotor.getVelocity());
         SmartDashboard.putNumber("Climb Position", s_climbLeaderMotor.getPosition());
 
 
