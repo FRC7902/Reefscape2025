@@ -84,7 +84,7 @@ public final class Constants {
         public static final double kRampRate = 0;
 
         public static final double kOuttakePower = 0.75;
-        public static final double kL1OuttakePower = 0.5;
+        public static final double kL1OuttakePower = 0.6;
         public static final double kIntakePower = 1;
         public static final double kCorrectionPower = 0.2;
 
