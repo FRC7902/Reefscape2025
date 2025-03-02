@@ -7,19 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "S2HG"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "CoralOutakeV2"
+            "pathName": "S1L1"
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 7.0
+            "waitTime": 5.0
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Copy of S1L1"
           }
         }
       ]

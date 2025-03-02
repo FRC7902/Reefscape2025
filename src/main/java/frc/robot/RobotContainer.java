@@ -138,11 +138,13 @@ public class RobotContainer {
          * SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeHighHeight));
          * NamedCommands.registerCommand("Lowest Height", new SetElevatorPositionCommand(0));
          */
-
+        NamedCommands.registerCommand("OutakeCoralV2", new OuttakeCoralCommand(Constants.CoralIndexerConstants.kL1OuttakePower));
+        NamedCommands.registerCommand("StopCoralOutake", new OuttakeCoralCommand(0));
+        
         // preloads the path
 
         // Register Event Triggers
-        new EventTrigger("ElevatorL1").onTrue(new SetElevatorPositionCommand(0));
+        new EventTrigger("ElevatorL1").onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel1Height));
         new EventTrigger("ElevatorL2").onTrue(
                 new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel2Height));
         new EventTrigger("ElevatorL3").onTrue(
@@ -151,7 +153,7 @@ public class RobotContainer {
         new EventTrigger("intakealgaeoff").toggleOnTrue(new IntakeAlgaeCommand());
         new EventTrigger("coraloutakeon").toggleOnTrue(
                 new OuttakeCoralCommand(Constants.CoralIndexerConstants.kL1OuttakePower));
-        new EventTrigger("coraloutakeoff").toggleOnFalse(new OuttakeCoralCommand());
+        new EventTrigger("coraloutakeoff").toggleOnTrue(new OuttakeCoralCommand());
         new EventTrigger("lowalgae")
                 .onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeLowHeight));
         // new EventTrigger("highalgae")

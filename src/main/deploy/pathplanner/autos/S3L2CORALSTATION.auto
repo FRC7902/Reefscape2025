@@ -7,19 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "S1L1"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 2.0
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "coraloutakeon"
+            "pathName": "S3L1"
           }
         },
         {
@@ -29,9 +17,9 @@
           }
         },
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "coraloutakeoff"
+            "pathName": "CSS3L1"
           }
         }
       ]

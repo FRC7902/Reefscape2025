@@ -13,18 +13,6 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 2.0
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "coraloutakeon"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
             "waitTime": 5.0
           }
         },
