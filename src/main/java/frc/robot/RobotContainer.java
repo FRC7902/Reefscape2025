@@ -180,7 +180,7 @@ public class RobotContainer {
             this::select);
 
     private final Command m_selectOuttakeCommand = new SelectCommand<>(Map.ofEntries(
-            Map.entry(ElevatorPosition.CORAL_L1, new OuttakeCoralCommand()),
+            Map.entry(ElevatorPosition.CORAL_L1, new OuttakeCoralCommand(Constants.CoralIndexerConstants.kL1OuttakePower)),
             Map.entry(ElevatorPosition.CORAL_L2, new OuttakeCoralCommand()),
             Map.entry(ElevatorPosition.CORAL_L3, new OuttakeCoralCommand()),
             Map.entry(ElevatorPosition.CORAL_STATION_AND_PROCESSOR, new OuttakeAlgaeCommand())),
