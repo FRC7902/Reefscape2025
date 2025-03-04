@@ -7,19 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "S3L1"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 3.0
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "CSS3L1"
+            "pathName": "pid testing"
           }
         }
       ]

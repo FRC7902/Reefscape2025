@@ -21,11 +21,11 @@ public final class Constants {
 
     
     public static class PathPlanner {
-        public static final double kPDrive = 0.9;
+        public static final double kPDrive = 1.95;
         public static final double kIDrive = 0;
         public static final double kDDrive = 0.01;
 
-        public static final double kPAngle = 0.7;
+        public static final double kPAngle = 2.6;
         public static final double kIAngle = 0;
         public static final double kDAngle = 0.01;
     }
