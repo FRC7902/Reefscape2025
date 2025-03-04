@@ -6,7 +6,14 @@ package frc.robot;
 
 import java.io.File;
 import java.util.Map;
+
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.events.EventTrigger;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
@@ -34,6 +41,7 @@ import frc.robot.subsystems.CoralIndexerSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem.ElevatorPosition;
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.commands.teleop.climb.ManualClimb;
 import swervelib.SwerveInputStream;
 
 /**
@@ -61,6 +69,8 @@ public class RobotContainer {
     public static final SwerveSubsystem drivebase =
             new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
 
+    private final SendableChooser<Command> autoChooser;
+
     /**
      * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular
      * velocity.
@@ -68,7 +78,7 @@ public class RobotContainer {
     SwerveInputStream driveAngularVelocity = SwerveInputStream
             .of(drivebase.getSwerveDrive(), () -> m_driverController.getLeftY() * -1,
                     () -> m_driverController.getLeftX() * -1)
-            .withControllerRotationAxis(m_driverController::getRightX)
+            .withControllerRotationAxis(() -> m_driverController.getRightX() * -1)
             .deadband(OperatorConstants.DEADBAND).scaleTranslation(0.8)
             .allianceRelativeControl(true);
 
@@ -105,6 +115,60 @@ public class RobotContainer {
     public RobotContainer() {
         // Configure the trigger bindings
         configureBindings();
+
+        // Build an auto chooser. This will use Commands.none() as the default option.
+        autoChooser = AutoBuilder.buildAutoChooser("DEFAULT");
+
+        // Another option that allows you to specify the default auto by its name
+        // autoChooser = AutoBuilder.buildAutoChooser("My Default Auto");
+
+        /*
+         * NamedCommands.registerCommand("ElevatorL2", new
+         * SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel2Height));
+         * NamedCommands.registerCommand("Elevator L3", new
+         * SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel3Height));
+         * NamedCommands.registerCommand("Intake Algae", new IntakeAlgaeCommand());
+         * NamedCommands.registerCommand("Coral Intake", new
+         * IntakeCoralCommand(Constants.CoralIndexerConstants.kIntakePower));
+         * NamedCommands.registerCommand("Coral Correcter", new CorrectCoralPositionCommand());
+         * NamedCommands.registerCommand("Coral Outake", new OuttakeCoralCommand());
+         * NamedCommands.registerCommand("Low Algae", new
+         * SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeLowHeight));
+         * NamedCommands.registerCommand("High Algae", new
+         * SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeHighHeight));
+         * NamedCommands.registerCommand("Lowest Height", new SetElevatorPositionCommand(0));
+         */
+        NamedCommands.registerCommand("OutakeCoralV2", new OuttakeCoralCommand(Constants.CoralIndexerConstants.kL1OuttakePower));
+        NamedCommands.registerCommand("StopCoralOutake", new OuttakeCoralCommand(0));
+        
+        // preloads the path
+
+        // Register Event Triggers
+        new EventTrigger("ElevatorL1").onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel1Height));
+        new EventTrigger("ElevatorL2").onTrue(
+                new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel2Height));
+        new EventTrigger("ElevatorL3").onTrue(
+                new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel3Height));
+        new EventTrigger("intakealgaeon").toggleOnTrue(new IntakeAlgaeCommand());
+        new EventTrigger("intakealgaeoff").toggleOnTrue(new IntakeAlgaeCommand());
+        new EventTrigger("coraloutakeon").toggleOnTrue(
+                new OuttakeCoralCommand(Constants.CoralIndexerConstants.kL1OuttakePower));
+        new EventTrigger("coraloutakeoff").toggleOnTrue(new OuttakeCoralCommand());
+        new EventTrigger("lowalgae")
+                .onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeLowHeight));
+        new EventTrigger("highalgae")
+                .onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeHighHeight));
+
+
+
+        // new EventTrigger("shoot note").and(new
+        // Trigger(exampleSubsystem::someCondition)).onTrue(Commands.print("shoot note");
+
+        // Point Towards Zone Triggers
+        // new PointTowardsZoneTrigger("Speaker").whileTrue(Commands.print("aiming at
+        // speaker"));
+
+        SmartDashboard.putData("Auto Chooser", autoChooser);
     }
 
     private ElevatorPosition select() {
@@ -118,7 +182,7 @@ public class RobotContainer {
             this::select);
 
     private final Command m_selectOuttakeCommand = new SelectCommand<>(Map.ofEntries(
-            Map.entry(ElevatorPosition.CORAL_L1, new OuttakeCoralCommand()),
+            Map.entry(ElevatorPosition.CORAL_L1, new OuttakeCoralCommand(Constants.CoralIndexerConstants.kL1OuttakePower)),
             Map.entry(ElevatorPosition.CORAL_L2, new OuttakeCoralCommand()),
             Map.entry(ElevatorPosition.CORAL_L3, new OuttakeCoralCommand()),
             Map.entry(ElevatorPosition.CORAL_STATION_AND_PROCESSOR, new OuttakeAlgaeCommand())),
@@ -152,7 +216,11 @@ public class RobotContainer {
 
         // Zero gyro
         m_driverController.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-        m_driverController.back().whileTrue(new InitiateClimbCommand());
+
+        m_driverController.back()
+                .whileTrue(Commands.parallel(new OuttakeAlgaeCommand(), new OuttakeCoralCommand()));
+
+        m_operatorController.back().whileTrue(new InitiateClimbCommand());
 
         // Raise elevator (by height of Algae diameter) while intaking algae
         m_driverController.leftBumper().whileTrue(m_selectIntakeCommand);
@@ -163,11 +231,18 @@ public class RobotContainer {
         m_driverController.rightTrigger(0.05).whileTrue(new StrafeRightCommand());
 
         // Climb controls
-        m_driverController.povUp().whileTrue(new ConditionalCommand(new MoveClimbUpCommand(),
-                new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
-        m_driverController.povDown().whileTrue(new ConditionalCommand(new MoveClimbDownCommand(),
-        new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
-        
+        m_driverController.povUp()
+                .whileTrue(new ConditionalCommand(new ManualClimb(m_climbSubsystem, 12),
+                        new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
+        m_driverController.povDown()
+                .whileTrue(new ConditionalCommand(new ManualClimb(m_climbSubsystem, -12),
+                        new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
+        m_driverController.povLeft()
+                .onTrue(new ConditionalCommand(new MoveClimbUpCommand(m_climbSubsystem),
+                        new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
+        m_driverController.povRight()
+                .onTrue(new ConditionalCommand(new MoveClimbDownCommand(m_climbSubsystem),
+                        new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
 
         m_indexSubsystem
                 .setDefaultCommand(
@@ -186,7 +261,6 @@ public class RobotContainer {
                 new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel2Height));
         m_operatorController.y().onTrue(
                 new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel3Height));
-
 
         // Elevator algae positions
         m_operatorController.povDown()
@@ -214,21 +288,14 @@ public class RobotContainer {
      *
      * @return the command to run in autonomous
      */
-    // public Command getAutonomousCommand() {
-    // // An example command will be run in autonomous
-    // return Autos.exampleAuto(m_exampleSubsystem);
-    // }
+    public Command getAutonomousCommand() {
+        // An example command will be run in autonomous
+        // return drivebase.getAutonomousCommand("New Auto");
+
+        return autoChooser.getSelected();
+    }
 
     public void setMotorBrake(boolean brake) {
         drivebase.setMotorBrake(brake);
-    }
-
-    /**
-     * Use this to pass the autonomous command to the main {@link Robot} class.
-     *
-     * @return the command to run in autonomous
-     */
-    public Command getAutonomousCommand() {
-        return null;
     }
 }

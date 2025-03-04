@@ -22,7 +22,7 @@ public class StrafeLeftCommand extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    RobotContainer.drivebase.strafe(-RobotContainer.m_driverController.getLeftTriggerAxis(), 0.1);
+    RobotContainer.drivebase.strafe(RobotContainer.m_driverController.getLeftTriggerAxis(), 0.1);
   }
 
   // Called once the command ends or is interrupted.

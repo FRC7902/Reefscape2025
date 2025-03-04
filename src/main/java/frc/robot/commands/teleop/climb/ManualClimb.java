@@ -10,13 +10,15 @@ import frc.robot.Constants.ClimbConstants;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.RobotContainer;
 
-public class MoveClimbDownCommand extends Command {
+public class ManualClimb extends Command {
 
+    private double direction = 0;
     private ClimbSubsystem m_climbSubsystem;
     
-    public MoveClimbDownCommand(ClimbSubsystem m_climbSubsystem) {
+    public ManualClimb(ClimbSubsystem m_climbSubsystem, double direction) {
         addRequirements(RobotContainer.m_climbSubsystem);
         this.m_climbSubsystem = m_climbSubsystem;
+        this.direction = direction;
     }
 
     // Called when the command is initially scheduled.
@@ -28,8 +30,7 @@ public class MoveClimbDownCommand extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        //m_climbSubsystem.runToAngle(m_operatorController, m_climbSubsystem.getClimbArmAngle(), ClimbConstants.kClimbBackwardLimit, -1);
-        m_climbSubsystem.driveMotors(12);
+        m_climbSubsystem.driveMotors(12 * direction);
     }
 
     // Called once the command ends or is interrupted.
@@ -41,6 +42,6 @@ public class MoveClimbDownCommand extends Command {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return m_climbSubsystem.getClimbArmAngle() >= 263;
+        return false;    
     }
 }
