@@ -37,6 +37,7 @@ public final class Constants {
       public static final double kGroundToCameraDistance = 0; //in meters
       public static final double kGroundToAprilTagDistance = 0.22225; //in meters
       public static final double kCameraPitch = 0;
+      public static final double kAprilTagArea = 0.75;
     }
     
     public static class PathPlanner {
