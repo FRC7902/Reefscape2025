@@ -71,7 +71,7 @@ public class RobotContainer {
     public static final SwerveSubsystem drivebase =
             new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
 
-    public static final CameraInterface m_autoAlignCam = new CameraInterface("skibidi");         
+    public static final CameraInterface m_autoAlignCam = new CameraInterface("skibidi", drivebase);         
 
     private final SendableChooser<Command> autoChooser;
 
@@ -79,7 +79,7 @@ public class RobotContainer {
      * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular
      * velocity.
      */
-    SwerveInputStream driveAngularVelocity = SwerveInputStream
+    public SwerveInputStream driveAngularVelocity = SwerveInputStream
             .of(drivebase.getSwerveDrive(), () -> m_driverController.getLeftY() * -1,
                     () -> m_driverController.getLeftX() * -1)
             .withControllerRotationAxis(() -> m_driverController.getRightX() * -1)
@@ -249,7 +249,7 @@ public class RobotContainer {
                 .onTrue(new ConditionalCommand(new MoveClimbDownCommand(m_climbSubsystem),
                         new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
         */
-        m_driverController.povRight().whileTrue(new AlignToReef(drivebase, m_autoAlignCam, m_driverController));
+        m_driverController.povRight().whileTrue(new AlignToReef(drivebase, m_autoAlignCam, m_driverController, this, m_indexSubsystem));
         
         m_indexSubsystem
                 .setDefaultCommand(
