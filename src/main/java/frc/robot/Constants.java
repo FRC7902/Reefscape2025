@@ -17,9 +17,14 @@ import edu.wpi.first.math.util.Units;
  */
 public final class Constants {
 
-    public static final double MAX_SPEED = Units.feetToMeters(15);
+    public static class DriveConstants {
+        public static final double MAX_SPEED = Units.feetToMeters(15);
 
-    
+        public static final double kSlewRateLimitX = 0.5;
+        public static final double kSlewRateLimitY = 0.5;
+        public static final double kSlewRateLimitRot = 0.5;
+    }
+
     public static class PathPlanner {
         public static final double kPDrive = 1.95;
         public static final double kIDrive = 0;
@@ -31,34 +36,37 @@ public final class Constants {
     }
 
     public static class ClimbConstants {
-      // CAN ID of the primary motor
-      public static final int kClimbLeaderMotorCANID = 41;
-      // CAN ID of the secondary motor
-      public static final int kClimbFollowerMotorCANID = 42;
-      // Digital IO Port that the REV Through Bore Absolute Encoder is connected to on the RIO (uses PWM)
-      public static final int kRevThroughBoreIO = 0;
-      // current limit when motor rpm is at 0 (in amps)
-      public static final int kMotorStallCurrent = 50;
-      // current limit when motor rpm is at 5700 (unique to NEO motors) (in amps)
-      public static final int kMotorFreeSpeedCurrent = 50;
-      // climb arm angle limiter when arm is moving outwards from the robot (in degrees)
-      public static final double kClimbBackwardLimit = 0; 
-      // climb arm angle limiter when arm is moving inwards to the robot (in degrees)
-      public static final double kClimbForwardLimit = 263.1; 
-      public static final double kClimbHomePose = 315.1;
-      // motor voltage applied when climb arm is set to move foward
-      public static final double kMotorVoltageUp = 12;
-      // motor voltage applied when climb arm is set to move backwards (negative to move the opposite direction)
-      public static final double kMotorVoltageDown = -12;
-      //975.6 Hz for REV Through Bore Absolute Encoder
-      //https://www.revrobotics.com/rev-11-1271/#:~:text=Output%20Frequency%3A%20975.6Hz
-      public static final double kRevThroughBoreFrequency = 975.6; 
-      //The REV Throughbore has a minimum pulse of 1 μs / 1025 μs and a maximum pulse of 1024 μs / 1025 μs
-      //these values are used to ensure accuracy of the encoder's data
-      public static final double kRevThroughBoreMinPulse = 0.000975609756; 
-      public static final double kRevThroughBoreMaxPulse = 0.99902439;
-      public static final int kLeftServoID = 9;
-      public static final int kRightServoID = 8;
+        // CAN ID of the primary motor
+        public static final int kClimbLeaderMotorCANID = 41;
+        // CAN ID of the secondary motor
+        public static final int kClimbFollowerMotorCANID = 42;
+        // Digital IO Port that the REV Through Bore Absolute Encoder is connected to on the RIO
+        // (uses PWM)
+        public static final int kRevThroughBoreIO = 0;
+        // current limit when motor rpm is at 0 (in amps)
+        public static final int kMotorStallCurrent = 50;
+        // current limit when motor rpm is at 5700 (unique to NEO motors) (in amps)
+        public static final int kMotorFreeSpeedCurrent = 50;
+        // climb arm angle limiter when arm is moving outwards from the robot (in degrees)
+        public static final double kClimbBackwardLimit = 0;
+        // climb arm angle limiter when arm is moving inwards to the robot (in degrees)
+        public static final double kClimbForwardLimit = 263.1;
+        public static final double kClimbHomePose = 315.1;
+        // motor voltage applied when climb arm is set to move foward
+        public static final double kMotorVoltageUp = 12;
+        // motor voltage applied when climb arm is set to move backwards (negative to move the
+        // opposite direction)
+        public static final double kMotorVoltageDown = -12;
+        // 975.6 Hz for REV Through Bore Absolute Encoder
+        // https://www.revrobotics.com/rev-11-1271/#:~:text=Output%20Frequency%3A%20975.6Hz
+        public static final double kRevThroughBoreFrequency = 975.6;
+        // The REV Throughbore has a minimum pulse of 1 μs / 1025 μs and a maximum pulse of 1024 μs
+        // / 1025 μs
+        // these values are used to ensure accuracy of the encoder's data
+        public static final double kRevThroughBoreMinPulse = 0.000975609756;
+        public static final double kRevThroughBoreMaxPulse = 0.99902439;
+        public static final int kLeftServoID = 9;
+        public static final int kRightServoID = 8;
     }
     public static class OperatorConstants {
         public static final int kDriverControllerPort = 0;
