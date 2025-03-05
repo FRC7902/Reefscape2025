@@ -11,6 +11,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.events.EventTrigger;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -20,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.teleop.NullCommand;
@@ -71,6 +73,10 @@ public class RobotContainer {
 
     private final SendableChooser<Command> autoChooser;
 
+    SlewRateLimiter m_filterX = new SlewRateLimiter(DriveConstants.kSlewRateLimitX);
+    SlewRateLimiter m_filterY = new SlewRateLimiter(DriveConstants.kSlewRateLimitY);
+    SlewRateLimiter m_filterRot = new SlewRateLimiter(DriveConstants.kSlewRateLimitRot);
+
     /**
      * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular
      * velocity.
@@ -79,6 +85,19 @@ public class RobotContainer {
             .of(drivebase.getSwerveDrive(), () -> m_driverController.getLeftY() * -1,
                     () -> m_driverController.getLeftX() * -1)
             .withControllerRotationAxis(() -> m_driverController.getRightX() * -1)
+            .deadband(OperatorConstants.DEADBAND).scaleTranslation(0.8)
+            .allianceRelativeControl(true);
+
+    /**
+     * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular
+     * velocity.
+     */
+    SwerveInputStream driveSlewAngularVelocity = SwerveInputStream
+            .of(drivebase.getSwerveDrive(),
+                    () -> m_filterY.calculate(m_driverController.getLeftY() * -1),
+                    () -> m_filterX.calculate(m_driverController.getLeftX() * -1))
+            .withControllerRotationAxis(
+                    () -> m_filterRot.calculate(m_driverController.getRightX() * -1))
             .deadband(OperatorConstants.DEADBAND).scaleTranslation(0.8)
             .allianceRelativeControl(true);
 
@@ -138,13 +157,15 @@ public class RobotContainer {
          * SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeHighHeight));
          * NamedCommands.registerCommand("Lowest Height", new SetElevatorPositionCommand(0));
          */
-        NamedCommands.registerCommand("OutakeCoralV2", new OuttakeCoralCommand(Constants.CoralIndexerConstants.kL1OuttakePower));
+        NamedCommands.registerCommand("OutakeCoralV2",
+                new OuttakeCoralCommand(Constants.CoralIndexerConstants.kL1OuttakePower));
         NamedCommands.registerCommand("StopCoralOutake", new OuttakeCoralCommand(0));
-        
+
         // preloads the path
 
         // Register Event Triggers
-        new EventTrigger("ElevatorL1").onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel1Height));
+        new EventTrigger("ElevatorL1").onTrue(
+                new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel1Height));
         new EventTrigger("ElevatorL2").onTrue(
                 new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel2Height));
         new EventTrigger("ElevatorL3").onTrue(
@@ -181,12 +202,16 @@ public class RobotContainer {
 
             this::select);
 
-    private final Command m_selectOuttakeCommand = new SelectCommand<>(Map.ofEntries(
-            Map.entry(ElevatorPosition.CORAL_L1, new OuttakeCoralCommand(Constants.CoralIndexerConstants.kL1OuttakePower)),
-            Map.entry(ElevatorPosition.CORAL_L2, new OuttakeCoralCommand()),
-            Map.entry(ElevatorPosition.CORAL_L3, new OuttakeCoralCommand()),
-            Map.entry(ElevatorPosition.CORAL_STATION_AND_PROCESSOR, new OuttakeAlgaeCommand())),
-            this::select);
+    private final Command m_selectOuttakeCommand =
+            new SelectCommand<>(Map.ofEntries(
+                    Map.entry(ElevatorPosition.CORAL_L1,
+                            new OuttakeCoralCommand(
+                                    Constants.CoralIndexerConstants.kL1OuttakePower)),
+                    Map.entry(ElevatorPosition.CORAL_L2, new OuttakeCoralCommand()),
+                    Map.entry(ElevatorPosition.CORAL_L3, new OuttakeCoralCommand()),
+                    Map.entry(ElevatorPosition.CORAL_STATION_AND_PROCESSOR,
+                            new OuttakeAlgaeCommand())),
+                    this::select);
 
     /**
      * Use this method to define your trigger->command mappings. Triggers can be created via the
@@ -202,6 +227,8 @@ public class RobotContainer {
         Command driveFieldOrientedDirectAngle = drivebase.driveFieldOriented(driveDirectAngle);
         Command driveFieldOrientedAnglularVelocity =
                 drivebase.driveFieldOriented(driveAngularVelocity);
+        Command driveFieldOrientedSlewAngularVelocity =
+                drivebase.driveFieldOriented(driveSlewAngularVelocity);
         Command driveRobotOrientedAngularVelocity =
                 drivebase.driveFieldOriented(driveRobotOriented);
         Command driveFieldOrientedDirectAngleKeyboard =
@@ -210,7 +237,10 @@ public class RobotContainer {
                 drivebase.driveFieldOriented(driveAngularVelocityKeyboard);
 
         // Default to field-centric swerve drive
-        drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
+        // drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
+        drivebase.setDefaultCommand(new ConditionalCommand(driveFieldOrientedAnglularVelocity,
+                driveFieldOrientedSlewAngularVelocity, () -> m_elevatorSubsystem
+                        .getElevatorEnumPosition() != ElevatorPosition.CORAL_STATION_AND_PROCESSOR));
 
         m_climbSubsystem.setDefaultCommand(new LockFunnelCommand());
 
