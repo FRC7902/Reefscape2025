@@ -9,7 +9,7 @@ import frc.robot.Constants.VisionConstants;
 import frc.robot.RobotContainer;
 
 public class CameraInterface {
-    private PhotonCamera camera;
+    private final PhotonCamera camera;
     private boolean targetIsVisible = false;
     private double targetYaw = 0;
     private Pose2d poseOfAprilTag = new Pose2d(0, 0, new Rotation2d(0));
@@ -109,7 +109,7 @@ public class CameraInterface {
      * @param aprilTagPose 
      */ 
     public Pose2d getRobotToTagPose(Pose2d aprilTagPose) {
-        Pose2d robotPose = getRobotPose();
+        final Pose2d robotPose = getRobotPose();
         return new Pose2d(aprilTagPose.getX() - robotPose.getX(), aprilTagPose.getY() - robotPose.getY(), aprilTagPose.getRotation());
     }
 
@@ -118,13 +118,13 @@ public class CameraInterface {
      * If an april tag is detected, the "targetIsVisible" boolean is set to true, which is necessary for any commands related to the CameraInterface to ensure no null values are accidentally read (will throw NullPointerException if read).
      */     
     public void getCameraResults() {
-        var results = camera.getAllUnreadResults();
+        final var results = camera.getAllUnreadResults();
         if (!results.isEmpty()) {
             var result = results.get(results.size() - 1);
             if (result.hasTargets()) {
-                for (var target : result.getTargets()) {
+                for (final var target : result.getTargets()) {
                     if (target.getArea() >= VisionConstants.kAprilTagArea) {
-                        int targetID = target.getFiducialId();
+                        final int targetID = target.getFiducialId();
                         if (isReefAprilTag(targetID)) {
                             targetYaw = target.getYaw();
                             poseOfAprilTag = aprilTagFieldLayout.getTagPose(targetID).get().toPose2d();
