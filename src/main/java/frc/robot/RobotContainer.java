@@ -6,10 +6,8 @@ package frc.robot;
 
 import java.io.File;
 import java.util.Map;
-
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.events.EventTrigger;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -27,10 +25,11 @@ import frc.robot.commands.teleop.SwerveCommands.StrafeLeftCommand;
 import frc.robot.commands.teleop.SwerveCommands.StrafeRightCommand;
 import frc.robot.commands.teleop.algae_manipulator.IntakeAlgaeCommand;
 import frc.robot.commands.teleop.algae_manipulator.OuttakeAlgaeCommand;
-import frc.robot.commands.teleop.climb.InitiateClimbCommand;
 import frc.robot.commands.teleop.climb.LockFunnelCommand;
+import frc.robot.commands.teleop.climb.ManualClimb;
 import frc.robot.commands.teleop.climb.MoveClimbDownCommand;
 import frc.robot.commands.teleop.climb.MoveClimbUpCommand;
+import frc.robot.commands.teleop.climb.UnlockFunnelCommand;
 import frc.robot.commands.teleop.coral_indexer.CorrectCoralPositionCommand;
 import frc.robot.commands.teleop.coral_indexer.IntakeCoralCommand;
 import frc.robot.commands.teleop.coral_indexer.OuttakeCoralCommand;
@@ -41,7 +40,6 @@ import frc.robot.subsystems.CoralIndexerSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem.ElevatorPosition;
 import frc.robot.subsystems.SwerveSubsystem;
-import frc.robot.commands.teleop.climb.ManualClimb;
 import swervelib.SwerveInputStream;
 
 /**
@@ -138,13 +136,15 @@ public class RobotContainer {
          * SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeHighHeight));
          * NamedCommands.registerCommand("Lowest Height", new SetElevatorPositionCommand(0));
          */
-        NamedCommands.registerCommand("OutakeCoralV2", new OuttakeCoralCommand(Constants.CoralIndexerConstants.kL1OuttakePower));
+        NamedCommands.registerCommand("OutakeCoralV2",
+                new OuttakeCoralCommand(Constants.CoralIndexerConstants.kL1OuttakePower));
         NamedCommands.registerCommand("StopCoralOutake", new OuttakeCoralCommand(0));
-        
+
         // preloads the path
 
         // Register Event Triggers
-        new EventTrigger("ElevatorL1").onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel1Height));
+        new EventTrigger("ElevatorL1").onTrue(
+                new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel1Height));
         new EventTrigger("ElevatorL2").onTrue(
                 new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel2Height));
         new EventTrigger("ElevatorL3").onTrue(
@@ -181,12 +181,16 @@ public class RobotContainer {
 
             this::select);
 
-    private final Command m_selectOuttakeCommand = new SelectCommand<>(Map.ofEntries(
-            Map.entry(ElevatorPosition.CORAL_L1, new OuttakeCoralCommand(Constants.CoralIndexerConstants.kL1OuttakePower)),
-            Map.entry(ElevatorPosition.CORAL_L2, new OuttakeCoralCommand()),
-            Map.entry(ElevatorPosition.CORAL_L3, new OuttakeCoralCommand()),
-            Map.entry(ElevatorPosition.CORAL_STATION_AND_PROCESSOR, new OuttakeAlgaeCommand())),
-            this::select);
+    private final Command m_selectOuttakeCommand =
+            new SelectCommand<>(Map.ofEntries(
+                    Map.entry(ElevatorPosition.CORAL_L1,
+                            new OuttakeCoralCommand(
+                                    Constants.CoralIndexerConstants.kL1OuttakePower)),
+                    Map.entry(ElevatorPosition.CORAL_L2, new OuttakeCoralCommand()),
+                    Map.entry(ElevatorPosition.CORAL_L3, new OuttakeCoralCommand()),
+                    Map.entry(ElevatorPosition.CORAL_STATION_AND_PROCESSOR,
+                            new OuttakeAlgaeCommand())),
+                    this::select);
 
     /**
      * Use this method to define your trigger->command mappings. Triggers can be created via the
@@ -220,8 +224,6 @@ public class RobotContainer {
         m_driverController.back()
                 .whileTrue(Commands.parallel(new OuttakeAlgaeCommand(), new OuttakeCoralCommand()));
 
-        m_operatorController.back().whileTrue(new InitiateClimbCommand());
-
         // Raise elevator (by height of Algae diameter) while intaking algae
         m_driverController.leftBumper().whileTrue(m_selectIntakeCommand);
         m_driverController.rightBumper().whileTrue(m_selectOuttakeCommand);
@@ -251,6 +253,13 @@ public class RobotContainer {
                                 .andThen(new IntakeCoralCommand(
                                         Constants.CoralIndexerConstants.kCorrectionPower)
                                                 .withTimeout(1)));
+
+        // Initiate climb
+        m_driverController.back()
+                .onTrue(Commands.sequence(
+                        new SetElevatorPositionCommand(ElevatorConstants.kElevatorMinHeightMeters),
+                        new UnlockFunnelCommand().withTimeout(2),
+                        new MoveClimbUpCommand(m_climbSubsystem)));
 
         // Elevator coral positions
         m_operatorController.x().onTrue(
