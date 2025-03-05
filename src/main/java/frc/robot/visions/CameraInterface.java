@@ -7,23 +7,32 @@ import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants.VisionConstants;
+import frc.robot.subsystems.CoralIndexerSubsystem;
+import frc.robot.subsystems.SwerveSubsystem;
 
 public class CameraInterface {
-    private PhotonCamera camera;
+    public PhotonCamera camera;
     private PhotonPoseEstimator photonEstimator; //creates pose estimator object
     private Matrix<N3, N1> curStdDevs; //creates matrix for current standard deviations
     private boolean targetIsVisible = false;
     public double targetYaw = 0;
-    public double distanceToTag = 0;
+    public Pose2d poseOfAprilTag = new Pose2d(0, 0, new Rotation2d(0));
+    public Pose2d poseFromRobotToTag = new Pose2d(0, 0, new Rotation2d(0));
     public double horizontalDistanceToTag = 0;
-    
-    public CameraInterface(String cameraName) {
+    public AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
+    private SwerveSubsystem drivebase;
+
+
+    public CameraInterface(String cameraName, SwerveSubsystem drivebase) {
         camera = new PhotonCamera(cameraName);
-        photonEstimator = new PhotonPoseEstimator(AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark), PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, VisionConstants.krobotToCam);
+        photonEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, VisionConstants.krobotToCam);
+        this.drivebase = drivebase;
     }
 
     private boolean isReefAprilTag(int aprilTagID) {
@@ -51,18 +60,27 @@ public class CameraInterface {
         targetIsVisible = false;
     }
 
+    public Pose2d getRobotToTagPose(Pose2d pose) {
+        Pose2d robotPose = drivebase.getPose();
+        return new Pose2d(pose.getX() - robotPose.getX(), pose.getY() - robotPose.getY(), pose.getRotation());
+    }
+
     public void getCameraResults() {
         var results = camera.getAllUnreadResults();
         if (!results.isEmpty()) {
             var result = results.get(results.size() - 1);
             if (result.hasTargets()) {
                 for (var target : result.getTargets()) {
-                    if (isReefAprilTag(target.getFiducialId())) {
-                        targetYaw = target.getYaw();
-                        distanceToTag = PhotonUtils.calculateDistanceToTargetMeters(VisionConstants.kGroundToCameraDistance, VisionConstants.kGroundToAprilTagDistance, Units.degreesToRadians(VisionConstants.kCameraPitch), Units.degreesToRadians(target.getPitch()));
-                        horizontalDistanceToTag = distanceToTag * Math.sin(targetYaw);
-                        targetIsVisible = true;
-                        break;
+                    if (target.getArea() >= 0.75) {
+                        int targetID = target.getFiducialId();
+                        if (isReefAprilTag(targetID)) {
+                            targetYaw = target.getYaw();
+                            poseOfAprilTag = aprilTagFieldLayout.getTagPose(targetID).get().toPose2d();
+                            poseFromRobotToTag = getRobotToTagPose(poseOfAprilTag);
+                            horizontalDistanceToTag = poseFromRobotToTag.getY();
+                            targetIsVisible = true;
+                            break;
+                        }
                     }
                 }
             }
