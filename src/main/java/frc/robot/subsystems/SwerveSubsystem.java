@@ -383,6 +383,12 @@ public class SwerveSubsystem extends SubsystemBase {
      *                         smoother controls.
      * @return Drive command.
      */
+
+
+    public double getMaximumChassisAngularVelocity() {
+        return swerveDrive.getMaximumChassisAngularVelocity();
+    }
+
     public Command driveCommand(DoubleSupplier translationX, DoubleSupplier translationY,
             DoubleSupplier angularRotationX) {
         return run(() -> {
