@@ -249,7 +249,7 @@ public class RobotContainer {
                 .onTrue(new ConditionalCommand(new MoveClimbDownCommand(m_climbSubsystem),
                         new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
         */
-        m_driverController.povRight().whileTrue(new AlignToReef(drivebase, m_autoAlignCam, m_driverController, this, m_indexSubsystem));
+        m_driverController.povRight().whileTrue(new AlignToReef());
         
         m_indexSubsystem
                 .setDefaultCommand(
