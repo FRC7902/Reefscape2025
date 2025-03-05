@@ -8,6 +8,7 @@ import java.util.function.DoubleSupplier;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.Constants.VisionConstants;
 import swervelib.SwerveInputStream;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
@@ -21,7 +22,7 @@ public class AlignToReef extends Command {
     addRequirements();
   }
 
-  public SwerveInputStream getDriveAngularVelocity() {
+  private SwerveInputStream getDriveAngularVelocity() {
     return SwerveInputStream.of(RobotContainer.drivebase.getSwerveDrive(), 
     () -> RobotContainer.m_driverController.getLeftY() * -1,
     () -> RobotContainer.m_driverController.getLeftX() * -1)
@@ -31,7 +32,6 @@ public class AlignToReef extends Command {
     .allianceRelativeControl(true);        
   }
 
-
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
@@ -39,10 +39,10 @@ public class AlignToReef extends Command {
     RobotContainer.m_autoAlignCam.resetTargetDetector();
     endCommand = !RobotContainer.m_indexSubsystem.hasCoral();
     if (RobotContainer.m_driverController.povRight().getAsBoolean()) {
-      reefOffset = 1.3; // to test
+      reefOffset = VisionConstants.reefToAprilTagOffset; // to measure
     }
     else if (RobotContainer.m_driverController.povLeft().getAsBoolean()) {
-      reefOffset = -1.3; // to test
+      reefOffset = -VisionConstants.reefToAprilTagOffset; // to measure
     }
   }
 
