@@ -40,8 +40,10 @@ import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.CoralIndexerSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem.ElevatorPosition;
+import frc.robot.visions.CameraInterface;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.commands.teleop.climb.ManualClimb;
+import frc.robot.commands.teleop.visions.AlignToReef;
 import swervelib.SwerveInputStream;
 
 /**
@@ -68,6 +70,8 @@ public class RobotContainer {
 
     public static final SwerveSubsystem drivebase =
             new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
+
+    public static final CameraInterface m_autoAlignCam = new CameraInterface("skibidi");         
 
     private final SendableChooser<Command> autoChooser;
 
@@ -237,13 +241,16 @@ public class RobotContainer {
         m_driverController.povDown()
                 .whileTrue(new ConditionalCommand(new ManualClimb(m_climbSubsystem, -12),
                         new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
+        /* 
         m_driverController.povLeft()
                 .onTrue(new ConditionalCommand(new MoveClimbUpCommand(m_climbSubsystem),
                         new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
         m_driverController.povRight()
                 .onTrue(new ConditionalCommand(new MoveClimbDownCommand(m_climbSubsystem),
                         new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
-
+        */
+        m_driverController.povRight().whileTrue(new AlignToReef(drivebase, m_autoAlignCam, m_driverController));
+        
         m_indexSubsystem
                 .setDefaultCommand(
                         new IntakeCoralCommand(Constants.CoralIndexerConstants.kIntakePower)
