@@ -41,6 +41,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
+import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.PathPlanner;
 import frc.robot.Robot;
 import swervelib.SwerveController;
@@ -65,7 +66,7 @@ public class SwerveSubsystem extends SubsystemBase {
         // objects being created.
         SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
         try {
-            swerveDrive = new SwerveParser(directory).createSwerveDrive(Constants.MAX_SPEED,
+            swerveDrive = new SwerveParser(directory).createSwerveDrive(DriveConstants.MAX_SPEED,
                     new Pose2d(new Translation2d(Meter.of(1), Meter.of(4)),
                             Rotation2d.fromDegrees(0)));
             // Alternative method if you don't want to supply the conversion factor via JSON
@@ -609,7 +610,7 @@ public class SwerveSubsystem extends SubsystemBase {
         Translation2d scaledInputs = SwerveMath.cubeTranslation(new Translation2d(xInput, yInput));
         return swerveDrive.swerveController.getTargetSpeeds(scaledInputs.getX(),
                 scaledInputs.getY(), headingX, headingY, getHeading().getRadians(),
-                Constants.MAX_SPEED);
+                DriveConstants.MAX_SPEED);
     }
 
     /**
@@ -627,7 +628,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
         return swerveDrive.swerveController.getTargetSpeeds(scaledInputs.getX(),
                 scaledInputs.getY(), angle.getRadians(), getHeading().getRadians(),
-                Constants.MAX_SPEED);
+                DriveConstants.MAX_SPEED);
     }
 
     /**

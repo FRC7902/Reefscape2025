@@ -4,7 +4,16 @@
 
 package frc.robot;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
+import frc.robot.Constants.ElevatorConstants;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -17,8 +26,18 @@ import edu.wpi.first.math.util.Units;
  */
 public final class Constants {
 
-    public static final double MAX_SPEED = Units.feetToMeters(15);
 
+    public static class DriveConstants {
+      public static final double MAX_SPEED = Units.feetToMeters(15);
+    }
+
+    public static class VisionConstants {
+      public static final Rotation3d krobotToCamRotation = new Rotation3d(0, 0, 0);
+      public static final Transform3d krobotToCam = new Transform3d(0, 0, 0, krobotToCamRotation);
+      public static final double kGroundToCameraDistance = 0; //in meters
+      public static final double kGroundToAprilTagDistance = 0.22225; //in meters
+      public static final double kCameraPitch = 0;
+    }
     
     public static class PathPlanner {
         public static final double kPDrive = 1.95;
