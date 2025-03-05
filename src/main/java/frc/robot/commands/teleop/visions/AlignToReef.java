@@ -35,7 +35,7 @@ public class AlignToReef extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    RobotContainer.m_autoAlignCam.camera.getAllUnreadResults();
+    RobotContainer.m_autoAlignCam.clearCameraFIFOBuffer();
     RobotContainer.m_autoAlignCam.resetTargetDetector();
     endCommand = !RobotContainer.m_indexSubsystem.hasCoral();
     if (RobotContainer.m_driverController.povRight().getAsBoolean()) {
