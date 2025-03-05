@@ -239,12 +239,10 @@ public class RobotContainer {
         m_driverController.povDown()
                 .whileTrue(new ConditionalCommand(new ManualClimb(m_climbSubsystem, -12),
                         new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
-        m_driverController.povLeft()
-                .onTrue(new ConditionalCommand(new MoveClimbUpCommand(m_climbSubsystem),
-                        new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
-        m_driverController.povRight()
-                .onTrue(new ConditionalCommand(new MoveClimbDownCommand(m_climbSubsystem),
-                        new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
+        m_driverController.povLeft().onTrue(new ConditionalCommand(new MoveClimbUpCommand(),
+                new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
+        m_driverController.povRight().onTrue(new ConditionalCommand(new MoveClimbDownCommand(),
+                new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
 
         m_indexSubsystem
                 .setDefaultCommand(
@@ -258,8 +256,7 @@ public class RobotContainer {
         m_driverController.back()
                 .onTrue(Commands.sequence(
                         new SetElevatorPositionCommand(ElevatorConstants.kElevatorMinHeightMeters),
-                        new UnlockFunnelCommand().withTimeout(2),
-                        new MoveClimbUpCommand(m_climbSubsystem)));
+                        new UnlockFunnelCommand().withTimeout(2), new MoveClimbUpCommand()));
 
         // Elevator coral positions
         m_operatorController.x().onTrue(

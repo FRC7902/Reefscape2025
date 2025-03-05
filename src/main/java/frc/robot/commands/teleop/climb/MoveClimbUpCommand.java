@@ -5,43 +5,42 @@
 package frc.robot.commands.teleop.climb;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.Constants.ClimbConstants;
-import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.RobotContainer;
 
 public class MoveClimbUpCommand extends Command {
 
-    private ClimbSubsystem m_climbSubsystem;
-    
-    public MoveClimbUpCommand(ClimbSubsystem m_climbSubsystem) {
+
+    public MoveClimbUpCommand() {
         addRequirements(RobotContainer.m_climbSubsystem);
-        this.m_climbSubsystem = m_climbSubsystem;
     }
 
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        m_climbSubsystem.stopMotors();
+        RobotContainer.m_climbSubsystem.stopMotors();
     }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        //m_climbSubsystem.runToAngle(m_operatorController, m_climbSubsystem.getClimbArmAngle(), ClimbConstants.kClimbForwardLimit, 1);
-        m_climbSubsystem.driveMotors(-12);
+        // RobotContainer.m_climbSubsystem.runToAngle(m_operatorController,
+        // RobotContainer.m_climbSubsystem.getClimbArmAngle(),
+        // ClimbConstants.kClimbForwardLimit, 1);
+        RobotContainer.m_climbSubsystem.driveMotors(-12);
     }
 
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-        m_climbSubsystem.stopMotors();
+        RobotContainer.m_climbSubsystem.stopMotors();
     }
 
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-     //   return m_climbSubsystem.isAtTargetAngle(m_climbSubsystem.getClimbArmAngle(), ClimbConstants.kClimbForwardLimit, 1);
-        return m_climbSubsystem.getClimbArmAngle() <= 90;
+        // return
+        // RobotContainer.m_climbSubsystem.isAtTargetAngle(RobotContainer.m_climbSubsystem.getClimbArmAngle(),
+        // ClimbConstants.kClimbForwardLimit, 1);
+        return RobotContainer.m_climbSubsystem.getClimbArmAngle() <= 90;
     }
 }
