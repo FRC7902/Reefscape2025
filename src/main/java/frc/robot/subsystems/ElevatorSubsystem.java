@@ -32,6 +32,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.ElevatorConstants;
+import frc.robot.commands.teleop.elevator.SetElevatorPositionCommand;
 
 public class ElevatorSubsystem extends SubsystemBase {
 
@@ -39,6 +40,8 @@ public class ElevatorSubsystem extends SubsystemBase {
     public enum ElevatorPosition {
         CORAL_L1, CORAL_L2, CORAL_L3, CORAL_STATION_AND_PROCESSOR, ALGAE_HIGH, ALGAE_LOW
     }
+
+    private ElevatorPosition m_selectedPosition = ElevatorPosition.CORAL_STATION_AND_PROCESSOR;
 
     /** TalonFX leader motor controller object */
     private final TalonFX m_leaderMotor = new TalonFX(ElevatorConstants.kElevatorLeaderCAN);
@@ -327,6 +330,31 @@ public class ElevatorSubsystem extends SubsystemBase {
         }
     }
 
+    public void setSelectedElevatorPosition(ElevatorPosition position) {
+        m_selectedPosition = position;
+    }
+
+    public Command getElevatorPositionCommand() {
+        switch (m_selectedPosition) {
+            case CORAL_L1:
+                return new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel1Height);
+            case CORAL_L2:
+                return new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel2Height);
+            case CORAL_L3:
+                return new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel3Height);
+            case CORAL_STATION_AND_PROCESSOR:
+                return new SetElevatorPositionCommand(
+                        ElevatorConstants.kElevatorCoralStationAndProcessorHeight);
+            case ALGAE_HIGH:
+                return new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeHighHeight);
+            case ALGAE_LOW:
+                return new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeLowHeight);
+            default:
+                return new SetElevatorPositionCommand(
+                        ElevatorConstants.kElevatorCoralStationAndProcessorHeight);
+        }
+    }
+
     @Override
     public void periodic() {
         if (m_leaderMotor.getClosedLoopReference().getValueAsDouble() == 0
@@ -360,8 +388,9 @@ public class ElevatorSubsystem extends SubsystemBase {
         // m_elevatorFollowerMotor.getSupplyCurrent().getValueAsDouble());
         // SmartDashboard.putBoolean("Reverse limit switch", isAtRetractLimit());
 
-        // String elevatorEnumPosition = (getElevatorEnumPosition() != null) ? getElevatorEnumPosition().toString()
-        //         : "N/A";
+        // String elevatorEnumPosition = (getElevatorEnumPosition() != null) ?
+        // getElevatorEnumPosition().toString()
+        // : "N/A";
         // SmartDashboard.putString("Curr Position Name", elevatorEnumPosition);
 
         updateTelemetry();

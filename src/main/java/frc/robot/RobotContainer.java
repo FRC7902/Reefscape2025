@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -138,13 +139,15 @@ public class RobotContainer {
          * SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeHighHeight));
          * NamedCommands.registerCommand("Lowest Height", new SetElevatorPositionCommand(0));
          */
-        NamedCommands.registerCommand("OutakeCoralV2", new OuttakeCoralCommand(Constants.CoralIndexerConstants.kL1OuttakePower));
+        NamedCommands.registerCommand("OutakeCoralV2",
+                new OuttakeCoralCommand(Constants.CoralIndexerConstants.kL1OuttakePower));
         NamedCommands.registerCommand("StopCoralOutake", new OuttakeCoralCommand(0));
-        
+
         // preloads the path
 
         // Register Event Triggers
-        new EventTrigger("ElevatorL1").onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel1Height));
+        new EventTrigger("ElevatorL1").onTrue(
+                new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel1Height));
         new EventTrigger("ElevatorL2").onTrue(
                 new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel2Height));
         new EventTrigger("ElevatorL3").onTrue(
@@ -181,12 +184,16 @@ public class RobotContainer {
 
             this::select);
 
-    private final Command m_selectOuttakeCommand = new SelectCommand<>(Map.ofEntries(
-            Map.entry(ElevatorPosition.CORAL_L1, new OuttakeCoralCommand(Constants.CoralIndexerConstants.kL1OuttakePower)),
-            Map.entry(ElevatorPosition.CORAL_L2, new OuttakeCoralCommand()),
-            Map.entry(ElevatorPosition.CORAL_L3, new OuttakeCoralCommand()),
-            Map.entry(ElevatorPosition.CORAL_STATION_AND_PROCESSOR, new OuttakeAlgaeCommand())),
-            this::select);
+    private final Command m_selectOuttakeCommand =
+            new SelectCommand<>(Map.ofEntries(
+                    Map.entry(ElevatorPosition.CORAL_L1,
+                            new OuttakeCoralCommand(
+                                    Constants.CoralIndexerConstants.kL1OuttakePower)),
+                    Map.entry(ElevatorPosition.CORAL_L2, new OuttakeCoralCommand()),
+                    Map.entry(ElevatorPosition.CORAL_L3, new OuttakeCoralCommand()),
+                    Map.entry(ElevatorPosition.CORAL_STATION_AND_PROCESSOR,
+                            new OuttakeAlgaeCommand())),
+                    this::select);
 
     /**
      * Use this method to define your trigger->command mappings. Triggers can be created via the
@@ -244,6 +251,9 @@ public class RobotContainer {
                 .onTrue(new ConditionalCommand(new MoveClimbDownCommand(m_climbSubsystem),
                         new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
 
+        // Trigger elevator to go to selected elevator position
+        m_operatorController.a().onTrue(m_elevatorSubsystem.getElevatorPositionCommand());
+
         m_indexSubsystem
                 .setDefaultCommand(
                         new IntakeCoralCommand(Constants.CoralIndexerConstants.kIntakePower)
@@ -252,21 +262,28 @@ public class RobotContainer {
                                         Constants.CoralIndexerConstants.kCorrectionPower)
                                                 .withTimeout(1)));
 
-        // Elevator coral positions
-        m_operatorController.x().onTrue(
-                new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel1Height));
-        m_operatorController.a().onTrue(new SetElevatorPositionCommand(
-                ElevatorConstants.kElevatorCoralStationAndProcessorHeight));
-        m_operatorController.b().onTrue(
-                new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel2Height));
-        m_operatorController.y().onTrue(
-                new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel3Height));
+        // Pre-select elevator coral positions
+        m_operatorController.x().onTrue(new InstantCommand(() -> {
+            m_elevatorSubsystem.setSelectedElevatorPosition(ElevatorPosition.CORAL_L1);
+        }));
+        m_operatorController.a().onTrue(new InstantCommand(() -> {
+            m_elevatorSubsystem
+                    .setSelectedElevatorPosition(ElevatorPosition.CORAL_STATION_AND_PROCESSOR);
+        }));
+        m_operatorController.b().onTrue(new InstantCommand(() -> {
+            m_elevatorSubsystem.setSelectedElevatorPosition(ElevatorPosition.CORAL_L2);
+        }));
+        m_operatorController.y().onTrue(new InstantCommand(() -> {
+            m_elevatorSubsystem.setSelectedElevatorPosition(ElevatorPosition.CORAL_L3);
+        }));
 
-        // Elevator algae positions
-        m_operatorController.povDown()
-                .onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeLowHeight));
-        m_operatorController.povUp()
-                .onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeHighHeight));
+        // Pre-select elevator algae positions
+        m_operatorController.povDown().onTrue(new InstantCommand(() -> {
+            m_elevatorSubsystem.setSelectedElevatorPosition(ElevatorPosition.ALGAE_LOW);
+        }));
+        m_operatorController.povUp().onTrue(new InstantCommand(() -> {
+            m_elevatorSubsystem.setSelectedElevatorPosition(ElevatorPosition.ALGAE_HIGH);
+        }));
 
         // ======= Test bindings =======
 
