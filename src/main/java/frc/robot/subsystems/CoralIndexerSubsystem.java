@@ -33,6 +33,8 @@ public class CoralIndexerSubsystem extends SubsystemBase {
     // kVelocity)
     private double m_simMotorVelocity = 0;
 
+    private Debouncer m_debouncer = new Debouncer(0.1);
+
     public CoralIndexerSubsystem() {
         m_indexMotorConfig.smartCurrentLimit(30).openLoopRampRate(CoralIndexerConstants.kRampRate)
                 .idleMode(IdleMode.kBrake);
@@ -74,6 +76,10 @@ public class CoralIndexerSubsystem extends SubsystemBase {
 
     public boolean isShallowBeamBroken() {
         return !m_shallowBeamBreak.get();
+    }
+
+    public boolean isShallowBeamBrokenWithDebouce() {
+        return m_debouncer.calculate(isShallowBeamBroken());
     }
 
     public boolean isDeepBeamBroken() {

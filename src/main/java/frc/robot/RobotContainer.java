@@ -32,7 +32,7 @@ import frc.robot.commands.teleop.climb.LockFunnelCommand;
 import frc.robot.commands.teleop.climb.MoveClimbDownCommand;
 import frc.robot.commands.teleop.climb.MoveClimbUpCommand;
 import frc.robot.commands.teleop.coral_indexer.CorrectCoralPositionCommand;
-import frc.robot.commands.teleop.coral_indexer.IntakeCoralCommand;
+import frc.robot.commands.teleop.coral_indexer.ManualIntakeCoralCommand;
 import frc.robot.commands.teleop.coral_indexer.OuttakeCoralCommand;
 import frc.robot.commands.teleop.elevator.SetElevatorPositionCommand;
 import frc.robot.subsystems.AlgaeManipulatorSubsystem;
@@ -138,13 +138,15 @@ public class RobotContainer {
          * SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeHighHeight));
          * NamedCommands.registerCommand("Lowest Height", new SetElevatorPositionCommand(0));
          */
-        NamedCommands.registerCommand("OutakeCoralV2", new OuttakeCoralCommand(Constants.CoralIndexerConstants.kL1OuttakePower));
+        NamedCommands.registerCommand("OutakeCoralV2",
+                new OuttakeCoralCommand(Constants.CoralIndexerConstants.kL1OuttakePower));
         NamedCommands.registerCommand("StopCoralOutake", new OuttakeCoralCommand(0));
-        
+
         // preloads the path
 
         // Register Event Triggers
-        new EventTrigger("ElevatorL1").onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel1Height));
+        new EventTrigger("ElevatorL1").onTrue(
+                new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel1Height));
         new EventTrigger("ElevatorL2").onTrue(
                 new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel2Height));
         new EventTrigger("ElevatorL3").onTrue(
@@ -175,18 +177,27 @@ public class RobotContainer {
         return m_elevatorSubsystem.getElevatorEnumPosition();
     }
 
-    private final Command m_selectIntakeCommand = new SelectCommand<>(
-            Map.ofEntries(Map.entry(ElevatorPosition.ALGAE_LOW, new IntakeAlgaeCommand()),
-                    Map.entry(ElevatorPosition.ALGAE_HIGH, new IntakeAlgaeCommand())),
-
+    private final Command m_selectIntakeCommand = new SelectCommand<>(Map.ofEntries(
+            Map.entry(ElevatorPosition.ALGAE_LOW, new IntakeAlgaeCommand()),
+            Map.entry(ElevatorPosition.ALGAE_HIGH, new IntakeAlgaeCommand()),
+            // Pre-spin the coral indexer if deep beam is not broken
+            Map.entry(ElevatorPosition.CORAL_STATION_AND_PROCESSOR,
+                    new ConditionalCommand(new NullCommand(),
+                            new ManualIntakeCoralCommand(
+                                    Constants.CoralIndexerConstants.kIntakePower).withTimeout(5),
+                            m_indexSubsystem::isDeepBeamBroken))),
             this::select);
 
-    private final Command m_selectOuttakeCommand = new SelectCommand<>(Map.ofEntries(
-            Map.entry(ElevatorPosition.CORAL_L1, new OuttakeCoralCommand(Constants.CoralIndexerConstants.kL1OuttakePower)),
-            Map.entry(ElevatorPosition.CORAL_L2, new OuttakeCoralCommand()),
-            Map.entry(ElevatorPosition.CORAL_L3, new OuttakeCoralCommand()),
-            Map.entry(ElevatorPosition.CORAL_STATION_AND_PROCESSOR, new OuttakeAlgaeCommand())),
-            this::select);
+    private final Command m_selectOuttakeCommand =
+            new SelectCommand<>(Map.ofEntries(
+                    Map.entry(ElevatorPosition.CORAL_L1,
+                            new OuttakeCoralCommand(
+                                    Constants.CoralIndexerConstants.kL1OuttakePower)),
+                    Map.entry(ElevatorPosition.CORAL_L2, new OuttakeCoralCommand()),
+                    Map.entry(ElevatorPosition.CORAL_L3, new OuttakeCoralCommand()),
+                    Map.entry(ElevatorPosition.CORAL_STATION_AND_PROCESSOR,
+                            new OuttakeAlgaeCommand())),
+                    this::select);
 
     /**
      * Use this method to define your trigger->command mappings. Triggers can be created via the
@@ -246,9 +257,9 @@ public class RobotContainer {
 
         m_indexSubsystem
                 .setDefaultCommand(
-                        new IntakeCoralCommand(Constants.CoralIndexerConstants.kIntakePower)
+                        new ManualIntakeCoralCommand(Constants.CoralIndexerConstants.kIntakePower)
                                 .andThen(new CorrectCoralPositionCommand().withTimeout(1))
-                                .andThen(new IntakeCoralCommand(
+                                .andThen(new ManualIntakeCoralCommand(
                                         Constants.CoralIndexerConstants.kCorrectionPower)
                                                 .withTimeout(1)));
 

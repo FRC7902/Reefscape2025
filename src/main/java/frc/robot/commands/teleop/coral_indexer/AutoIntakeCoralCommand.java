@@ -12,12 +12,12 @@ import frc.robot.RobotContainer;
  * https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#
  * defining-commands
  */
-public class IntakeCoralCommand extends Command {
+public class AutoIntakeCoralCommand extends Command {
 
     private double m_power;
 
     /** Creates a new IntakeCoralCommand. */
-    public IntakeCoralCommand(double power) {
+    public AutoIntakeCoralCommand(double power) {
         // Use addRequirements() here to declare subsystem dependencies.
         addRequirements(RobotContainer.m_indexSubsystem);
         m_power = power;
