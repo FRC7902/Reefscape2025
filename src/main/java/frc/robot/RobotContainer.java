@@ -204,14 +204,10 @@ public class RobotContainer {
     private void configureBindings() {
         // Swerve drive controls
         Command driveFieldOrientedDirectAngle = drivebase.driveFieldOriented(driveDirectAngle);
-        Command driveFieldOrientedAnglularVelocity =
-                drivebase.driveFieldOriented(driveAngularVelocity);
-        Command driveRobotOrientedAngularVelocity =
-                drivebase.driveFieldOriented(driveRobotOriented);
-        Command driveFieldOrientedDirectAngleKeyboard =
-                drivebase.driveFieldOriented(driveDirectAngleKeyboard);
-        Command driveFieldOrientedAnglularVelocityKeyboard =
-                drivebase.driveFieldOriented(driveAngularVelocityKeyboard);
+        Command driveFieldOrientedAnglularVelocity = drivebase.driveFieldOriented(driveAngularVelocity);
+        Command driveRobotOrientedAngularVelocity = drivebase.driveFieldOriented(driveRobotOriented);
+        Command driveFieldOrientedDirectAngleKeyboard = drivebase.driveFieldOriented(driveDirectAngleKeyboard);
+        Command driveFieldOrientedAnglularVelocityKeyboard = drivebase.driveFieldOriented(driveAngularVelocityKeyboard);
 
         // Default to field-centric swerve drive
         drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);

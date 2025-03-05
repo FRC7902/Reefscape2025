@@ -14,6 +14,7 @@ import swervelib.SwerveInputStream;
 public class AlignToReef extends Command {
   /** Creates a new AlignToReefCommand. */
   private boolean endCommand = false;
+  private double reefOffset = 0;
 
   public AlignToReef() {
     // Use addRequirements() here to declare subsystem dependencies.
@@ -37,6 +38,12 @@ public class AlignToReef extends Command {
     RobotContainer.m_autoAlignCam.camera.getAllUnreadResults();
     RobotContainer.m_autoAlignCam.resetTargetDetector();
     endCommand = !RobotContainer.m_indexSubsystem.hasCoral();
+    if (RobotContainer.m_driverController.povRight().getAsBoolean()) {
+      reefOffset = 1.3; // to test
+    }
+    else if (RobotContainer.m_driverController.povLeft().getAsBoolean()) {
+      reefOffset = -1.3; // to test
+    }
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -48,7 +55,7 @@ public class AlignToReef extends Command {
     }
     else if (RobotContainer.m_autoAlignCam.cameraSawTarget()) {
       DoubleSupplier xTrans = () -> RobotContainer.m_autoAlignCam.poseFromRobotToTag.getX();
-      DoubleSupplier yTrans = () -> RobotContainer.m_autoAlignCam.poseFromRobotToTag.getY();
+      DoubleSupplier yTrans = () -> (RobotContainer.m_autoAlignCam.poseFromRobotToTag.getY() + reefOffset);
       DoubleSupplier maxAngularRotation = () -> RobotContainer.drivebase.getMaximumChassisAngularVelocity();
       RobotContainer.drivebase.driveCommand(xTrans, yTrans, maxAngularRotation);
     }
