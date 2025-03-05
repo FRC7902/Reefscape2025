@@ -205,6 +205,7 @@ public class RobotContainer {
      */
     private void configureBindings() {
         // Swerve drive controls
+<<<<<<< HEAD
         Command driveFieldOrientedDirectAngle = m_swerveSubsystem.driveFieldOriented(driveDirectAngle);
         Command driveFieldOrientedAnglularVelocity =
                 m_swerveSubsystem.driveFieldOriented(driveAngularVelocity);
@@ -214,6 +215,13 @@ public class RobotContainer {
                 m_swerveSubsystem.driveFieldOriented(driveDirectAngleKeyboard);
         Command driveFieldOrientedAnglularVelocityKeyboard =
                 m_swerveSubsystem.driveFieldOriented(driveAngularVelocityKeyboard);
+=======
+        Command driveFieldOrientedDirectAngle = drivebase.driveFieldOriented(driveDirectAngle);
+        Command driveFieldOrientedAnglularVelocity = drivebase.driveFieldOriented(driveAngularVelocity);
+        Command driveRobotOrientedAngularVelocity = drivebase.driveFieldOriented(driveRobotOriented);
+        Command driveFieldOrientedDirectAngleKeyboard = drivebase.driveFieldOriented(driveDirectAngleKeyboard);
+        Command driveFieldOrientedAnglularVelocityKeyboard = drivebase.driveFieldOriented(driveAngularVelocityKeyboard);
+>>>>>>> 56a3ccc (added reef offset to test based on which pov button is added)
 
         // Default to field-centric swerve drive
         m_swerveSubsystem.setDefaultCommand(driveFieldOrientedAnglularVelocity);
