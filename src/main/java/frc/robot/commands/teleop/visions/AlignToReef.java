@@ -4,6 +4,8 @@
 
 package frc.robot.commands.teleop.visions;
 
+import java.util.function.DoubleSupplier;
+
 import com.google.flatbuffers.Constants;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -27,17 +29,28 @@ public class AlignToReef extends Command {
   private CommandXboxController m_driverController;
   private RobotContainer m_robotContainer;
   private CoralIndexerSubsystem m_coralIndexerSubsystem;
-
   private boolean endCommand = false;
+
   public AlignToReef(SwerveSubsystem drivebase, CameraInterface autoAlignCam, CommandXboxController m_driverController, RobotContainer m_robotContainer, CoralIndexerSubsystem m_coralIndexerSubsystem) {
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(RobotContainer.drivebase);
+    addRequirements();
     this.drivebase = drivebase;
     this.autoAlignCam = autoAlignCam;
     this.m_driverController = m_driverController;
     this.m_robotContainer = m_robotContainer;
     this.m_coralIndexerSubsystem = m_coralIndexerSubsystem;
   }
+
+  public SwerveInputStream getDriveAngularVelocity() {
+    return SwerveInputStream.of(drivebase.getSwerveDrive(), 
+    () -> m_driverController.getLeftY() * -1,
+    () -> m_driverController.getLeftX() * -1)
+    .withControllerRotationAxis(() -> m_driverController.getRightX() * -1)
+    .deadband(OperatorConstants.DEADBAND)
+    .scaleTranslation(0.8)
+    .allianceRelativeControl(true);        
+  }
+
 
   // Called when the command is initially scheduled.
   @Override
@@ -51,25 +64,14 @@ public class AlignToReef extends Command {
   @Override
   public void execute() {
     if (!(autoAlignCam.cameraSawTarget())) {
-        autoAlignCam.getCameraResults();
-        SwerveInputStream driveAngularVelocity = SwerveInputStream
-        .of(drivebase.getSwerveDrive(), () -> m_driverController.getLeftY() * -1,
-                () -> m_driverController.getLeftX() * -1)
-        .withControllerRotationAxis(() -> m_driverController.getRightX() * -1)
-        .deadband(OperatorConstants.DEADBAND).scaleTranslation(0.8)
-        .allianceRelativeControl(true);        
-        Commands.run(() -> drivebase.driveFieldOriented(driveAngularVelocity), drivebase);
-        
+      autoAlignCam.getCameraResults();
+      Commands.run(() -> drivebase.driveFieldOriented(getDriveAngularVelocity())); 
     }
     else if (autoAlignCam.cameraSawTarget()) {
-      SwerveInputStream driveAngularVelocity = SwerveInputStream
-      .of(drivebase.getSwerveDrive(), () -> m_driverController.getLeftY() * 0,
-              () -> m_driverController.getLeftX() * -1)
-      .withControllerRotationAxis(() -> m_driverController.getRightX() * 0)
-      .deadband(OperatorConstants.DEADBAND).scaleTranslation(0.8)
-      .allianceRelativeControl(true).aim(autoAlignCam.poseFromRobotToTag);
-      
-      Commands.run(() -> drivebase.driveFieldOriented(driveAngularVelocity), drivebase);
+      DoubleSupplier xTrans = () -> autoAlignCam.poseFromRobotToTag.getX();
+      DoubleSupplier yTrans = () -> autoAlignCam.poseFromRobotToTag.getY();
+      DoubleSupplier maxAngularRotation = () -> drivebase.getMaximumChassisAngularVelocity();
+      Commands.run(() -> drivebase.driveCommand(xTrans, yTrans, maxAngularRotation));
     }
   }
 
