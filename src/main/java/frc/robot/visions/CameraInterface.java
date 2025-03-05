@@ -13,26 +13,23 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants.VisionConstants;
+import frc.robot.RobotContainer;
 import frc.robot.subsystems.CoralIndexerSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 
 public class CameraInterface {
     public PhotonCamera camera;
     private PhotonPoseEstimator photonEstimator; //creates pose estimator object
-    private Matrix<N3, N1> curStdDevs; //creates matrix for current standard deviations
     private boolean targetIsVisible = false;
-    public double targetYaw = 0;
-    public Pose2d poseOfAprilTag = new Pose2d(0, 0, new Rotation2d(0));
-    public Pose2d poseFromRobotToTag = new Pose2d(0, 0, new Rotation2d(0));
-    public double horizontalDistanceToTag = 0;
-    public AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
-    private SwerveSubsystem drivebase;
+    private double targetYaw = 0;
+    private Pose2d poseOfAprilTag = new Pose2d(0, 0, new Rotation2d(0));
+    private Pose2d poseFromRobotToTag = new Pose2d(0, 0, new Rotation2d(0));
+    private AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
 
 
-    public CameraInterface(String cameraName, SwerveSubsystem drivebase) {
+    public CameraInterface(String cameraName) {
         camera = new PhotonCamera(cameraName);
         photonEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, VisionConstants.krobotToCam);
-        this.drivebase = drivebase;
     }
 
     private boolean isReefAprilTag(int aprilTagID) {
@@ -56,12 +53,20 @@ public class CameraInterface {
         return targetIsVisible;
     }
 
+    public Pose2d getRobotToTagPose() {
+        return poseFromRobotToTag;
+    }
+
+    public double getYaw() {
+        return targetYaw;
+    }
+
     public void resetTargetDetector() {
         targetIsVisible = false;
     }
 
     public Pose2d getRobotToTagPose(Pose2d pose) {
-        Pose2d robotPose = drivebase.getPose();
+        Pose2d robotPose = RobotContainer.drivebase.getPose();
         return new Pose2d(pose.getX() - robotPose.getX(), pose.getY() - robotPose.getY(), pose.getRotation());
     }
 
@@ -77,7 +82,6 @@ public class CameraInterface {
                             targetYaw = target.getYaw();
                             poseOfAprilTag = aprilTagFieldLayout.getTagPose(targetID).get().toPose2d();
                             poseFromRobotToTag = getRobotToTagPose(poseOfAprilTag);
-                            horizontalDistanceToTag = poseFromRobotToTag.getY();
                             targetIsVisible = true;
                             break;
                         }

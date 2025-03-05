@@ -54,8 +54,8 @@ public class AlignToReef extends Command {
       RobotContainer.drivebase.driveFieldOriented(getDriveAngularVelocity()); 
     }
     else if (RobotContainer.m_autoAlignCam.cameraSawTarget()) {
-      DoubleSupplier xTrans = () -> RobotContainer.m_autoAlignCam.poseFromRobotToTag.getX();
-      DoubleSupplier yTrans = () -> (RobotContainer.m_autoAlignCam.poseFromRobotToTag.getY() + reefOffset);
+      DoubleSupplier xTrans = () -> RobotContainer.m_autoAlignCam.getRobotToTagPose().getX();
+      DoubleSupplier yTrans = () -> (RobotContainer.m_autoAlignCam.getRobotToTagPose().getY() + reefOffset);
       DoubleSupplier maxAngularRotation = () -> RobotContainer.drivebase.getMaximumChassisAngularVelocity();
       RobotContainer.drivebase.driveCommand(xTrans, yTrans, maxAngularRotation);
     }
