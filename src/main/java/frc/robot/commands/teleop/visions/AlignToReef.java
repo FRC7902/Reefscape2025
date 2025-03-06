@@ -4,8 +4,15 @@
 
 package frc.robot.commands.teleop.visions;
 
+import java.util.List;
+import java.util.Set;
 import java.util.function.DoubleSupplier;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.path.Waypoint;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.RobotContainer;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.VisionConstants;
@@ -16,6 +23,7 @@ public class AlignToReef extends Command {
   /** Creates a new AlignToReefCommand. */
   private boolean endCommand = false;
   private double reefOffset = 0;
+  
 
   public AlignToReef() {
     // Use addRequirements() here to declare subsystem dependencies.
@@ -35,7 +43,7 @@ public class AlignToReef extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    RobotContainer.m_autoAlignCam.clearCameraFIFOBuffer();
+    //RobotContainer.m_autoAlignCam.clearCameraFIFOBuffer();
     RobotContainer.m_autoAlignCam.resetTargetDetector();
     endCommand = !RobotContainer.m_indexSubsystem.hasCoral();
     if (RobotContainer.m_driverController.povRight().getAsBoolean()) {
@@ -44,22 +52,42 @@ public class AlignToReef extends Command {
     else if (RobotContainer.m_driverController.povLeft().getAsBoolean()) {
       reefOffset = -VisionConstants.reefToAprilTagOffset; // to measure
     }
+    RobotContainer.m_autoAlignCam.getCameraResults();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
-  @Override
+  
+  /*
+  @Override 
   public void execute() {
     if (!(RobotContainer.m_autoAlignCam.cameraSawTarget())) {
       RobotContainer.m_autoAlignCam.getCameraResults();
       RobotContainer.drivebase.driveFieldOriented(getDriveAngularVelocity()); 
     }
     else if (RobotContainer.m_autoAlignCam.cameraSawTarget()) {
+      System.out.println("HAWK TUAH!");
       final DoubleSupplier xTrans = () -> RobotContainer.m_autoAlignCam.getRobotToTagPose().getX();
-      final DoubleSupplier yTrans = () -> (RobotContainer.m_autoAlignCam.getRobotToTagPose().getY() + reefOffset);
+      final DoubleSupplier yTrans = () -> (RobotContainer.m_autoAlignCam.getRobotToTagPose().getY());
       final DoubleSupplier maxAngularRotation = () -> RobotContainer.drivebase.getMaximumChassisAngularVelocity();
-      RobotContainer.drivebase.driveCommand(xTrans, yTrans, maxAngularRotation);
+      //Commands.defer(() -> RobotContainer.drivebase.createPathToAprilTag(RobotContainer.m_autoAlignCam.getRobotToTagPose()), Set.of(RobotContainer.drivebase));
+      //RobotContainer.drivebase.drive(new Translation2d(RobotContainer.m_autoAlignCam.getRobotToTagPose().getX(), RobotContainer.m_autoAlignCam.getRobotToTagPose().getY()), RobotContainer.m_autoAlignCam.getYaw(), true);
+      RobotContainer.m_autoAlignCam.setTagWayPoint();
+      endCommand = true;
     }
+    */
+  @Override
+  public void execute() {
+    System.out.println("HAWK TUAH!");
+    final DoubleSupplier xTrans = () -> RobotContainer.m_autoAlignCam.getRobotToTagPose().getX();
+    final DoubleSupplier yTrans = () -> (RobotContainer.m_autoAlignCam.getRobotToTagPose().getY());
+    final DoubleSupplier maxAngularRotation = () -> RobotContainer.drivebase.getMaximumChassisAngularVelocity();
+    //Commands.defer(() -> RobotContainer.drivebase.createPathToAprilTag(RobotContainer.m_autoAlignCam.getRobotToTagPose()), Set.of(RobotContainer.drivebase));
+    //RobotContainer.drivebase.drive(new Translation2d(RobotContainer.m_autoAlignCam.getRobotToTagPose().getX(), RobotContainer.m_autoAlignCam.getRobotToTagPose().getY()), RobotContainer.m_autoAlignCam.getYaw(), true);
+    //RobotContainer.m_autoAlignCam.setTagWayPoint();
+    endCommand = true;   
   }
+    //
+
 
   // Called once the command ends or is interrupted.
   @Override
@@ -69,7 +97,6 @@ public class AlignToReef extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    //return endCommand;
-    return false;
+    return endCommand;
   }
 }

@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.VecBuilder;
@@ -39,6 +40,9 @@ public final class Constants {
       public static final double kCameraPitch = 0; //to measure
       public static final double kAprilTagArea = 0.75;
       public static final double reefToAprilTagOffset = 1.3; //to measure
+        public static final PathConstraints kPathConstraints = new PathConstraints(
+      RobotContainer.drivebase.getSwerveDrive().getMaximumChassisVelocity(), 7,
+      3, 4);
     }
     
     public static class PathPlanner {

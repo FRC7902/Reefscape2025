@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ElevatorConstants;
@@ -260,7 +261,8 @@ public class RobotContainer {
                 .onTrue(new ConditionalCommand(new MoveClimbDownCommand(m_climbSubsystem),
                         new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
         */
-        m_driverController.povRight().whileTrue(new AlignToReef());
+        //m_driverController.povRight().whileTrue(new SequentialCommandGroup(new AlignToReef(), drivebase.driveToDistanceCommand(m_autoAlignCam.getRobotTranslationDistance(), 3)));
+        m_driverController.povRight().whileTrue(new SequentialCommandGroup(new AlignToReef(), drivebase.goToPose(RobotContainer.m_autoAlignCam.poseOfAprilTag)));
         
         m_indexSubsystem
                 .setDefaultCommand(
