@@ -9,7 +9,10 @@ import java.util.Set;
 import java.util.function.DoubleSupplier;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.Waypoint;
+
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -23,6 +26,8 @@ public class AlignToReef extends Command {
   /** Creates a new AlignToReefCommand. */
   private boolean endCommand = false;
   private double reefOffset = 0;
+  private Pose2d closestAprilTagPose;
+  private Twist2d distanceToTag;
   
 
   public AlignToReef() {
@@ -52,12 +57,13 @@ public class AlignToReef extends Command {
     else if (RobotContainer.m_driverController.povLeft().getAsBoolean()) {
       reefOffset = -VisionConstants.reefToAprilTagOffset; // to measure
     }
-    RobotContainer.m_autoAlignCam.getCameraResults();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   
-  /*
+
+
+  
   @Override 
   public void execute() {
     if (!(RobotContainer.m_autoAlignCam.cameraSawTarget())) {
@@ -66,17 +72,17 @@ public class AlignToReef extends Command {
     }
     else if (RobotContainer.m_autoAlignCam.cameraSawTarget()) {
       System.out.println("HAWK TUAH!");
-      final DoubleSupplier xTrans = () -> RobotContainer.m_autoAlignCam.getRobotToTagPose().getX();
-      final DoubleSupplier yTrans = () -> (RobotContainer.m_autoAlignCam.getRobotToTagPose().getY());
-      final DoubleSupplier maxAngularRotation = () -> RobotContainer.drivebase.getMaximumChassisAngularVelocity();
-      //Commands.defer(() -> RobotContainer.drivebase.createPathToAprilTag(RobotContainer.m_autoAlignCam.getRobotToTagPose()), Set.of(RobotContainer.drivebase));
-      //RobotContainer.drivebase.drive(new Translation2d(RobotContainer.m_autoAlignCam.getRobotToTagPose().getX(), RobotContainer.m_autoAlignCam.getRobotToTagPose().getY()), RobotContainer.m_autoAlignCam.getYaw(), true);
+      closestAprilTagPose = RobotContainer.m_autoAlignCam.getClosestAprilTagPose();
+      distanceToTag = RobotContainer.m_autoAlignCam.getDistanceFromRobotToTag(closestAprilTagPose);
+
       RobotContainer.m_autoAlignCam.setTagWayPoint();
       endCommand = true;
     }
-    */
-  @Override
-  public void execute() {
+  }
+    
+
+  
+  public void executer() {
     System.out.println("HAWK TUAH!");
     final DoubleSupplier xTrans = () -> RobotContainer.m_autoAlignCam.getRobotToTagPose().getX();
     final DoubleSupplier yTrans = () -> (RobotContainer.m_autoAlignCam.getRobotToTagPose().getY());
@@ -86,7 +92,7 @@ public class AlignToReef extends Command {
     //RobotContainer.m_autoAlignCam.setTagWayPoint();
     endCommand = true;   
   }
-    //
+  
 
 
   // Called once the command ends or is interrupted.

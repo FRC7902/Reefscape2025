@@ -12,20 +12,24 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.RobotContainer;
 
 public class CameraInterface {
-    private final PhotonCamera camera;
-    private boolean targetIsVisible = false;
-    private double targetYaw = 0;
+    public final PhotonCamera camera;
+    public boolean targetIsVisible = false;
+    public double targetYaw = 0;
     public Pose2d poseOfAprilTag = new Pose2d(0, 0, new Rotation2d(0));
-    private Pose2d poseFromRobotToTag = new Pose2d(0, 0, new Rotation2d(0));
-    private AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
+    public Pose2d poseFromRobotToTag = new Pose2d(0, 0, new Rotation2d(0));
+    public AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
+    public int aprilTagID = -1;
     List<Waypoint> waypoints; 
     PathConstraints constraints;
     PathPlannerPath path;
+    List<Pose2d> scannedAprilTagPoses;
+    
 
      /**
      * Creates a new camera object for each camera attached to the Raspberry Pi.
@@ -45,7 +49,7 @@ public class CameraInterface {
      * 
      * @return Whether the April Tag detected by the camera is an April Tag on the reef or not.
      */ 
-    private boolean isReefAprilTag(int aprilTagID) {
+    public boolean isReefAprilTag(int aprilTagID) {
         switch (aprilTagID) {
             case -1: return false;
             case 1: return false;
@@ -160,7 +164,20 @@ public class CameraInterface {
      * If an april tag is detected, the "targetIsVisible" boolean is set to true, which is necessary for any commands related to the CameraInterface to ensure no null values are accidentally read (will throw NullPointerException if read).
      */     
 
-    /* 
+    public Pose2d getClosestAprilTagPose() {
+        return RobotContainer.drivebase.getPose().nearest(scannedAprilTagPoses);
+    }
+    
+
+    public Twist2d getDistanceFromRobotToTag(Pose2d aprilTagPose) {
+        return RobotContainer.drivebase.getPose().log(aprilTagPose);
+    }
+
+    public int getTargetAprilTagID() {
+        return aprilTagID;
+    }
+
+
     public void getCameraResults() {
         final var results = camera.getAllUnreadResults();
         if (!results.isEmpty()) {
@@ -172,8 +189,10 @@ public class CameraInterface {
                         if (isReefAprilTag(targetID)) {
                             targetYaw = target.getYaw();
                             poseOfAprilTag = aprilTagFieldLayout.getTagPose(targetID).get().toPose2d();
+                            scannedAprilTagPoses.add(poseOfAprilTag);
                             poseFromRobotToTag = getRobotToTagPose(poseOfAprilTag);
                             targetIsVisible = true;
+                            aprilTagID = targetID;
                             break;
                         }
                     }
@@ -181,8 +200,8 @@ public class CameraInterface {
             }
         }
     }
-    */
-    public void getCameraResults() {
+    
+    public void getCameraResults(int dividend) {
         poseOfAprilTag = aprilTagFieldLayout.getTagPose(18).get().toPose2d();
         poseFromRobotToTag = getRobotToTagPose(poseOfAprilTag);
         targetIsVisible = true;
