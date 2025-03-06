@@ -8,7 +8,9 @@ import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N1;
@@ -34,7 +36,9 @@ public final class Constants {
 
     public static class VisionConstants {
       public static final Rotation3d krobotToCamRotation = new Rotation3d(0, 0, 0);
+      public static final Rotation2d krobotToCamRotation2d = new Rotation2d(0);
       public static final Transform3d krobotToCam = new Transform3d(0, 0, 0, krobotToCamRotation); //to measure
+      public static final Transform2d krobotToCam2d = new Transform2d(0, 0, krobotToCamRotation2d); //to measure
       public static final double kGroundToCameraDistance = 0; //in meters
       public static final double kGroundToAprilTagDistance = 0.22225; //in meters
       public static final double kCameraPitch = 0; //to measure
