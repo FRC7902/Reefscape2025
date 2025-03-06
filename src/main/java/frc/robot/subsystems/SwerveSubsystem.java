@@ -9,6 +9,7 @@ import static edu.wpi.first.units.Units.Meter;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
@@ -21,7 +22,10 @@ import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.path.GoalEndState;
+import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.path.Waypoint;
 import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.swerve.SwerveSetpoint;
 import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
@@ -39,6 +43,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
@@ -52,6 +57,7 @@ import swervelib.parser.SwerveDriveConfiguration;
 import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
+import frc.robot.RobotContainer;
 
 public class SwerveSubsystem extends SubsystemBase {
 
@@ -354,7 +360,7 @@ public class SwerveSubsystem extends SubsystemBase {
      *         given speed
      */
     public Command driveToDistanceCommand(double distanceInMeters, double speedInMetersPerSecond) {
-        return run(() -> drive(new ChassisSpeeds(speedInMetersPerSecond, 0, 0)))
+        return run(() -> drive(new ChassisSpeeds(RobotContainer.m_driverController.getLeftY() * swerveDrive.getMaximumChassisVelocity(), speedInMetersPerSecond, 0)))
                 .until(() -> swerveDrive.getPose().getTranslation()
                         .getDistance(new Translation2d(0, 0)) > distanceInMeters);
     }
@@ -463,6 +469,13 @@ public class SwerveSubsystem extends SubsystemBase {
                                                                         // used most of the time.
     }
 
+
+
+    public Command goToPose(Pose2d target_pose) {
+        return AutoBuilder.pathfindToPoseFlipped(target_pose, Constants.VisionConstants.kPathConstraints, 0.0);
+      }
+
+    
     /**
      * Drive the robot given a chassis field oriented velocity.
      *
@@ -471,6 +484,8 @@ public class SwerveSubsystem extends SubsystemBase {
     public void driveFieldOriented(ChassisSpeeds velocity) {
         swerveDrive.driveFieldOriented(velocity);
     }
+
+
 
     /**
      * Drive the robot given a chassis field oriented velocity.
@@ -706,6 +721,9 @@ public class SwerveSubsystem extends SubsystemBase {
         return swerveDrive;
     }
 
+
+
+
     public Command snapToAngle(double angleDegrees, double toleranceDegrees) {
         SwerveController controller = swerveDrive.getSwerveController();
 
@@ -732,4 +750,37 @@ public class SwerveSubsystem extends SubsystemBase {
                 strafePower * Math.abs(speedMultiplier) * swerveDrive.getMaximumChassisVelocity()),
                 0, false, false);
     }
+
+    
+    public Command createPathToAprilTag(Pose2d robotToAprilTagPose) {
+        System.out.println("I SAID THIS IS HOW THE STORY GOESSSSS");
+        return driveWithSetpointGeneratorFieldRelative(() -> new ChassisSpeeds(
+            getFieldVelocity().vxMetersPerSecond, getFieldVelocity().vyMetersPerSecond,
+            swerveDrive.swerveController.headingCalculate(getHeading().getRadians(), robotToAprilTagPose.getRotation().getRadians())
+            
+        ));
+    }
+
+
+
+    public void driveToAprilTag(DoubleSupplier xTrans, DoubleSupplier yTrans, DoubleSupplier angularVel) {
+        //System.out.println("X TRANSLATION:" + xTrans.getAsDouble());
+        //System.out.println("Y TRANSLATION:" + yTrans.getAsDouble());
+        //System.out.println("ANGLE:" + angularVel.getAsDouble());
+
+        double time = yTrans.getAsDouble() / angularVel.getAsDouble();
+
+        Timer timer = new Timer();
+
+        timer.start();
+
+        if (!(timer.get() >= time)) {
+            strafe(1, 1);
+        }
+        else if (timer.get() >= time) {
+            timer.stop();
+            System.out.println("TIMER:" + timer.get());
+        }
+    }
+
 }
