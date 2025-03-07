@@ -178,7 +178,7 @@ public class CameraInterface {
     }
 
 
-    public void getCameraResults() {
+    public void getCameraResults(int gooner) {
         final var results = camera.getAllUnreadResults();
         if (!results.isEmpty()) {
             var result = results.get(results.size() - 1);
@@ -201,7 +201,7 @@ public class CameraInterface {
         }
     }
     
-    public void getCameraResults(int dividend) {
+    public void getCameraResults() {
         poseOfAprilTag = aprilTagFieldLayout.getTagPose(18).get().toPose2d();
         poseFromRobotToTag = getRobotToTagPose(poseOfAprilTag);
         targetIsVisible = true;

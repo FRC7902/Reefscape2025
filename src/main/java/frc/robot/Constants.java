@@ -43,7 +43,7 @@ public final class Constants {
       public static final double kGroundToAprilTagDistance = 0.22225; //in meters
       public static final double kCameraPitch = 0; //to measure
       public static final double kAprilTagArea = 0.75;
-      public static final double reefToAprilTagOffset = 1.3; //to measure
+      public static final double reefToAprilTagOffset = 0.25; //to measure
         public static final PathConstraints kPathConstraints = new PathConstraints(
       RobotContainer.drivebase.getSwerveDrive().getMaximumChassisVelocity(), 7,
       3, 4);

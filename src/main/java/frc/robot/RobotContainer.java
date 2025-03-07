@@ -45,6 +45,7 @@ import frc.robot.visions.CameraInterface;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.commands.teleop.climb.ManualClimb;
 import frc.robot.commands.teleop.visions.AlignToReef;
+import frc.robot.commands.teleop.visions.GoToAprilTag;
 import swervelib.SwerveInputStream;
 
 /**
@@ -247,8 +248,10 @@ public class RobotContainer {
                         new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
         */
         //m_driverController.povRight().whileTrue(new SequentialCommandGroup(new AlignToReef(), drivebase.driveToDistanceCommand(m_autoAlignCam.getRobotTranslationDistance(), 3)));
-        m_driverController.povRight().whileTrue(new SequentialCommandGroup(new AlignToReef(), drivebase.goToPose(RobotContainer.m_autoAlignCam.poseOfAprilTag)));
-        
+        //m_driverController.povRight().whileTrue(new SequentialCommandGroup(new AlignToReef(), drivebase.goToPose(RobotContainer.m_autoAlignCam.poseOfAprilTag)));
+        m_driverController.povLeft().whileTrue(new AlignToReef());
+        m_driverController.povRight().whileTrue(new AlignToReef());
+
         m_indexSubsystem
                 .setDefaultCommand(
                         new IntakeCoralCommand(Constants.CoralIndexerConstants.kIntakePower)
