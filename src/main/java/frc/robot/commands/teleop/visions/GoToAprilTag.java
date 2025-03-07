@@ -90,16 +90,19 @@ public GoToAprilTag(CameraInterface m_autoAlignCam, SwerveSubsystem drivebase, C
             robotPose2d.getY(),
             0.0, 
             new Rotation3d(0.0, 0.0, robotPose2d.getRotation().getRadians()));
-    
+ 
+            
     var photonRes = m_autoAlignCam.camera.getLatestResult();
     int aprilTagID = -1;
     if (photonRes.hasTargets()) {
+      
       // Find the tag we want to chase
       var targetOpt = photonRes.getTargets().stream()
           .filter(t -> m_autoAlignCam.isReefAprilTag(t.getFiducialId()))
           .filter(t -> !t.equals(lastTarget) && t.getPoseAmbiguity() <= .2 && t.getPoseAmbiguity() != -1)
           .findFirst();
       
+
       aprilTagID = targetOpt.get().getFiducialId();
 
       Pose3d aprilTagPose = m_autoAlignCam.aprilTagFieldLayout.getTagPose(aprilTagID).get();
@@ -131,12 +134,12 @@ public GoToAprilTag(CameraInterface m_autoAlignCam, SwerveSubsystem drivebase, C
     
     if (lastTarget != null) {
       // Drive to the target
-      var xSpeed = xController.calculate(robotPose.getX());
+      var xSpeed = yController.calculate(robotPose.getX());
       if (xController.atGoal()) {
         xSpeed = 0;
       }
 
-      var ySpeed = yController.calculate(robotPose.getY());
+      var ySpeed = xController.calculate(robotPose.getY());
       if (yController.atGoal()) {
         ySpeed = 0;
       }
@@ -147,7 +150,7 @@ public GoToAprilTag(CameraInterface m_autoAlignCam, SwerveSubsystem drivebase, C
       }
 
       drivebase.drive(
-        ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, omegaSpeed, robotPose2d.getRotation()));
+        ChassisSpeeds.fromFieldRelativeSpeeds(RobotContainer.m_driverController.getLeftX(), ySpeed, omegaSpeed, robotPose2d.getRotation()));
     
   }
 }
@@ -159,7 +162,8 @@ public GoToAprilTag(CameraInterface m_autoAlignCam, SwerveSubsystem drivebase, C
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return endCommand;
+    //return endCommand;
+    return false;
     }
 
   private SwerveInputStream getDriveAngularVelocity() {
