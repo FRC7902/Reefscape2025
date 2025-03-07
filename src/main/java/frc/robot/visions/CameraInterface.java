@@ -2,22 +2,25 @@ package frc.robot.visions;
 
 import java.util.List;
 import org.photonvision.PhotonCamera;
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.path.GoalEndState;
-import com.pathplanner.lib.path.PathConstraints;
-import com.pathplanner.lib.path.PathPlannerPath;
-import com.pathplanner.lib.path.Waypoint;
+import org.photonvision.estimation.TargetModel;
+import org.photonvision.simulation.PhotonCameraSim;
+import org.photonvision.simulation.SimCameraProperties;
+import org.photonvision.simulation.VisionSystemSim;
+import org.photonvision.simulation.VisionTargetSim;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Twist2d;
-import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.RobotContainer;
 
-public class CameraInterface {
+public class CameraInterface extends SubsystemBase {
     public final PhotonCamera camera;
     public boolean targetIsVisible = false;
     public double targetYaw = 0;
@@ -25,11 +28,14 @@ public class CameraInterface {
     public Pose2d poseFromRobotToTag = new Pose2d(0, 0, new Rotation2d(0));
     public AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
     public int aprilTagID = -1;
-    List<Waypoint> waypoints; 
-    PathConstraints constraints;
-    PathPlannerPath path;
     List<Pose2d> scannedAprilTagPoses;
     
+
+    private final VisionSystemSim visionSim;
+    private TargetModel targetModel;
+    private SimCameraProperties m_simCamProperties;
+    private PhotonCameraSim s_autoAlignCam;
+
 
      /**
      * Creates a new camera object for each camera attached to the Raspberry Pi.
@@ -39,7 +45,33 @@ public class CameraInterface {
      *      */     
     public CameraInterface(String cameraName) {
         camera = new PhotonCamera(cameraName);
-        constraints = new PathConstraints(3.0, 3.0, 2 * Math.PI, 4 * Math.PI);
+        visionSim = new VisionSystemSim("main");
+        targetModel = TargetModel.kAprilTag36h11;
+        Pose3d targetPose = new Pose3d(16, 4, 2, new Rotation3d(0, 0, Math.PI));
+        // The given target model at the given pose
+        VisionTargetSim visionTarget = new VisionTargetSim(targetPose, targetModel);
+
+        // Add this vision target to the vision system simulation to make it visible
+        visionSim.addVisionTargets(visionTarget);
+        visionSim.addAprilTags(aprilTagFieldLayout);
+
+        m_simCamProperties = new SimCameraProperties();
+
+        m_simCamProperties.setCalibration(640, 480,Rotation2d.fromDegrees(0));
+        m_simCamProperties.setCalibError(0.25, 0.08);
+        m_simCamProperties.setFPS(60);
+        m_simCamProperties.setAvgLatencyMs(25);
+        m_simCamProperties.setLatencyStdDevMs(5);
+
+        s_autoAlignCam = new PhotonCameraSim(camera, m_simCamProperties);
+        // Our camera is mounted 0.1 meters forward and 0.5 meters up from the robot pose,
+        // (Robot pose is considered the center of rotation at the floor level, or Z = 0)
+        Translation3d robotToCameraTrl = new Translation3d(0.1, 0, 0.5);
+        // and pitched 15 degrees up.
+        Rotation3d robotToCameraRot = new Rotation3d(0, Math.toRadians(-15), 0);
+        Transform3d robotToCamera = new Transform3d(robotToCameraTrl, robotToCameraRot);
+
+        visionSim.addCamera(s_autoAlignCam, robotToCamera);
     }
 
      /**
@@ -128,49 +160,8 @@ public class CameraInterface {
         return new Pose2d(aprilTagPose.getX() - robotPose.getX(), aprilTagPose.getY() - robotPose.getY(), aprilTagPose.getRotation());
     }
 
-    public double getRobotTranslationDistance() {
-        final Translation2d robotTranslation = RobotContainer.drivebase.getSwerveDrive().getPose().getTranslation();
-        final Translation2d aprilTagTranslation = poseOfAprilTag.getTranslation();
-        return robotTranslation.getDistance(aprilTagTranslation);
-    }
-
-    public double getDistance() {
-        return Math.sqrt((Math.pow(getRobotToTagPose().getX(), 2) + Math.pow(getRobotToTagPose().getY(), 2)));
-    }
-
-    public void setTagWayPoint() {
-        PathPlannerPath.waypointsFromPoses(poseOfAprilTag);
-    }
-
-
-  
-    public void createNewPathPlannerPath() {
-        path = new PathPlannerPath(
-            waypoints,
-            constraints,
-            null, // The ideal starting state, this is only relevant for pre-planned paths, so can be null for on-the-fly paths.
-            new GoalEndState(0.0, Rotation2d.fromDegrees(-90)) // Goal end state. You can set a holonomic rotation here. If using a differential drivetrain, the rotation will have no effect.
-        );        
-    }
-
-// The constraints for this path.
-    // PathConstraints constraints = PathConstraints.unlimitedConstraints(12.0); // You can also use unlimited constraints, only limited by motor torque and nominal battery voltage
-
-    // Create the path using the waypoints created above
-   
-
-     /**
-     * Uses the camera to determine if there is an April Tag in it's FOV.
-     * If an april tag is detected, the "targetIsVisible" boolean is set to true, which is necessary for any commands related to the CameraInterface to ensure no null values are accidentally read (will throw NullPointerException if read).
-     */     
-
     public Pose2d getClosestAprilTagPose() {
         return RobotContainer.drivebase.getPose().nearest(scannedAprilTagPoses);
-    }
-    
-
-    public Twist2d getDistanceFromRobotToTag(Pose2d aprilTagPose) {
-        return RobotContainer.drivebase.getPose().log(aprilTagPose);
     }
 
     public int getTargetAprilTagID() {
@@ -207,4 +198,11 @@ public class CameraInterface {
         targetIsVisible = true;
         targetYaw = 0;
     }
+
+    @Override
+    public void simulationPeriodic() {
+        visionSim.getDebugField();
+        visionSim.update(getRobotPose());
+    }
+
 }

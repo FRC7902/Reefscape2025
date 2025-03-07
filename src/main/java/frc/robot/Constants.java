@@ -15,6 +15,7 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants.ElevatorConstants;
 
@@ -35,18 +36,36 @@ public final class Constants {
     }
 
     public static class VisionConstants {
+
+      //Camera Offset
       public static final Rotation3d krobotToCamRotation = new Rotation3d(0, 0, 0);
       public static final Rotation2d krobotToCamRotation2d = new Rotation2d(0);
       public static final Transform3d krobotToCam = new Transform3d(0, 0, 0, krobotToCamRotation); //to measure
       public static final Transform2d krobotToCam2d = new Transform2d(0, 0, krobotToCamRotation2d); //to measure
       public static final double kGroundToCameraDistance = 0; //in meters
-      public static final double kGroundToAprilTagDistance = 0.22225; //in meters
       public static final double kCameraPitch = 0; //to measure
+
+      //April Tag Offset
+      public static final double kGroundToAprilTagDistance = 0.22225; //in meters
       public static final double kAprilTagArea = 0.75;
+
+      //Reef Offset
       public static final double reefToAprilTagOffset = 0.25; //to measure
-        public static final PathConstraints kPathConstraints = new PathConstraints(
-      RobotContainer.drivebase.getSwerveDrive().getMaximumChassisVelocity(), 7,
-      3, 4);
+
+      //PID Y Controller Constants
+      public static final TrapezoidProfile.Constraints yConstraints = new TrapezoidProfile.Constraints(3, 2);
+      public static final double yControllerTolerance = 0.02;
+      public static final double kPY = 0.03;
+      public static final double kIY = 0;
+      public static final double kDY = 0.01;
+
+      //PID Omega Controller Constants
+      public static final TrapezoidProfile.Constraints omegaConstraints =   new TrapezoidProfile.Constraints(3, 2);
+      public static final double omegaControllerTolerance = 0.02;
+      public static final double kPOmega = 0.03;
+      public static final double kIOmega = 0;
+      public static final double kDOmega = 0.01;      
+
     }
     
     public static class PathPlanner {

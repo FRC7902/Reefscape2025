@@ -469,12 +469,6 @@ public class SwerveSubsystem extends SubsystemBase {
                                                                         // used most of the time.
     }
 
-
-
-    public Command goToPose(Pose2d target_pose) {
-        return AutoBuilder.pathfindToPoseFlipped(target_pose, Constants.VisionConstants.kPathConstraints, 0.0);
-      }
-
     
     /**
      * Drive the robot given a chassis field oriented velocity.

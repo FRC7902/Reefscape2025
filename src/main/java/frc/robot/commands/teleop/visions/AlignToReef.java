@@ -4,25 +4,20 @@
 
 package frc.robot.commands.teleop.visions;
 
-import java.util.List;
-import java.util.Set;
-import java.util.function.DoubleSupplier;
-import com.pathplanner.lib.path.PathPlannerPath;
-import com.pathplanner.lib.path.Waypoint;
+
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.VisionConstants;
+import frc.robot.subsystems.CoralIndexerSubsystem;
+import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.visions.CameraInterface;
 import swervelib.SwerveInputStream;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
@@ -32,66 +27,60 @@ public class AlignToReef extends Command {
   private double reefOffset = 0;
   private Pose2d closestAprilTagPose;
   private Pose2d robotPose;
-  
-  private final TrapezoidProfile.Constraints xConstraints = new TrapezoidProfile.Constraints(3, 2);
-  private final TrapezoidProfile.Constraints yConstraints = new TrapezoidProfile.Constraints(3, 2);
-  private final TrapezoidProfile.Constraints omegaConstraints =   new TrapezoidProfile.Constraints(3, 2);
 
-  private final ProfiledPIDController xController = new ProfiledPIDController(0.03, 0.1, 0.1, xConstraints); //to tune
-  private final ProfiledPIDController yController = new ProfiledPIDController(0.03, 0.1, 0.1, yConstraints); //to tune
-  private final ProfiledPIDController omegaController = new ProfiledPIDController(0.03, 0, 0, omegaConstraints); //to tune
+  private final ProfiledPIDController yController = new ProfiledPIDController(VisionConstants.kPY, VisionConstants.kIY, VisionConstants.kDY, VisionConstants.yConstraints); //to tune
+  private final ProfiledPIDController omegaController = new ProfiledPIDController(VisionConstants.kPOmega, VisionConstants.kIOmega, VisionConstants.kDOmega, VisionConstants.omegaConstraints); //to tune
 
-  public AlignToReef() {
+  private final CameraInterface m_autoAlignCam;
+  private final CoralIndexerSubsystem m_indexSubsystem;
+  private final SwerveSubsystem drivebase;
+  private final CommandXboxController m_driverController;
+
+  public AlignToReef(SwerveSubsystem drivebase, CameraInterface m_autoAlignCam, CoralIndexerSubsystem m_indexSubsystem, CommandXboxController m_driverController) {
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(RobotContainer.drivebase);
+    addRequirements(RobotContainer.drivebase, RobotContainer.m_autoAlignCam);
+    this.m_autoAlignCam = m_autoAlignCam;
+    this.drivebase = drivebase;
+    this.m_indexSubsystem = m_indexSubsystem;
+    this.m_driverController = m_driverController;
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    endCommand = !RobotContainer.m_indexSubsystem.hasCoral();
+    endCommand = !m_indexSubsystem.hasCoral();
     //RobotContainer.m_autoAlignCam.clearCameraFIFOBuffer();
-    RobotContainer.m_autoAlignCam.resetTargetDetector();
-    robotPose = RobotContainer.drivebase.getPose();
+    m_autoAlignCam.resetTargetDetector();
+    robotPose = drivebase.getPose();
 
-    xController.reset(robotPose.getX());
     yController.reset(robotPose.getY());
     omegaController.reset(robotPose.getRotation().getRadians());
 
-    xController.setTolerance(0.02);
-    yController.setTolerance(0.02);
+    yController.setTolerance(VisionConstants.yControllerTolerance);
 
-    if (RobotContainer.m_driverController.povLeft().getAsBoolean()) {
+    if (driverPressedPOVLeft()) {
       reefOffset = VisionConstants.reefToAprilTagOffset; // to measure
     }
-    else if (RobotContainer.m_driverController.povRight().getAsBoolean()) {
+    else if (driverPressedPOVRight()) {
       reefOffset = -VisionConstants.reefToAprilTagOffset; // to measure
     }
   }
-
 
   // Called every time the scheduler runs while the command is scheduled.
   
   @Override 
   public void execute() {
-    robotPose = RobotContainer.drivebase.getPose();
-    final boolean cameraSawTarget = RobotContainer.m_autoAlignCam.cameraSawTarget();
+    robotPose = drivebase.getPose();
+    final boolean cameraSawTarget = m_autoAlignCam.cameraSawTarget();
     if (!cameraSawTarget) {
-      RobotContainer.m_autoAlignCam.getCameraResults();
-      RobotContainer.drivebase.driveFieldOriented(getDriveAngularVelocity()); 
+      m_autoAlignCam.getCameraResults();
+      drivebase.driveFieldOriented(getDriveAngularVelocity()); 
     }
     else if (cameraSawTarget) {
       //System.out.println("HAWK TUAH!");
-      closestAprilTagPose = RobotContainer.m_autoAlignCam.poseOfAprilTag;
-      xController.setGoal(closestAprilTagPose.getX());
+      closestAprilTagPose = m_autoAlignCam.poseOfAprilTag;
       yController.setGoal(closestAprilTagPose.getY() + reefOffset);
       omegaController.setGoal(closestAprilTagPose.getRotation().getRadians());
-      
-      var xSpeed = xController.calculate(robotPose.getX());
-      if (xController.atGoal()) {
-        System.out.println("X Controller at goal");
-        xSpeed = 0;
-      }
 
       var ySpeed = yController.calculate(robotPose.getY());
       if (yController.atGoal()) {
@@ -106,32 +95,16 @@ public class AlignToReef extends Command {
         omegaSpeed = 0;
       }
 
-      SmartDashboard.putNumber("Accumulated Y Error", yController.getAccumulatedError());
-      SmartDashboard.putNumber("Accumulated X Error", xController.getAccumulatedError());
+      final double yControllerError = yController.getAccumulatedError();
 
-      
-      RobotContainer.drivebase.drive(
+      SmartDashboard.putNumber("Accumulated Y Error", yControllerError);
+      drivebase.drive(
         //ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, omegaSpeed, robotPose.getRotation()));
-        ChassisSpeeds.fromFieldRelativeSpeeds(RobotContainer.m_driverController.getLeftY(), ySpeed, omegaSpeed, robotPose.getRotation()));
-
+        ChassisSpeeds.fromFieldRelativeSpeeds(getDriverControllerLeftY(), ySpeed, omegaSpeed, robotPose.getRotation()));
     }
     
 }
     
-/*  
-  public void executer() {
-    System.out.println("HAWK TUAH!");
-    final DoubleSupplier xTrans = () -> RobotContainer.m_autoAlignCam.getRobotToTagPose().getX();
-    final DoubleSupplier yTrans = () -> (RobotContainer.m_autoAlignCam.getRobotToTagPose().getY());
-    final DoubleSupplier maxAngularRotation = () -> RobotContainer.drivebase.getMaximumChassisAngularVelocity();
-    //Commands.defer(() -> RobotContainer.drivebase.createPathToAprilTag(RobotContainer.m_autoAlignCam.getRobotToTagPose()), Set.of(RobotContainer.drivebase));
-    //RobotContainer.drivebase.drive(new Translation2d(RobotContainer.m_autoAlignCam.getRobotToTagPose().getX(), RobotContainer.m_autoAlignCam.getRobotToTagPose().getY()), RobotContainer.m_autoAlignCam.getYaw(), true);
-    //RobotContainer.m_autoAlignCam.setTagWayPoint();
-    endCommand = true;   
-  }
-*/
-
-
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
@@ -144,11 +117,23 @@ public class AlignToReef extends Command {
     return false;
   }
 
+  private double getDriverControllerLeftY() {
+    return m_driverController.getLeftY();
+  }
+
+  private boolean driverPressedPOVLeft() {
+    return m_driverController.povLeft().getAsBoolean();
+  }
+
+  private boolean driverPressedPOVRight() {
+    return m_driverController.povRight().getAsBoolean();
+  }
+
   private SwerveInputStream getDriveAngularVelocity() {
-    return SwerveInputStream.of(RobotContainer.drivebase.getSwerveDrive(), 
-    () -> RobotContainer.m_driverController.getLeftY() * -1,
-    () -> RobotContainer.m_driverController.getLeftX() * -1)
-    .withControllerRotationAxis(() -> RobotContainer.m_driverController.getRightX() * -1)
+    return SwerveInputStream.of(drivebase.getSwerveDrive(), 
+    () -> m_driverController.getLeftY() * -1,
+    () -> m_driverController.getLeftX() * -1)
+    .withControllerRotationAxis(() -> m_driverController.getRightX() * -1)
     .deadband(OperatorConstants.DEADBAND)
     .scaleTranslation(0.8)
     .allianceRelativeControl(true);        

@@ -249,8 +249,8 @@ public class RobotContainer {
         */
         //m_driverController.povRight().whileTrue(new SequentialCommandGroup(new AlignToReef(), drivebase.driveToDistanceCommand(m_autoAlignCam.getRobotTranslationDistance(), 3)));
         //m_driverController.povRight().whileTrue(new SequentialCommandGroup(new AlignToReef(), drivebase.goToPose(RobotContainer.m_autoAlignCam.poseOfAprilTag)));
-        m_driverController.povLeft().whileTrue(new AlignToReef());
-        m_driverController.povRight().whileTrue(new AlignToReef());
+        m_driverController.povLeft().whileTrue(new AlignToReef(drivebase, m_autoAlignCam, m_indexSubsystem, m_driverController));
+        m_driverController.povRight().whileTrue(new AlignToReef(drivebase, m_autoAlignCam, m_indexSubsystem, m_driverController));
 
         m_indexSubsystem
                 .setDefaultCommand(
