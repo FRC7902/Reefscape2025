@@ -186,11 +186,14 @@ public class CameraInterface extends SubsystemBase {
         return targetRange;
     }
 
-    public void getCameraResults(int gooner) {
+    public void getCameraResults() {
         final var results = camera.getAllUnreadResults();
+        //System.out.println("sigma");
         if (!results.isEmpty()) {
+            //System.out.println("YAAAAAAA");
             var result = results.get(results.size() - 1);
             if (result.hasTargets()) {
+                //System.out.println("WE GOT APRIL TAGSSS");
                 for (final var target : result.getTargets()) {
                     if (target.getArea() >= VisionConstants.kAprilTagArea) {
                         final int targetID = target.getFiducialId();
@@ -206,7 +209,7 @@ public class CameraInterface extends SubsystemBase {
         }
     }
     
-    public void getCameraResults() {
+    public void getCameraResults(int sigma) {
         poseOfAprilTag = aprilTagFieldLayout.getTagPose(18).get().toPose2d();
         poseFromRobotToTag = getRobotToTagPose(poseOfAprilTag);
         targetIsVisible = true;
