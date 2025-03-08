@@ -11,12 +11,6 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "CoralOutakeV2"
-          }
-        },
-        {
           "type": "wait",
           "data": {
             "waitTime": 7.0

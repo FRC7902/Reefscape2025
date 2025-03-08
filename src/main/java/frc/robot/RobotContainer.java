@@ -144,6 +144,8 @@ public class RobotContainer {
         // preloads the path
 
         // Register Event Triggers
+        new EventTrigger("ZeroPosition")
+        .onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralStationAndProcessorHeight));
         new EventTrigger("ElevatorL1").onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel1Height));
         new EventTrigger("ElevatorL2").onTrue(
                 new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel2Height));
@@ -151,9 +153,9 @@ public class RobotContainer {
                 new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel3Height));
         new EventTrigger("intakealgaeon").toggleOnTrue(new IntakeAlgaeCommand());
         new EventTrigger("intakealgaeoff").toggleOnFalse(new IntakeAlgaeCommand());
-        new EventTrigger("coraloutakeon").toggleOnTrue(
-                new OuttakeCoralCommand(Constants.CoralIndexerConstants.kL1OuttakePower));
-        new EventTrigger("coraloutakeoff").toggleOnFalse(new OuttakeCoralCommand());
+        new EventTrigger("coraloutakeon").onTrue(
+                new OuttakeCoralCommand(Constants.CoralIndexerConstants.kL1OuttakePower).withTimeout(3));
+        //new EventTrigger("coraloutakeoff").toggleOnFalse(new OuttakeCoralCommand());
         new EventTrigger("lowalgae")
                 .onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeLowHeight));
         new EventTrigger("highalgae")

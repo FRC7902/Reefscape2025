@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.974897540983607,
-        "y": 2.820235655737705
+        "x": 5.04451219512195,
+        "y": 2.8469512195121958
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.55030737704918,
-        "y": 1.777305327868853
+        "x": 5.6199220311875235,
+        "y": 1.804020891643344
       },
       "isLocked": false,
       "linkedName": null
@@ -29,36 +29,26 @@
     }
   ],
   "rotationTargets": [],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0.7279202279202276,
+      "maxWaypointRelativePos": 1.0,
+      "constraints": {
+        "maxVelocity": 1.0,
+        "maxAcceleration": 1.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "coraloutakeoff",
-      "waypointRelativePos": 0.0,
-      "endWaypointRelativePos": null,
-      "command": null
-    },
-    {
-      "name": "",
-      "waypointRelativePos": 0,
-      "endWaypointRelativePos": null,
-      "command": null
-    },
-    {
-      "name": "",
-      "waypointRelativePos": 0,
-      "endWaypointRelativePos": null,
-      "command": null
-    },
-    {
-      "name": "",
-      "waypointRelativePos": 0,
-      "endWaypointRelativePos": null,
-      "command": null
-    },
-    {
-      "name": "",
-      "waypointRelativePos": 0,
+      "name": "ZeroPosition",
+      "waypointRelativePos": 0.5000000000000001,
       "endWaypointRelativePos": null,
       "command": null
     }
@@ -73,7 +63,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -127.23483398157464
+    "rotation": 53.49484075019434
   },
   "reversed": false,
   "folder": null,
