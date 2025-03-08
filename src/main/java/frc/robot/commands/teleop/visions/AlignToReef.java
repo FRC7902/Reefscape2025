@@ -76,13 +76,14 @@ public class AlignToReef extends Command {
   @Override 
   public void execute() {
     robotPose = drivebase.getPose();
-    final boolean cameraSawTarget = m_autoAlignCam.cameraSawTarget();
+    boolean cameraSawTarget = m_autoAlignCam.cameraSawTarget();
     if (!cameraSawTarget) {
       m_autoAlignCam.getCameraResults();
       drivebase.driveFieldOriented(getDriveAngularVelocity()); 
+      System.out.println("blawg!");
     }
     else if (cameraSawTarget) {
-      //System.out.println("HAWK TUAH!");
+      System.out.println("HAWK TUAH!");
       //closestAprilTagPose = m_autoAlignCam.poseOfAprilTag;
       
       double horizontalDistance = m_autoAlignCam.getTargetRange() * Math.cos(m_autoAlignCam.getYaw());
