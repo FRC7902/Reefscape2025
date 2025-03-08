@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.012859519675925,
-        "y": 2.8016026475694433
+        "x": 4.974897540983607,
+        "y": 2.820235655737705
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.007839027872648,
-        "y": -0.8906104671846533
+        "x": 5.55030737704918,
+        "y": 1.777305327868853
       },
       "isLocked": false,
       "linkedName": null
@@ -20,8 +20,8 @@
         "y": 0.7531152343749988
       },
       "prevControl": {
-        "x": 2.3641854141005467,
-        "y": 1.432619273332234
+        "x": 2.901024590163934,
+        "y": 1.165932377049179
       },
       "nextControl": null,
       "isLocked": false,
@@ -35,6 +35,30 @@
     {
       "name": "coraloutakeoff",
       "waypointRelativePos": 0.0,
+      "endWaypointRelativePos": null,
+      "command": null
+    },
+    {
+      "name": "",
+      "waypointRelativePos": 0,
+      "endWaypointRelativePos": null,
+      "command": null
+    },
+    {
+      "name": "",
+      "waypointRelativePos": 0,
+      "endWaypointRelativePos": null,
+      "command": null
+    },
+    {
+      "name": "",
+      "waypointRelativePos": 0,
+      "endWaypointRelativePos": null,
+      "command": null
+    },
+    {
+      "name": "",
+      "waypointRelativePos": 0,
       "endWaypointRelativePos": null,
       "command": null
     }

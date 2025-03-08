@@ -63,7 +63,7 @@ public class SwerveSubsystem extends SubsystemBase {
     public SwerveSubsystem(File directory) {
         // Configure the Telemetry before creating the SwerveDrive to avoid unnecessary
         // objects being created.
-        SwerveDriveTelemetry.verbosity = TelemetryVerbosity.POSE;
+        SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
         try {
             swerveDrive = new SwerveParser(directory).createSwerveDrive(Constants.MAX_SPEED,
                     new Pose2d(new Translation2d(Meter.of(1), Meter.of(4)),
@@ -81,19 +81,19 @@ public class SwerveSubsystem extends SubsystemBase {
             swerveDrive.setCosineCompensator(false);
         } else {
 
-            swerveDrive.setCosineCompensator(true);// !SwerveDriveTelemetry.isSimulation); //
+            swerveDrive.setCosineCompensator(false);// !SwerveDriveTelemetry.isSimulation); //
                                                    // Disables
                                                    // cosine compensation for
                                                    // simulations since it causes discrepancies not
                                                    // seen in real life.
-            swerveDrive.setHeadingCorrection(true); // Heading correction should only be
+            swerveDrive.setHeadingCorrection(false); // Heading correction should only be
             // used while
             // controlling the robot via
             // angle.
 
         }
 
-        swerveDrive.setAngularVelocityCompensation(true, true, 0.12); // Correct for skew that
+        swerveDrive.setAngularVelocityCompensation(false, false, 0); // Correct for skew that
                                                                       // gets
                                                                       // worse as angular
                                                                       // velocity
@@ -105,7 +105,7 @@ public class SwerveSubsystem extends SubsystemBase {
                                                                // periodically when they are not
                                                                // moving.
 
-        swerveDrive.setChassisDiscretization(true, true, 0.03);
+        swerveDrive.setChassisDiscretization(false, true, 0.03);
         swerveDrive.swerveController.addSlewRateLimiters(null, null, null);
         swerveDrive.swerveController.setMaximumChassisAngularVelocity(20);
 

@@ -150,10 +150,10 @@ public class RobotContainer {
         new EventTrigger("ElevatorL3").onTrue(
                 new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel3Height));
         new EventTrigger("intakealgaeon").toggleOnTrue(new IntakeAlgaeCommand());
-        new EventTrigger("intakealgaeoff").toggleOnTrue(new IntakeAlgaeCommand());
+        new EventTrigger("intakealgaeoff").toggleOnFalse(new IntakeAlgaeCommand());
         new EventTrigger("coraloutakeon").toggleOnTrue(
                 new OuttakeCoralCommand(Constants.CoralIndexerConstants.kL1OuttakePower));
-        new EventTrigger("coraloutakeoff").toggleOnTrue(new OuttakeCoralCommand());
+        new EventTrigger("coraloutakeoff").toggleOnFalse(new OuttakeCoralCommand());
         new EventTrigger("lowalgae")
                 .onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeLowHeight));
         new EventTrigger("highalgae")
