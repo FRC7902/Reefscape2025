@@ -2,6 +2,7 @@ package frc.robot.visions;
 
 import java.util.List;
 import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonUtils;
 import org.photonvision.estimation.TargetModel;
 import org.photonvision.simulation.PhotonCameraSim;
 import org.photonvision.simulation.SimCameraProperties;
@@ -16,6 +17,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.RobotContainer;
@@ -35,6 +37,8 @@ public class CameraInterface extends SubsystemBase {
     private TargetModel targetModel;
     private SimCameraProperties m_simCamProperties;
     private PhotonCameraSim s_autoAlignCam;
+
+    private double targetRange = 0;
 
 
      /**
@@ -168,6 +172,9 @@ public class CameraInterface extends SubsystemBase {
         return aprilTagID;
     }
 
+    public double getTargetRange() {
+        return targetRange;
+    }
 
     public void getCameraResults(int gooner) {
         final var results = camera.getAllUnreadResults();
@@ -179,11 +186,8 @@ public class CameraInterface extends SubsystemBase {
                         final int targetID = target.getFiducialId();
                         if (isReefAprilTag(targetID)) {
                             targetYaw = target.getYaw();
-                            poseOfAprilTag = aprilTagFieldLayout.getTagPose(targetID).get().toPose2d();
-                            scannedAprilTagPoses.add(poseOfAprilTag);
-                            poseFromRobotToTag = getRobotToTagPose(poseOfAprilTag);
+                            targetRange = PhotonUtils.calculateDistanceToTargetMeters(VisionConstants.kGroundToCameraDistance, 1.435, Units.degreesToRadians(VisionConstants.kCameraPitch), Units.degreesToRadians(target.getPitch()));
                             targetIsVisible = true;
-                            aprilTagID = targetID;
                             break;
                         }
                     }
