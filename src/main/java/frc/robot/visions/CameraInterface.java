@@ -18,6 +18,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.RobotContainer;
@@ -40,6 +41,8 @@ public class CameraInterface extends SubsystemBase {
 
     private double targetRange = 0;
 
+    private double cameraOffsetToRobot = 0;
+
 
      /**
      * Creates a new camera object for each camera attached to the Raspberry Pi.
@@ -47,13 +50,15 @@ public class CameraInterface extends SubsystemBase {
      * 
      * @param cameraName
      *      */     
-    public CameraInterface(String cameraName) {
+    public CameraInterface(String cameraName, double cameraOffsetToRobot) {
         camera = new PhotonCamera(cameraName);
         visionSim = new VisionSystemSim("main");
         targetModel = TargetModel.kAprilTag36h11;
         Pose3d targetPose = new Pose3d(16, 4, 2, new Rotation3d(0, 0, Math.PI));
         // The given target model at the given pose
         VisionTargetSim visionTarget = new VisionTargetSim(targetPose, targetModel);
+
+        this.cameraOffsetToRobot = cameraOffsetToRobot;
 
         // Add this vision target to the vision system simulation to make it visible
         visionSim.addVisionTargets(visionTarget);
@@ -85,6 +90,11 @@ public class CameraInterface extends SubsystemBase {
      * 
      * @return Whether the April Tag detected by the camera is an April Tag on the reef or not.
      */ 
+
+    public double getCameraOffset() {
+        return cameraOffsetToRobot;
+    }
+
     public boolean isReefAprilTag(int aprilTagID) {
         switch (aprilTagID) {
             case -1: return false;
@@ -201,6 +211,19 @@ public class CameraInterface extends SubsystemBase {
         poseFromRobotToTag = getRobotToTagPose(poseOfAprilTag);
         targetIsVisible = true;
         targetYaw = 0;
+    }
+
+
+    @Override
+    public void periodic() {
+        VisionConstants.kPY = SmartDashboard.getNumber("kP Y", 0.03);
+        VisionConstants.kIY = SmartDashboard.getNumber("kI Y", 0);
+        VisionConstants.kDY = SmartDashboard.getNumber("kD Y", 0.01);
+
+        VisionConstants.kPOmega = SmartDashboard.getNumber("kP Omega", 0.03);
+        VisionConstants.kIOmega = SmartDashboard.getNumber("kI Omega", 0);
+        VisionConstants.kDOmega = SmartDashboard.getNumber("kD Omega", 0.01);
+
     }
 
     @Override

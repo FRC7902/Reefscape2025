@@ -55,16 +55,16 @@ public final class Constants {
       //PID Y Controller Constants
       public static final TrapezoidProfile.Constraints yConstraints = new TrapezoidProfile.Constraints(3, 2);
       public static final double yControllerTolerance = 0.02;
-      public static final double kPY = 0.03;
-      public static final double kIY = 0;
-      public static final double kDY = 0.01;
+      public static  double kPY = 0.03;
+      public static  double kIY = 0;
+      public static  double kDY = 0.01;
 
       //PID Omega Controller Constants
       public static final TrapezoidProfile.Constraints omegaConstraints =   new TrapezoidProfile.Constraints(3, 2);
       public static final double omegaControllerTolerance = 0.02;
-      public static final double kPOmega = 0.03;
-      public static final double kIOmega = 0;
-      public static final double kDOmega = 0.01;      
+      public static  double kPOmega = 0.03;
+      public static  double kIOmega = 0;
+      public static  double kDOmega = 0.01;      
 
     }
     
