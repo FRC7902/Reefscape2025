@@ -28,8 +28,8 @@ public class AlignToReef extends Command {
   private Pose2d closestAprilTagPose;
   private Pose2d robotPose;
 
-  private final ProfiledPIDController yController = new ProfiledPIDController(VisionConstants.kPY, VisionConstants.kIY, VisionConstants.kDY, VisionConstants.yConstraints); //to tune
-  private final ProfiledPIDController omegaController = new ProfiledPIDController(VisionConstants.kPOmega, VisionConstants.kIOmega, VisionConstants.kDOmega, VisionConstants.omegaConstraints); //to tune
+  private  ProfiledPIDController yController;
+  private  ProfiledPIDController omegaController;
 
   private final CameraInterface m_autoAlignCam;
   private final CoralIndexerSubsystem m_indexSubsystem;
@@ -43,6 +43,8 @@ public class AlignToReef extends Command {
     this.drivebase = drivebase;
     this.m_indexSubsystem = m_indexSubsystem;
     this.m_driverController = m_driverController;
+    yController = new ProfiledPIDController(VisionConstants.kPY, VisionConstants.kIY, VisionConstants.kDY, VisionConstants.yConstraints); //to tune
+    omegaController = new ProfiledPIDController(VisionConstants.kPOmega, VisionConstants.kIOmega, VisionConstants.kDOmega, VisionConstants.omegaConstraints); //to tune
   }
 
   // Called when the command is initially scheduled.
@@ -57,6 +59,9 @@ public class AlignToReef extends Command {
     omegaController.reset(robotPose.getRotation().getRadians());
 
     yController.setTolerance(VisionConstants.yControllerTolerance);
+
+    yController = new ProfiledPIDController(VisionConstants.kPY, VisionConstants.kIY, VisionConstants.kDY, VisionConstants.yConstraints); //to tune
+    omegaController = new ProfiledPIDController(VisionConstants.kPOmega, VisionConstants.kIOmega, VisionConstants.kDOmega, VisionConstants.omegaConstraints); //to tune
 
     if (driverPressedPOVLeft()) {
       reefOffset = VisionConstants.reefToAprilTagOffset; // to measure
@@ -78,9 +83,13 @@ public class AlignToReef extends Command {
     }
     else if (cameraSawTarget) {
       //System.out.println("HAWK TUAH!");
-      closestAprilTagPose = m_autoAlignCam.poseOfAprilTag;
-      yController.setGoal(closestAprilTagPose.getY() + reefOffset);
-      omegaController.setGoal(closestAprilTagPose.getRotation().getRadians());
+      //closestAprilTagPose = m_autoAlignCam.poseOfAprilTag;
+      
+      double horizontalDistance = m_autoAlignCam.getTargetRange() * Math.cos(m_autoAlignCam.getYaw());
+
+
+      yController.setGoal(horizontalDistance + reefOffset);
+      omegaController.setGoal(m_autoAlignCam.getYaw());
 
       var ySpeed = yController.calculate(robotPose.getY());
       if (yController.atGoal()) {
@@ -96,8 +105,12 @@ public class AlignToReef extends Command {
       }
 
       final double yControllerError = yController.getAccumulatedError();
+      final double omegaControllerError = omegaController.getAccumulatedError();
 
-      SmartDashboard.putNumber("Accumulated Y Error", yControllerError);
+
+      hawkTuah("Accumulated Y Error", yControllerError);
+      hawkTuah("Accumulated Omega Error", omegaControllerError);
+
       drivebase.drive(
         //ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, omegaSpeed, robotPose.getRotation()));
         ChassisSpeeds.fromFieldRelativeSpeeds(getDriverControllerLeftY(), ySpeed, omegaSpeed, robotPose.getRotation()));
@@ -108,6 +121,11 @@ public class AlignToReef extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+  }
+
+  public void hawkTuah(String text, double key) {
+    SmartDashboard.putNumber(text, key);
+
   }
 
   // Returns true when the command should end.

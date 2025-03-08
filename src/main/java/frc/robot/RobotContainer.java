@@ -73,7 +73,7 @@ public class RobotContainer {
     public static final SwerveSubsystem drivebase =
             new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
 
-    public static final CameraInterface m_autoAlignCam = new CameraInterface("skibidi");         
+    public static final CameraInterface m_autoAlignCam = new CameraInterface("skibidi", 0.03);         
 
     private final SendableChooser<Command> autoChooser;
 
