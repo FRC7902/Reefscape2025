@@ -11,7 +11,7 @@ import frc.robot.RobotContainer;
 public class StrafeRightCommand extends Command {
   /** Creates a new StrafeLeft. */
   public StrafeRightCommand() {
-    addRequirements(RobotContainer.drivebase);
+    addRequirements(RobotContainer.m_swerveSubsystem);
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
@@ -22,7 +22,7 @@ public class StrafeRightCommand extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    RobotContainer.drivebase.strafe(-RobotContainer.m_driverController.getRightTriggerAxis(), 0.1);
+    RobotContainer.m_swerveSubsystem.strafe(-RobotContainer.m_driverController.getRightTriggerAxis(), 0.1);
   }
 
   // Called once the command ends or is interrupted.

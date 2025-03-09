@@ -66,7 +66,7 @@ public class RobotContainer {
     public static final CommandXboxController m_operatorController =
             new CommandXboxController(OperatorConstants.kOperatorControllerPort);
 
-    public static final SwerveSubsystem drivebase =
+    public static final SwerveSubsystem m_swerveSubsystem =
             new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
 
     private final SendableChooser<Command> autoChooser;
@@ -76,7 +76,7 @@ public class RobotContainer {
      * velocity.
      */
     SwerveInputStream driveAngularVelocity = SwerveInputStream
-            .of(drivebase.getSwerveDrive(), () -> m_driverController.getLeftY() * -1,
+            .of(m_swerveSubsystem.getSwerveDrive(), () -> m_driverController.getLeftY() * -1,
                     () -> m_driverController.getLeftX() * -1)
             .withControllerRotationAxis(() -> m_driverController.getRightX() * -1)
             .deadband(OperatorConstants.DEADBAND).scaleTranslation(0.8)
@@ -96,7 +96,7 @@ public class RobotContainer {
             driveAngularVelocity.copy().robotRelative(true).allianceRelativeControl(false);
 
     SwerveInputStream driveAngularVelocityKeyboard = SwerveInputStream
-            .of(drivebase.getSwerveDrive(), () -> -m_driverController.getLeftY(),
+            .of(m_swerveSubsystem.getSwerveDrive(), () -> -m_driverController.getLeftY(),
                     () -> -m_driverController.getLeftX())
             .withControllerRotationAxis(() -> m_driverController.getRawAxis(2))
             .deadband(OperatorConstants.DEADBAND).scaleTranslation(0.8)
@@ -151,8 +151,8 @@ public class RobotContainer {
                 new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel2Height));
         new EventTrigger("ElevatorL3").onTrue(
                 new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel3Height));
-        new EventTrigger("intakealgaeon").toggleOnTrue(new IntakeAlgaeCommand());
-        new EventTrigger("intakealgaeoff").toggleOnFalse(new IntakeAlgaeCommand());
+        new EventTrigger("intakealgaeon").onTrue(new IntakeAlgaeCommand().withTimeout(1.5));
+        // new EventTrigger("intakealgaeoff").toggleOnFalse(new IntakeAlgaeCommand());
         new EventTrigger("coraloutakeon").onTrue(
                 new OuttakeCoralCommand(Constants.CoralIndexerConstants.kL1OuttakePower).withTimeout(3));
         //new EventTrigger("coraloutakeoff").toggleOnFalse(new OuttakeCoralCommand());
@@ -201,28 +201,29 @@ public class RobotContainer {
      */
     private void configureBindings() {
         // Swerve drive controls
-        Command driveFieldOrientedDirectAngle = drivebase.driveFieldOriented(driveDirectAngle);
+        Command driveFieldOrientedDirectAngle = m_swerveSubsystem.driveFieldOriented(driveDirectAngle);
         Command driveFieldOrientedAnglularVelocity =
-                drivebase.driveFieldOriented(driveAngularVelocity);
+                m_swerveSubsystem.driveFieldOriented(driveAngularVelocity);
         Command driveRobotOrientedAngularVelocity =
-                drivebase.driveFieldOriented(driveRobotOriented);
+                m_swerveSubsystem.driveFieldOriented(driveRobotOriented);
         Command driveFieldOrientedDirectAngleKeyboard =
-                drivebase.driveFieldOriented(driveDirectAngleKeyboard);
+                m_swerveSubsystem.driveFieldOriented(driveDirectAngleKeyboard);
         Command driveFieldOrientedAnglularVelocityKeyboard =
-                drivebase.driveFieldOriented(driveAngularVelocityKeyboard);
+                m_swerveSubsystem.driveFieldOriented(driveAngularVelocityKeyboard);
 
         // Default to field-centric swerve drive
-        drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
+        m_swerveSubsystem.setDefaultCommand(driveFieldOrientedAnglularVelocity);
 
         m_climbSubsystem.setDefaultCommand(new LockFunnelCommand());
 
         // Zero gyro
-        m_driverController.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
+        m_driverController.start().onTrue((Commands.runOnce(m_swerveSubsystem::zeroGyro)));
 
         m_driverController.back()
                 .whileTrue(Commands.parallel(new OuttakeAlgaeCommand(), new OuttakeCoralCommand()));
 
         m_operatorController.back().whileTrue(new InitiateClimbCommand());
+        m_operatorController.start().whileTrue(m_swerveSubsystem.centerModulesCommand());
 
         // Raise elevator (by height of Algae diameter) while intaking algae
         m_driverController.leftBumper().whileTrue(m_selectIntakeCommand);
@@ -298,6 +299,6 @@ public class RobotContainer {
     }
 
     public void setMotorBrake(boolean brake) {
-        drivebase.setMotorBrake(brake);
+        m_swerveSubsystem.setMotorBrake(brake);
     }
 }

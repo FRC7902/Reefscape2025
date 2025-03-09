@@ -19,7 +19,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "FinalPathRight2"
+            "pathName": "V2FinalPathRight2"
           }
         },
         {
@@ -31,7 +31,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "FinalPathRight3"
+            "pathName": "V2FinalPathRight3"
           }
         }
       ]

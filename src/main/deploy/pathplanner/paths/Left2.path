@@ -8,20 +8,20 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.936530243406383,
-        "y": 5.40342830619372
+        "x": 3.8707633667292676,
+        "y": 5.410477634404494
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 3.9796422782676353,
-        "y": 5.262454778267633
+        "x": 4.039856557377049,
+        "y": 5.265727459016393
       },
       "prevControl": {
-        "x": 3.7684761890707574,
-        "y": 5.128630704299994
+        "x": 3.960799615872837,
+        "y": 5.502898283529021
       },
       "nextControl": null,
       "isLocked": false,
@@ -48,20 +48,20 @@
   "eventMarkers": [
     {
       "name": "ElevatorL3",
-      "waypointRelativePos": 0.0,
+      "waypointRelativePos": 0.11443494776827819,
       "endWaypointRelativePos": null,
       "command": null
     },
     {
       "name": "coraloutakeon",
-      "waypointRelativePos": 0,
+      "waypointRelativePos": 1.0,
       "endWaypointRelativePos": null,
       "command": null
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 6.0,
-    "maxAcceleration": 4.0,
+    "maxVelocity": 5.0,
+    "maxAcceleration": 2.75,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
