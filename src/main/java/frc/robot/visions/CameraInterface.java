@@ -8,7 +8,8 @@ import org.photonvision.simulation.PhotonCameraSim;
 import org.photonvision.simulation.SimCameraProperties;
 import org.photonvision.simulation.VisionSystemSim;
 import org.photonvision.simulation.VisionTargetSim;
-
+import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.PhotonTrackedTarget;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -43,6 +44,7 @@ public class CameraInterface extends SubsystemBase {
 
     private double cameraOffsetToRobot = 0;
 
+    private PhotonPipelineResult photonResults;
 
      /**
      * Creates a new camera object for each camera attached to the Raspberry Pi.
@@ -186,6 +188,23 @@ public class CameraInterface extends SubsystemBase {
         return targetRange;
     }
 
+    public double getAprilTagYaw(PhotonTrackedTarget target) {
+        return target.getYaw();
+    }
+
+    public double getDistanceToAprilTag(PhotonTrackedTarget target) {
+        return PhotonUtils.calculateDistanceToTargetMeters(VisionConstants.kGroundToCameraDistance, 1.435, Units.degreesToRadians(VisionConstants.kCameraPitch), Units.degreesToRadians(target.getPitch()));
+    }
+
+    public void setPhotonPipelineResult(PhotonPipelineResult data) {
+        photonResults = data;
+    }
+    
+    public PhotonPipelineResult getPhotonPipelineResults() {
+        return photonResults;
+    }
+
+
     public void getCameraResults() {
         final var results = camera.getAllUnreadResults();
         //System.out.println("sigma");
@@ -199,7 +218,7 @@ public class CameraInterface extends SubsystemBase {
                         final int targetID = target.getFiducialId();
                         if (isReefAprilTag(targetID)) {
                             targetYaw = target.getYaw();
-                            targetRange = PhotonUtils.calculateDistanceToTargetMeters(VisionConstants.kGroundToCameraDistance, 1.435, Units.degreesToRadians(VisionConstants.kCameraPitch), Units.degreesToRadians(target.getPitch()));
+                            targetRange = getDistanceToAprilTag(target);
                             targetIsVisible = true;
                             break;
                         }

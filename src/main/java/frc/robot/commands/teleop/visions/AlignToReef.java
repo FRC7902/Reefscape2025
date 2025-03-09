@@ -77,8 +77,8 @@ public class AlignToReef extends Command {
   public void execute() {
     robotPose = drivebase.getPose();
     boolean cameraSawTarget = m_autoAlignCam.cameraSawTarget();
+    m_autoAlignCam.getCameraResults();
     if (!cameraSawTarget) {
-      m_autoAlignCam.getCameraResults();
       drivebase.driveFieldOriented(getDriveAngularVelocity()); 
       System.out.println("blawg!");
     }
@@ -111,6 +111,8 @@ public class AlignToReef extends Command {
 
       hawkTuah("Accumulated Y Error", yControllerError);
       hawkTuah("Accumulated Omega Error", omegaControllerError);
+      
+      hawkTuah("Distance to april tag", m_autoAlignCam.getTargetRange());
 
       drivebase.drive(
         //ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, omegaSpeed, robotPose.getRotation()));
