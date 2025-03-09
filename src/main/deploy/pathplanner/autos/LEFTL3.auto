@@ -7,7 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "L3S1KL"
+            "pathName": "Left1"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 2.5
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Left2"
           }
         },
         {
@@ -19,43 +31,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "L3KLAlgaebackwards"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "intakealgaeoff"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ElevatorL3"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "L3KLAlgaeforward"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.5
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "coraloutakeoff"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "L3KLCS"
+            "pathName": "Left3"
           }
         },
         {
@@ -67,19 +43,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "L3CSL"
+            "pathName": "Left4"
           }
         },
         {
-          "type": "named",
+          "type": "wait",
           "data": {
-            "name": "coraloutakeoff"
+            "waitTime": 1.5
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "KL",
+  "folder": null,
   "choreoAuto": false
 }

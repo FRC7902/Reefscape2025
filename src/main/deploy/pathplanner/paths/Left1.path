@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.0011993672865245,
-        "y": 5.210140875166778
+        "x": 7.577255737811203,
+        "y": 7.531245137448131
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.926653576342562,
-        "y": 5.883568342436626
+        "x": 6.983546773493283,
+        "y": 7.650496543722494
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 1.5286460504919948,
-        "y": 7.305838006587725
+        "x": 3.847482494813278,
+        "y": 5.142981878890041
       },
       "prevControl": {
-        "x": 2.8598600890176784,
-        "y": 6.61375122477485
+        "x": 3.451888232518197,
+        "y": 5.56255155102119
       },
       "nextControl": null,
       "isLocked": false,
@@ -32,7 +32,7 @@
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 0.699402573529412,
+      "minWaypointRelativePos": 0.648333885941644,
       "maxWaypointRelativePos": 1.0,
       "constraints": {
         "maxVelocity": 1.0,
@@ -47,8 +47,14 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "ZeroPosition",
-      "waypointRelativePos": 0,
+      "name": "lowalgae",
+      "waypointRelativePos": 0.5361302221485416,
+      "endWaypointRelativePos": null,
+      "command": null
+    },
+    {
+      "name": "intakealgaeon",
+      "waypointRelativePos": 1.0,
       "endWaypointRelativePos": null,
       "command": null
     }
@@ -63,13 +69,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -53.788415152228715
+    "rotation": -60.84757104130579
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -119.58275445316063
+    "rotation": -90.0
   },
   "useDefaultConstraints": true
 }

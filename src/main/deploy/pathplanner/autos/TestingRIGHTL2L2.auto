@@ -7,37 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "L1S1K"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.5
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "L1KCS"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "coraloutakeoff"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 1.0
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "L1CSL"
+            "pathName": "V2FinalPathRight1"
           }
         },
         {
@@ -45,11 +15,29 @@
           "data": {
             "waitTime": 2.0
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "FinalPathRight2"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.7
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "FinalPathRight3"
+          }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "KL",
+  "folder": null,
   "choreoAuto": false
 }
