@@ -42,6 +42,6 @@ public class MoveClimbUpCommand extends Command {
     @Override
     public boolean isFinished() {
      //   return m_climbSubsystem.isAtTargetAngle(m_climbSubsystem.getClimbArmAngle(), ClimbConstants.kClimbForwardLimit, 1);
-        return m_climbSubsystem.getClimbArmAngle() <= 90;
+        return m_climbSubsystem.getClimbArmAngle() <= 162;
     }
 }
