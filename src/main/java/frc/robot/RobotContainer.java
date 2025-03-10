@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ElevatorConstants;
@@ -44,8 +45,6 @@ import frc.robot.subsystems.ElevatorSubsystem.ElevatorPosition;
 import frc.robot.visions.CameraInterface;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.commands.teleop.climb.ManualClimb;
-import frc.robot.commands.teleop.visions.AlignToReef;
-import frc.robot.commands.teleop.visions.CheckForAprilTag;
 import swervelib.SwerveInputStream;
 
 /**
@@ -73,17 +72,14 @@ public class RobotContainer {
     public static final SwerveSubsystem m_swerveSubsystem =
             new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
 
-    //public static final CameraInterface leftCamera = new CameraInterface("skibidi", 0.03);
-    public static final CameraInterface rightCamera = new CameraInterface("quandale", 0.03);
-
     private final SendableChooser<Command> autoChooser;
 
     /**
      * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular
      * velocity.
      */
-    public SwerveInputStream driveAngularVelocity = SwerveInputStream
-            .of(m_swerveSubsystem.getSwerveDrive(), () -> m_driverController.getLeftY() * -1,
+    SwerveInputStream driveAngularVelocity = SwerveInputStream
+            .of(drivebase.getSwerveDrive(), () -> m_driverController.getLeftY() * -1,
                     () -> m_driverController.getLeftX() * -1)
             .withControllerRotationAxis(() -> m_driverController.getRightX() * -1)
             .deadband(OperatorConstants.DEADBAND).scaleTranslation(0.8)
@@ -208,11 +204,15 @@ public class RobotContainer {
      */
     private void configureBindings() {
         // Swerve drive controls
-        Command driveFieldOrientedDirectAngle = m_swerveSubsystem.driveFieldOriented(driveDirectAngle);
-        Command driveFieldOrientedAnglularVelocity = m_swerveSubsystem.driveFieldOriented(driveAngularVelocity);
-        Command driveRobotOrientedAngularVelocity = m_swerveSubsystem.driveFieldOriented(driveRobotOriented);
-        Command driveFieldOrientedDirectAngleKeyboard = m_swerveSubsystem.driveFieldOriented(driveDirectAngleKeyboard);
-        Command driveFieldOrientedAnglularVelocityKeyboard = m_swerveSubsystem.driveFieldOriented(driveAngularVelocityKeyboard);
+        Command driveFieldOrientedDirectAngle = drivebase.driveFieldOriented(driveDirectAngle);
+        Command driveFieldOrientedAnglularVelocity =
+                drivebase.driveFieldOriented(driveAngularVelocity);
+        Command driveRobotOrientedAngularVelocity =
+                drivebase.driveFieldOriented(driveRobotOriented);
+        Command driveFieldOrientedDirectAngleKeyboard =
+                drivebase.driveFieldOriented(driveDirectAngleKeyboard);
+        Command driveFieldOrientedAnglularVelocityKeyboard =
+                drivebase.driveFieldOriented(driveAngularVelocityKeyboard);
 
         // Default to field-centric swerve drive
         //m_swerveSubsystem.setDefaultCommand(driveFieldOrientedAnglularVelocity);
@@ -249,14 +249,12 @@ public class RobotContainer {
         m_driverController.povDown()
                 .whileTrue(new ConditionalCommand(new ManualClimb(m_climbSubsystem, -12),
                         new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
-        
         m_driverController.povLeft()
                 .onTrue(new ConditionalCommand(new MoveClimbUpCommand(m_climbSubsystem),
                         new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
         m_driverController.povRight()
                 .onTrue(new ConditionalCommand(new MoveClimbDownCommand(m_climbSubsystem),
                         new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
-        
 
         m_indexSubsystem
                 .setDefaultCommand(
