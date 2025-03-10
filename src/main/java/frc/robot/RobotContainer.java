@@ -6,7 +6,7 @@ package frc.robot;
 
 import java.io.File;
 import java.util.Map;
-
+import java.util.concurrent.locks.Condition;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
@@ -45,7 +45,7 @@ import frc.robot.visions.CameraInterface;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.commands.teleop.climb.ManualClimb;
 import frc.robot.commands.teleop.visions.AlignToReef;
-import frc.robot.commands.teleop.visions.GoToAprilTag;
+import frc.robot.commands.teleop.visions.CheckForAprilTag;
 import swervelib.SwerveInputStream;
 
 /**
@@ -73,7 +73,8 @@ public class RobotContainer {
     public static final SwerveSubsystem m_swerveSubsystem =
             new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
 
-    public static final CameraInterface m_autoAlignCam = new CameraInterface("skibidi", 0.03);         
+    //public static final CameraInterface leftCamera = new CameraInterface("skibidi", 0.03);
+    public static final CameraInterface rightCamera = new CameraInterface("quandale", 0.03);
 
     private final SendableChooser<Command> autoChooser;
 
@@ -98,7 +99,7 @@ public class RobotContainer {
     /**
      * Clone's the angular velocity input stream and converts it to a robotRelative input stream.
      */
-    SwerveInputStream driveRobotOriented =
+    public SwerveInputStream driveRobotOriented =
             driveAngularVelocity.copy().robotRelative(true).allianceRelativeControl(false);
 
     SwerveInputStream driveAngularVelocityKeyboard = SwerveInputStream
@@ -214,7 +215,9 @@ public class RobotContainer {
         Command driveFieldOrientedAnglularVelocityKeyboard = m_swerveSubsystem.driveFieldOriented(driveAngularVelocityKeyboard);
 
         // Default to field-centric swerve drive
-        m_swerveSubsystem.setDefaultCommand(driveFieldOrientedAnglularVelocity);
+        //m_swerveSubsystem.setDefaultCommand(driveFieldOrientedAnglularVelocity);
+
+        m_swerveSubsystem.setDefaultCommand(driveRobotOrientedAngularVelocity);
 
         m_climbSubsystem.setDefaultCommand(new LockFunnelCommand());
 
@@ -232,8 +235,12 @@ public class RobotContainer {
         m_driverController.rightBumper().whileTrue(m_selectOuttakeCommand);
 
         // Strafe controls
-        m_driverController.leftTrigger(0.05).whileTrue(new StrafeLeftCommand());
-        m_driverController.rightTrigger(0.05).whileTrue(new StrafeRightCommand());
+        //m_driverController.leftTrigger(0.05).whileTrue(new SequentialCommandGroup(new CheckForAprilTag(0), new AlignToReef(this, 0)));
+        //m_driverController.rightTrigger(0.05).whileTrue(new SequentialCommandGroup(new CheckForAprilTag(1), new AlignToReef(this, 1)));
+
+        m_driverController.leftTrigger(0.05).whileTrue(new ConditionalCommand(new SequentialCommandGroup(new CheckForAprilTag(0, rightCamera), new AlignToReef(this, 0, rightCamera)), new NullCommand(), rightCamera::cameraHasSeenAprilTag));
+        m_driverController.rightTrigger(0.05).whileTrue(new ConditionalCommand(new SequentialCommandGroup(new CheckForAprilTag(1, rightCamera), new AlignToReef(this, 0, rightCamera)), new NullCommand(), rightCamera::cameraHasSeenAprilTag));
+
 
         // Climb controls
         m_driverController.povUp()
@@ -242,18 +249,14 @@ public class RobotContainer {
         m_driverController.povDown()
                 .whileTrue(new ConditionalCommand(new ManualClimb(m_climbSubsystem, -12),
                         new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
-        /* 
+        
         m_driverController.povLeft()
                 .onTrue(new ConditionalCommand(new MoveClimbUpCommand(m_climbSubsystem),
                         new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
         m_driverController.povRight()
                 .onTrue(new ConditionalCommand(new MoveClimbDownCommand(m_climbSubsystem),
                         new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
-        */
-        //m_driverController.povRight().whileTrue(new SequentialCommandGroup(new AlignToReef(), drivebase.driveToDistanceCommand(m_autoAlignCam.getRobotTranslationDistance(), 3)));
-        //m_driverController.povRight().whileTrue(new SequentialCommandGroup(new AlignToReef(), drivebase.goToPose(RobotContainer.m_autoAlignCam.poseOfAprilTag)));
-        m_driverController.povLeft().whileTrue(new AlignToReef(m_swerveSubsystem, m_autoAlignCam, m_indexSubsystem, m_driverController));
-        m_driverController.povRight().whileTrue(new AlignToReef(m_swerveSubsystem, m_autoAlignCam, m_indexSubsystem, m_driverController));
+        
 
         m_indexSubsystem
                 .setDefaultCommand(
@@ -262,6 +265,7 @@ public class RobotContainer {
                                 .andThen(new IntakeCoralCommand(
                                         Constants.CoralIndexerConstants.kCorrectionPower)
                                                 .withTimeout(1)));
+
 
         // Elevator coral positions
         m_operatorController.x().onTrue(

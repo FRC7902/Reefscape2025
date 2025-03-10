@@ -18,6 +18,7 @@ import frc.robot.Constants.VisionConstants;
 import frc.robot.subsystems.CoralIndexerSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.visions.CameraInterface;
+import swervelib.SwerveController;
 import swervelib.SwerveInputStream;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
@@ -25,24 +26,30 @@ public class AlignToReef extends Command {
   /** Creates a new AlignToReefCommand. */
   private boolean endCommand = false;
   private double reefOffset = 0;
-  private Pose2d closestAprilTagPose;
+  private double robotRotation = 0;
   private Pose2d robotPose;
 
-  private  ProfiledPIDController yController;
-  private  ProfiledPIDController omegaController;
+  private ProfiledPIDController yController;
+  private ProfiledPIDController omegaController;
 
-  private final CameraInterface m_autoAlignCam;
-  private final CoralIndexerSubsystem m_indexSubsystem;
-  private final SwerveSubsystem drivebase;
-  private final CommandXboxController m_driverController;
+  private CameraInterface m_autoAlignCam;
 
-  public AlignToReef(SwerveSubsystem drivebase, CameraInterface m_autoAlignCam, CoralIndexerSubsystem m_indexSubsystem, CommandXboxController m_driverController) {
+  private final RobotContainer m_robotContainer;
+
+  private double aprilTagRotation;
+
+  double distanceToCenterOfAprilTag = 0;
+  double initialRobotPosition = 0;
+  
+  //Command driveRobotOrientedAngularVelocity;
+  //Command driveFieldOrientedAnglularVelocity;
+
+
+  public AlignToReef(RobotContainer m_robotContainer, int triggerType, CameraInterface m_autoAlignCamera) {
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(RobotContainer.m_swerveSubsystem, RobotContainer.m_autoAlignCam);
-    this.m_autoAlignCam = m_autoAlignCam;
-    this.drivebase = drivebase;
-    this.m_indexSubsystem = m_indexSubsystem;
-    this.m_driverController = m_driverController;
+    addRequirements(RobotContainer.m_swerveSubsystem);
+    this.m_robotContainer = m_robotContainer;
+    this.m_autoAlignCam = m_autoAlignCamera;
     yController = new ProfiledPIDController(VisionConstants.kPY, VisionConstants.kIY, VisionConstants.kDY, VisionConstants.yConstraints); //to tune
     omegaController = new ProfiledPIDController(VisionConstants.kPOmega, VisionConstants.kIOmega, VisionConstants.kDOmega, VisionConstants.omegaConstraints); //to tune
   }
@@ -50,80 +57,74 @@ public class AlignToReef extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    endCommand = !m_indexSubsystem.hasCoral();
+    endCommand = !RobotContainer.m_indexSubsystem.hasCoral();
     //RobotContainer.m_autoAlignCam.clearCameraFIFOBuffer();
-    m_autoAlignCam.resetTargetDetector();
-    robotPose = drivebase.getPose();
+    robotPose = RobotContainer.m_swerveSubsystem.getPose();
 
-    yController.reset(robotPose.getY());
-    omegaController.reset(robotPose.getRotation().getRadians());
+    robotRotation = robotPose.getRotation().getDegrees();
 
+    yController.reset(m_autoAlignCam.getAprilTagYaw());
     yController.setTolerance(VisionConstants.yControllerTolerance);
-
     yController = new ProfiledPIDController(VisionConstants.kPY, VisionConstants.kIY, VisionConstants.kDY, VisionConstants.yConstraints); //to tune
-    omegaController = new ProfiledPIDController(VisionConstants.kPOmega, VisionConstants.kIOmega, VisionConstants.kDOmega, VisionConstants.omegaConstraints); //to tune
 
-    if (driverPressedPOVLeft()) {
-      reefOffset = VisionConstants.reefToAprilTagOffset; // to measure
-    }
-    else if (driverPressedPOVRight()) {
-      reefOffset = -VisionConstants.reefToAprilTagOffset; // to measure
-    }
+    omegaController.reset(robotPose.getRotation().getRadians());
+    omegaController.setTolerance(VisionConstants.omegaControllerTolerance);
+    omegaController = new ProfiledPIDController(VisionConstants.kPOmega, VisionConstants.kIOmega, VisionConstants.kDOmega, VisionConstants.omegaConstraints); //to tune
+    
+    distanceToCenterOfAprilTag = m_autoAlignCam.getAprilTagYaw();
+    initialRobotPosition = RobotContainer.m_swerveSubsystem.getPose().getY();
+
+    //driveRobotOrientedAngularVelocity = RobotContainer.m_swerveSubsystem.driveFieldOriented(m_robotContainer.driveRobotOriented);
+    //driveFieldOrientedAnglularVelocity = RobotContainer.m_swerveSubsystem.driveFieldOriented(m_robotContainer.driveAngularVelocity);
+
+    aprilTagRotation = m_autoAlignCam.getAprilTagRotation();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   
   @Override 
   public void execute() {
-    robotPose = drivebase.getPose();
-    boolean cameraSawTarget = m_autoAlignCam.cameraSawTarget();
-    m_autoAlignCam.getCameraResults();
-    if (!cameraSawTarget) {
-      drivebase.driveFieldOriented(getDriveAngularVelocity()); 
-      System.out.println("blawg!");
+    robotPose = RobotContainer.m_swerveSubsystem.getPose();
+    robotRotation = robotPose.getRotation().getDegrees();
+    System.out.println("HAWK TUAH!");
+    //closestAprilTagPose = m_autoAlignCam.poseOfAprilTag;
+
+    SwerveController swerveController = RobotContainer.m_swerveSubsystem.getSwerveController();
+
+    yController.setGoal(0);
+    omegaController.setGoal(0);
+
+    double robotDisplacement = RobotContainer.m_swerveSubsystem.getPose().getY() - initialRobotPosition;
+    var ySpeed = yController.calculate(robotDisplacement);
+    if (yController.atGoal()) {
+      System.out.println("Y Controller at Goal");
+      ySpeed = 0;
     }
-    else if (cameraSawTarget) {
-      System.out.println("HAWK TUAH!");
-      //closestAprilTagPose = m_autoAlignCam.poseOfAprilTag;
-      
-      double horizontalDistance = m_autoAlignCam.getTargetRange() * Math.cos(m_autoAlignCam.getYaw());
 
-
-      yController.setGoal(horizontalDistance + reefOffset);
-      omegaController.setGoal(m_autoAlignCam.getYaw());
-
-      var ySpeed = yController.calculate(robotPose.getY());
-      if (yController.atGoal()) {
-        System.out.println("Y Controller at Goal");
-        ySpeed = 0;
-      }
-
-      //var omegaSpeed = omegaController.calculate(robotPose.getRotation().getRadians());
-      var omegaSpeed = 0;
-      if (omegaController.atGoal()) {
-        System.out.println("Omega at goal");
-        omegaSpeed = 0;
-      }
-
-      final double yControllerError = yController.getAccumulatedError();
-      final double omegaControllerError = omegaController.getAccumulatedError();
-
-
-      hawkTuah("Accumulated Y Error", yControllerError);
-      hawkTuah("Accumulated Omega Error", omegaControllerError);
-      
-      hawkTuah("Distance to april tag", m_autoAlignCam.getTargetRange());
-
-      drivebase.drive(
-        //ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, omegaSpeed, robotPose.getRotation()));
-        ChassisSpeeds.fromFieldRelativeSpeeds(getDriverControllerLeftY(), ySpeed, omegaSpeed, robotPose.getRotation()));
+    var omegaSpeed = omegaController.calculate(robotPose.getRotation().getRadians());
+    if (omegaController.atGoal()) {
+      System.out.println("Omega Controller at Goal");
+      omegaSpeed = 0;
     }
-    
+
+    final double yControllerError = yController.getAccumulatedError();
+    final double omegaControllerError = omegaController.getAccumulatedError();
+
+    hawkTuah("Accumulated Y Error", yControllerError);
+    hawkTuah("Accumulated Omega Error", omegaControllerError);
+
+    //drivebase.setDefaultCommand(driveRobotOrientedAngularVelocity);
+
+    RobotContainer.m_swerveSubsystem.drive(
+      //ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, omegaSpeed, robotPose.getRotation()));
+      //swerveController.getTargetSpeeds(yControllerError, yControllerError, yControllerError, robotDisplacement, yControllerError)
+      ChassisSpeeds.fromRobotRelativeSpeeds(getDriverControllerLeftY(), ySpeed, omegaSpeed, robotPose.getRotation()));
 }
     
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    //RobotContainer.m_swerveSubsystem.setDefaultCommand(driveFieldOrientedAnglularVelocity);
   }
 
   public void hawkTuah(String text, double key) {
@@ -139,27 +140,8 @@ public class AlignToReef extends Command {
   }
 
   private double getDriverControllerLeftY() {
-    return m_driverController.getLeftY();
+    return RobotContainer.m_driverController.getLeftY();
   }
-
-  private boolean driverPressedPOVLeft() {
-    return m_driverController.povLeft().getAsBoolean();
-  }
-
-  private boolean driverPressedPOVRight() {
-    return m_driverController.povRight().getAsBoolean();
-  }
-
-  private SwerveInputStream getDriveAngularVelocity() {
-    return SwerveInputStream.of(drivebase.getSwerveDrive(), 
-    () -> m_driverController.getLeftY() * -1,
-    () -> m_driverController.getLeftX() * -1)
-    .withControllerRotationAxis(() -> m_driverController.getRightX() * -1)
-    .deadband(OperatorConstants.DEADBAND)
-    .scaleTranslation(0.8)
-    .allianceRelativeControl(true);        
-  }
-
 }
 
 

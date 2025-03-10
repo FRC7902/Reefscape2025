@@ -739,6 +739,27 @@ public class SwerveSubsystem extends SubsystemBase {
                 && swerveDrive.getRobotVelocity().omegaRadiansPerSecond < 0.1);
     }
 
+    public Command snapToAprilTagAngle(double angleDegrees, double xTranslation, double yTranslation, double toleranceDegrees) {
+        SwerveController controller = swerveDrive.getSwerveController();
+
+        return run(() -> {
+            swerveDrive.drive(ChassisSpeeds.fromRobotRelativeSpeeds(xTranslation, yTranslation,
+                    controller.headingCalculate(
+                            swerveDrive.getOdometryHeading().unaryMinus().getRadians(),
+                            new Rotation2d(Math.toRadians(angleDegrees)).getRadians()),
+                    swerveDrive.getPose().getRotation()));
+            SmartDashboard.putNumber("Odom Heading (rad)",
+                    swerveDrive.getOdometryHeading().unaryMinus().getRadians());
+            SmartDashboard.putNumber("Target Heading (rad)", Math.toRadians(angleDegrees));
+            SmartDashboard.putNumber("Error (rad)",
+                    Math.abs(new Rotation2d(Math.toRadians(angleDegrees))
+                            .minus(swerveDrive.getOdometryHeading().unaryMinus()).getRadians()));
+        }).until(() -> (Math.abs(new Rotation2d(Math.toRadians(angleDegrees))
+                .minus(swerveDrive.getOdometryHeading().unaryMinus())
+                .getDegrees()) < toleranceDegrees)
+                && swerveDrive.getRobotVelocity().omegaRadiansPerSecond < 0.1);}
+
+
     public void strafe(double strafePower, double speedMultiplier) {
         swerveDrive.drive(new Translation2d(0,
                 strafePower * Math.abs(speedMultiplier) * swerveDrive.getMaximumChassisVelocity()),
