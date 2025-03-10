@@ -46,6 +46,9 @@ import frc.robot.visions.CameraInterface;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.commands.teleop.climb.ManualClimb;
 import swervelib.SwerveInputStream;
+import frc.robot.commands.teleop.visions.AlignToReef;
+import frc.robot.commands.teleop.visions.CheckForAprilTag;
+
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -74,12 +77,16 @@ public class RobotContainer {
 
     private final SendableChooser<Command> autoChooser;
 
+    private final CameraInterface rightCamera = new CameraInterface("skibidi", 0);
+    private final CameraInterface leftCamera = new CameraInterface("quandale", 0);
+
+
     /**
      * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular
      * velocity.
      */
     SwerveInputStream driveAngularVelocity = SwerveInputStream
-            .of(drivebase.getSwerveDrive(), () -> m_driverController.getLeftY() * -1,
+            .of(m_swerveSubsystem.getSwerveDrive(), () -> m_driverController.getLeftY() * -1,
                     () -> m_driverController.getLeftX() * -1)
             .withControllerRotationAxis(() -> m_driverController.getRightX() * -1)
             .deadband(OperatorConstants.DEADBAND).scaleTranslation(0.8)
@@ -204,15 +211,15 @@ public class RobotContainer {
      */
     private void configureBindings() {
         // Swerve drive controls
-        Command driveFieldOrientedDirectAngle = drivebase.driveFieldOriented(driveDirectAngle);
+        Command driveFieldOrientedDirectAngle = m_swerveSubsystem.driveFieldOriented(driveDirectAngle);
         Command driveFieldOrientedAnglularVelocity =
-                drivebase.driveFieldOriented(driveAngularVelocity);
+                m_swerveSubsystem.driveFieldOriented(driveAngularVelocity);
         Command driveRobotOrientedAngularVelocity =
-                drivebase.driveFieldOriented(driveRobotOriented);
+                m_swerveSubsystem.driveFieldOriented(driveRobotOriented);
         Command driveFieldOrientedDirectAngleKeyboard =
-                drivebase.driveFieldOriented(driveDirectAngleKeyboard);
+                m_swerveSubsystem.driveFieldOriented(driveDirectAngleKeyboard);
         Command driveFieldOrientedAnglularVelocityKeyboard =
-                drivebase.driveFieldOriented(driveAngularVelocityKeyboard);
+                m_swerveSubsystem.driveFieldOriented(driveAngularVelocityKeyboard);
 
         // Default to field-centric swerve drive
         //m_swerveSubsystem.setDefaultCommand(driveFieldOrientedAnglularVelocity);
