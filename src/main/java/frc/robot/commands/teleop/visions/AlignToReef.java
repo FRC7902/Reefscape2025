@@ -38,7 +38,7 @@ public class AlignToReef extends Command {
 
   public AlignToReef(SwerveSubsystem drivebase, CameraInterface m_autoAlignCam, CoralIndexerSubsystem m_indexSubsystem, CommandXboxController m_driverController) {
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(RobotContainer.drivebase, RobotContainer.m_autoAlignCam);
+    addRequirements(RobotContainer.m_swerveSubsystem, RobotContainer.m_autoAlignCam);
     this.m_autoAlignCam = m_autoAlignCam;
     this.drivebase = drivebase;
     this.m_indexSubsystem = m_indexSubsystem;

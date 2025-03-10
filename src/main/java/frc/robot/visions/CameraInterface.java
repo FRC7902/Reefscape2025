@@ -155,7 +155,7 @@ public class CameraInterface extends SubsystemBase {
      * @return The robot's current position in a Pose2d object.
      */       
     private Pose2d getRobotPose() {
-        return RobotContainer.drivebase.getPose();
+        return RobotContainer.m_swerveSubsystem.getPose();
     }
 
     /**
@@ -177,7 +177,7 @@ public class CameraInterface extends SubsystemBase {
     }
 
     public Pose2d getClosestAprilTagPose() {
-        return RobotContainer.drivebase.getPose().nearest(scannedAprilTagPoses);
+        return RobotContainer.m_swerveSubsystem.getPose().nearest(scannedAprilTagPoses);
     }
 
     public int getTargetAprilTagID() {

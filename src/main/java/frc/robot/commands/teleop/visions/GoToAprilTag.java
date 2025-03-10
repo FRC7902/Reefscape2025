@@ -61,7 +61,7 @@ public class GoToAprilTag extends Command {
 
 
 public GoToAprilTag(CameraInterface m_autoAlignCam, SwerveSubsystem drivebase, CoralIndexerSubsystem m_indexSubsystem) {
-    addRequirements(RobotContainer.drivebase);
+    addRequirements(RobotContainer.m_swerveSubsystem);
     this.m_autoAlignCam = m_autoAlignCam;
     this.drivebase = drivebase;
     this.m_indexSubsystem = m_indexSubsystem;
@@ -167,7 +167,7 @@ public GoToAprilTag(CameraInterface m_autoAlignCam, SwerveSubsystem drivebase, C
     }
 
   private SwerveInputStream getDriveAngularVelocity() {
-    return SwerveInputStream.of(RobotContainer.drivebase.getSwerveDrive(), 
+    return SwerveInputStream.of(RobotContainer.m_swerveSubsystem.getSwerveDrive(), 
     () -> RobotContainer.m_driverController.getLeftY() * -1,
     () -> RobotContainer.m_driverController.getLeftX() * -1)
     .withControllerRotationAxis(() -> RobotContainer.m_driverController.getRightX() * -1)
