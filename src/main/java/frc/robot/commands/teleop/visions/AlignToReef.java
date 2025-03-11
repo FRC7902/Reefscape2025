@@ -84,24 +84,24 @@ public class AlignToReef extends Command {
   
   @Override 
   public void execute() {
+    m_autoAlignCam.getCameraResults();
     robotPose = RobotContainer.m_swerveSubsystem.getPose();
-    robotRotation = robotPose.getRotation().getDegrees();
+    robotRotation = robotPose.getRotation().getRadians();
     System.out.println("HAWK TUAH!");
     //closestAprilTagPose = m_autoAlignCam.poseOfAprilTag;
-
-    SwerveController swerveController = RobotContainer.m_swerveSubsystem.getSwerveController();
 
     yController.setGoal(0);
     omegaController.setGoal(0);
 
     double robotDisplacement = RobotContainer.m_swerveSubsystem.getPose().getY() - initialRobotPosition;
-    var ySpeed = yController.calculate(robotDisplacement);
+    //var ySpeed = yController.calculate(robotDisplacement);
+    var ySpeed = yController.calculate(m_autoAlignCam.getAprilTagYaw());
     if (yController.atGoal()) {
       System.out.println("Y Controller at Goal");
       ySpeed = 0;
     }
 
-    var omegaSpeed = omegaController.calculate(robotPose.getRotation().getRadians());
+    var omegaSpeed = omegaController.calculate(robotRotation);
     if (omegaController.atGoal()) {
       System.out.println("Omega Controller at Goal");
       omegaSpeed = 0;
@@ -115,10 +115,12 @@ public class AlignToReef extends Command {
 
     //drivebase.setDefaultCommand(driveRobotOrientedAngularVelocity);
 
-    RobotContainer.m_swerveSubsystem.drive(
+    RobotContainer.m_swerveSubsystem.snapToAprilTagAngle(0, getDriverControllerLeftY(), ySpeed, 0.5);
+
+    //RobotContainer.m_swerveSubsystem.drive(
       //ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, omegaSpeed, robotPose.getRotation()));
       //swerveController.getTargetSpeeds(yControllerError, yControllerError, yControllerError, robotDisplacement, yControllerError)
-      ChassisSpeeds.fromRobotRelativeSpeeds(getDriverControllerLeftY(), ySpeed, omegaSpeed, robotPose.getRotation()));
+      //ChassisSpeeds.fromRobotRelativeSpeeds(getDriverControllerLeftY(), ySpeed, omegaSpeed, robotPose.getRotation()));
 }
     
   // Called once the command ends or is interrupted.
@@ -126,6 +128,7 @@ public class AlignToReef extends Command {
   public void end(boolean interrupted) {
     //RobotContainer.m_swerveSubsystem.setDefaultCommand(driveFieldOrientedAnglularVelocity);
   }
+
 
   public void hawkTuah(String text, double key) {
     SmartDashboard.putNumber(text, key);
@@ -140,7 +143,7 @@ public class AlignToReef extends Command {
   }
 
   private double getDriverControllerLeftY() {
-    return RobotContainer.m_driverController.getLeftY();
+    return -RobotContainer.m_driverController.getLeftY();
   }
 }
 

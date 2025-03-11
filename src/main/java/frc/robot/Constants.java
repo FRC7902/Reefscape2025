@@ -62,7 +62,7 @@ public final class Constants {
       //PID Omega Controller Constants
       public static final TrapezoidProfile.Constraints omegaConstraints =   new TrapezoidProfile.Constraints(3, 2);
       public static final double omegaControllerTolerance = 0.02;
-      public static  double kPOmega = 0.03;
+      public static  double kPOmega = 0.13;
       public static  double kIOmega = 0;
       public static  double kDOmega = 0.01;      
 
