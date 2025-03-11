@@ -5,6 +5,7 @@
 package frc.robot.commands.teleop.visions;
 
 
+import org.photonvision.PhotonUtils;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -30,6 +31,9 @@ public class AlignToReef extends Command {
   private Pose2d robotPose;
 
   private ProfiledPIDController yController;
+  private ProfiledPIDController y2Controller;
+  private ProfiledPIDController ySelectedController;
+
   private ProfiledPIDController omegaController;
 
   private CameraInterface m_autoAlignCam;
@@ -51,7 +55,9 @@ public class AlignToReef extends Command {
     this.m_robotContainer = m_robotContainer;
     this.m_autoAlignCam = m_autoAlignCamera;
     yController = new ProfiledPIDController(VisionConstants.kPY, VisionConstants.kIY, VisionConstants.kDY, VisionConstants.yConstraints); //to tune
+    y2Controller = new ProfiledPIDController(VisionConstants.kPY2, VisionConstants.kIY2, VisionConstants.kDY2, VisionConstants.yConstraints); //to tune
     omegaController = new ProfiledPIDController(VisionConstants.kPOmega, VisionConstants.kIOmega, VisionConstants.kDOmega, VisionConstants.omegaConstraints); //to tune
+
   }
 
   // Called when the command is initially scheduled.
@@ -63,9 +69,18 @@ public class AlignToReef extends Command {
 
     robotRotation = robotPose.getRotation().getDegrees();
 
+    yController = new ProfiledPIDController(VisionConstants.kPY, VisionConstants.kIY, VisionConstants.kDY, VisionConstants.yConstraints); //to tune
+    y2Controller = new ProfiledPIDController(VisionConstants.kPY2, VisionConstants.kIY2, VisionConstants.kDY2, VisionConstants.yConstraints); //to tune
+
+    if (m_autoAlignCam.getAprilTagYaw() < 10) {
+      yController = y2Controller;
+    }
+
     yController.reset(m_autoAlignCam.getAprilTagYaw());
     yController.setTolerance(VisionConstants.yControllerTolerance);
-    yController = new ProfiledPIDController(VisionConstants.kPY, VisionConstants.kIY, VisionConstants.kDY, VisionConstants.yConstraints); //to tune
+
+
+
 
     omegaController.reset(robotPose.getRotation().getRadians());
     omegaController.setTolerance(VisionConstants.omegaControllerTolerance);

@@ -27,7 +27,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.RobotContainer;
 
-public class CameraInterface {
+public class CameraInterface extends SubsystemBase {
     public final PhotonCamera camera;
     public boolean targetIsVisible = false;
     public double targetYaw = 0;
@@ -46,6 +46,16 @@ public class CameraInterface {
     public CameraInterface(String cameraName, double cameraOffsetToRobot) {
         camera = new PhotonCamera(cameraName);
         this.cameraOffsetToRobot = cameraOffsetToRobot;
+          
+        SmartDashboard.putNumber("kPY Close", VisionConstants.kPY2);
+        SmartDashboard.putNumber("kIY Close", VisionConstants.kIY2);
+        SmartDashboard.putNumber("kDY Close", VisionConstants.kDY2);
+
+        SmartDashboard.putNumber("kPY Far", VisionConstants.kPY);
+        SmartDashboard.putNumber("kIY Far", VisionConstants.kIY);
+        SmartDashboard.putNumber("kDY Far", VisionConstants.kDY);
+
+        SmartDashboard.putNumber("April Tag Offset", VisionConstants.kAprilTagOffset);
     }
 
      /**
@@ -159,6 +169,26 @@ public class CameraInterface {
                 }
             }
         }
+    }
+
+    @Override
+    public void periodic() {
+
+        SmartDashboard.putNumber("April Tag Yaw", getAprilTagYaw());
+    
+
+        SmartDashboard.getNumber("kPY Close", VisionConstants.kPY2);
+        SmartDashboard.getNumber("kIY Close", VisionConstants.kIY2);
+        SmartDashboard.getNumber("kDY Close", VisionConstants.kDY2);
+
+        SmartDashboard.getNumber("kPY Far", VisionConstants.kPY);
+        SmartDashboard.getNumber("kIY Far", VisionConstants.kIY);
+        SmartDashboard.getNumber("kDY Far", VisionConstants.kDY);
+
+        SmartDashboard.getNumber("April Tag Offset", VisionConstants.kAprilTagOffset);
+
+
+
     }
 
 }

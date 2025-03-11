@@ -44,9 +44,12 @@ public final class Constants {
       public static final Transform2d krobotToCam2d = new Transform2d(0, 0, krobotToCamRotation2d); //to measure
       public static final double kGroundToCameraDistance = 0; //in meters
       public static final double kCameraPitch = 0; //to measure
+      public static double kGroundToCamera = 0.38735;
+
+      public static double kAprilTagOffset = 0;
 
       //April Tag Offset
-      public static final double kGroundToAprilTagDistance = 0.22225; //in meters
+      public static final double kGroundToAprilTagDistance = 0.171; //in meters
       public static final double kAprilTagArea = 0.75;
 
       //Reef Offset
@@ -59,7 +62,7 @@ public final class Constants {
       public static  double kIY = 0;
       public static  double kDY = 0;
 
-      public static double kPY2 = 0.01;
+      public static double kPY2 = 0.07;
       public static double kIY2 = 0;
       public static double kDY2 = 0;
 
