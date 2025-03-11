@@ -1,16 +1,33 @@
 package frc.robot.visions;
 
+import java.util.List;
 import java.util.Optional;
 import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonUtils;
+import org.photonvision.estimation.TargetModel;
+import org.photonvision.simulation.PhotonCameraSim;
+import org.photonvision.simulation.SimCameraProperties;
+import org.photonvision.simulation.VisionSystemSim;
+import org.photonvision.simulation.VisionTargetSim;
+import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.PhotonTrackedTarget;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.VisionConstants;
+import frc.robot.RobotContainer;
 
-public class CameraInterface extends SubsystemBase {
+public class CameraInterface {
     public final PhotonCamera camera;
     public boolean targetIsVisible = false;
     public double targetYaw = 0;
@@ -29,17 +46,6 @@ public class CameraInterface extends SubsystemBase {
     public CameraInterface(String cameraName, double cameraOffsetToRobot) {
         camera = new PhotonCamera(cameraName);
         this.cameraOffsetToRobot = cameraOffsetToRobot;
-        SmartDashboard.putNumber("kPY Close", VisionConstants.kPYC);
-        SmartDashboard.putNumber("kIY Close", VisionConstants.kIYC);
-        SmartDashboard.putNumber("kDY Close", VisionConstants.kDYC);
-
-        SmartDashboard.putNumber("kPY Far", VisionConstants.kPYF);
-        SmartDashboard.putNumber("kIY Far", VisionConstants.kIYF);
-        SmartDashboard.putNumber("kDY Far", VisionConstants.kDYF);
-
-        SmartDashboard.putNumber("April Tag Offset", VisionConstants.kAprilTagOffset);
-        SmartDashboard.putNumber("Debouncer Max Time", VisionConstants.kMaxTimeToWait);
-
     }
 
      /**
@@ -100,14 +106,6 @@ public class CameraInterface extends SubsystemBase {
         return aprilTagID;
     }
 
-    /* 
-    public double getAprilTagRotation() {
-        int aprilTagID = getTargetAprilTagID();
-        return aprilTagFieldLayout.getTagPose(aprilTagID).get().getRotation().getAngle();
-    }
-    */
-
-     
     public double getAprilTagRotation() {
         int aprilTagID = getTargetAprilTagID();
         final Optional<Alliance> alliance = DriverStation.getAlliance();
@@ -134,7 +132,6 @@ public class CameraInterface extends SubsystemBase {
         }
         return 0;
     }
-    
 
     public boolean cameraHasSeenAprilTag() {
         resetTargetDetector();
@@ -162,25 +159,6 @@ public class CameraInterface extends SubsystemBase {
                 }
             }
         }
-    }
-
-    @Override
-    public void periodic() {
-        SmartDashboard.getNumber("kPY Close", VisionConstants.kPYC);
-        SmartDashboard.getNumber("kIY Close", VisionConstants.kIYC);
-        SmartDashboard.getNumber("kDY Close", VisionConstants.kDYC);
-
-        SmartDashboard.getNumber("kPY Far", VisionConstants.kPYF);
-        SmartDashboard.getNumber("kIY Far", VisionConstants.kIYF);
-        SmartDashboard.getNumber("kDY Far", VisionConstants.kDYF);
-
-        SmartDashboard.getNumber("April Tag Offset", VisionConstants.kAprilTagOffset);
-        SmartDashboard.getNumber("Debouncer Max Time", VisionConstants.kMaxTimeToWait);
-
-        SmartDashboard.putBoolean("Camera sees target", cameraSawTarget());
-        SmartDashboard.putNumber("April Tag Yaw", getAprilTagYaw());
-        SmartDashboard.putNumber("April Tag ID", getTargetAprilTagID());
-        SmartDashboard.putNumber("April Tag Rotation", getAprilTagRotation());
     }
 
 }
