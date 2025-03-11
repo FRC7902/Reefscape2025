@@ -96,7 +96,7 @@ public class AlignToReef extends Command {
     double robotDisplacement = RobotContainer.m_swerveSubsystem.getPose().getY() - initialRobotPosition;
     //var ySpeed = yController.calculate(robotDisplacement);
     var ySpeed = yController.calculate(m_autoAlignCam.getAprilTagYaw());
-    if (yController.atGoal()) {
+    if (yController.atGoal() || robotRotation > 0.4363) {
       System.out.println("Y Controller at Goal");
       ySpeed = 0;
     }
