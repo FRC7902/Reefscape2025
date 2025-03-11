@@ -38,33 +38,32 @@ public final class Constants {
     public static class VisionConstants {
 
       //Camera Offset
-      public static final Rotation3d krobotToCamRotation = new Rotation3d(0, 0, 0);
-      public static final Rotation2d krobotToCamRotation2d = new Rotation2d(0);
-      public static final Transform3d krobotToCam = new Transform3d(0, 0, 0, krobotToCamRotation); //to measure
-      public static final Transform2d krobotToCam2d = new Transform2d(0, 0, krobotToCamRotation2d); //to measure
       public static final double kGroundToCameraDistance = 0; //in meters
       public static final double kCameraPitch = 0; //to measure
 
       //April Tag Offset
       public static final double kGroundToAprilTagDistance = 0.22225; //in meters
       public static final double kAprilTagArea = 0.75;
+      public static double kAprilTagOffset = 0;
 
       //Reef Offset
       public static final double reefToAprilTagOffset = 0.25; //to measure
 
-      //PID Y Controller Constants
+      //PID Y Controller for far Distances Constants
       public static final TrapezoidProfile.Constraints yConstraints = new TrapezoidProfile.Constraints(3, 2);
       public static final double yControllerTolerance = 0.02;
-      public static  double kPY = 0.20;
-      public static  double kIY = 0;
-      public static  double kDY = 0;
+      public static double kPYF = 0.20;
+      public static double kIYF = 0;
+      public static double kDYF = 0;
 
-      //PID Omega Controller Constants
-      public static final TrapezoidProfile.Constraints omegaConstraints =   new TrapezoidProfile.Constraints(3, 2);
+      //PID Y Controller for Close Distances Constants
       public static final double omegaControllerTolerance = 0.02;
-      public static  double kPOmega = 0.13;
-      public static  double kIOmega = 0;
-      public static  double kDOmega = 0.01;      
+      public static double kPYC = 0.20;
+      public static double kIYC = 0;
+      public static double kDYC = 0;     
+
+      //Debouncer Offsets
+      public static double kMaxTimeToWait = 0.5;
 
     }
     

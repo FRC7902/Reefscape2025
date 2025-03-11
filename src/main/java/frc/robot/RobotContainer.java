@@ -180,7 +180,7 @@ public class RobotContainer {
         // new PointTowardsZoneTrigger("Speaker").whileTrue(Commands.print("aiming at
         // speaker"));
 
-        SmartDashboard.putData("Auto Chooser", autoChooser);
+        //SmartDashboard.putData("Auto Chooser", autoChooser); commented out for testing
     }
 
     private ElevatorPosition select() {
@@ -246,12 +246,12 @@ public class RobotContainer {
         m_driverController.rightBumper().whileTrue(m_selectOuttakeCommand);
 
         // Strafe controls
-        //m_driverController.leftTrigger(0.05).whileTrue(new SequentialCommandGroup(new CheckForAprilTag(0), new AlignToReef(this, 0)));
-        //m_driverController.rightTrigger(0.05).whileTrue(new SequentialCommandGroup(new CheckForAprilTag(1), new AlignToReef(this, 1)));
+        m_driverController.povRight().whileTrue(new StrafeRightCommand());
+        m_driverController.povLeft().whileTrue(new StrafeLeftCommand());
 
-        m_driverController.leftTrigger(0.05).whileTrue(new ConditionalCommand(new SequentialCommandGroup(new CheckForAprilTag(0, rightCamera), new AlignToReef(this, 0, rightCamera)), m_swerveSubsystem.driveFieldOriented(driveAngularVelocity), rightCamera::cameraHasSeenAprilTag));
-        m_driverController.rightTrigger(0.05).whileTrue(new ConditionalCommand(new SequentialCommandGroup(new CheckForAprilTag(1, rightCamera), new AlignToReef(this, 0, rightCamera)), m_swerveSubsystem.driveFieldOriented(driveAngularVelocity), rightCamera::cameraHasSeenAprilTag));
-
+        //Auto-align controls
+        m_driverController.leftTrigger(0.05).whileTrue(new ConditionalCommand(new SequentialCommandGroup(new CheckForAprilTag(rightCamera), new AlignToReef(this, 0, rightCamera)), m_swerveSubsystem.driveFieldOriented(driveAngularVelocity), rightCamera::cameraHasSeenAprilTag));
+        m_driverController.rightTrigger(0.05).whileTrue(new ConditionalCommand(new SequentialCommandGroup(new CheckForAprilTag(rightCamera), new AlignToReef(this, 0, rightCamera)), m_swerveSubsystem.driveFieldOriented(driveAngularVelocity), rightCamera::cameraHasSeenAprilTag));
 
         // Climb controls
         m_driverController.povUp()

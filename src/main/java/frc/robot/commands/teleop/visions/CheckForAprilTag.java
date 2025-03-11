@@ -5,22 +5,18 @@
 package frc.robot.commands.teleop.visions;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.RobotContainer;
 import frc.robot.visions.CameraInterface;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class CheckForAprilTag extends Command {
   /** Creates a new AlignToReefCommand. */
   private boolean endCommand = false;
-  private double triggerType = 0;
-
   private CameraInterface m_autoAlignCam;
 
 
-  public CheckForAprilTag(int triggerType, CameraInterface m_autoAlignCam) {
+  public CheckForAprilTag(CameraInterface m_autoAlignCam) {
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements();
-    this.triggerType = triggerType;
     this.m_autoAlignCam = m_autoAlignCam;
 
   }

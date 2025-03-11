@@ -97,7 +97,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     /** Creates a new ElevatorSubsystem */
     public ElevatorSubsystem() {
         if (RobotBase.isSimulation()) {
-            SmartDashboard.putData("Elevator Sim", m_mech2d);
+            //SmartDashboard.putData("Elevator Sim", m_mech2d); commented out for testing
             m_elevatorMech2d.setColor(new Color8Bit(Color.kAntiqueWhite));
         }
 
@@ -339,10 +339,11 @@ public class ElevatorSubsystem extends SubsystemBase {
         }
 
         // Update SmartDashboard
-        SmartDashboard.putNumber("Elevator position (m)", getPositionMeters());
-        SmartDashboard.putNumber("Elevator setpoint position (m)",
-                m_leaderMotor.getClosedLoopReference().getValueAsDouble()
-                        * ElevatorConstants.kElevatorMetersPerMotorRotation);
+        //SmartDashboard.putNumber("Elevator position (m)", getPositionMeters()); commented out for testing
+        //SmartDashboard.putNumber("Elevator setpoint position (m)", commented out for testing
+        //        m_leaderMotor.getClosedLoopReference().getValueAsDouble()
+        //                * ElevatorConstants.kElevatorMetersPerMotorRotation);
+        
         // SmartDashboard.putNumber("Elevator velocity (m/s)",
         // getVelocityMetersPerSecond());
         // SmartDashboard.putNumber("Rotations",
