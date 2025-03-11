@@ -80,8 +80,6 @@ public class AlignToReef extends Command {
     yController.setTolerance(VisionConstants.yControllerTolerance);
 
 
-
-
     omegaController.reset(robotPose.getRotation().getRadians());
     omegaController.setTolerance(VisionConstants.omegaControllerTolerance);
     omegaController = new ProfiledPIDController(VisionConstants.kPOmega, VisionConstants.kIOmega, VisionConstants.kDOmega, VisionConstants.omegaConstraints); //to tune
@@ -122,8 +120,8 @@ public class AlignToReef extends Command {
       omegaSpeed = 0;
     }
 
-    final double yControllerError = yController.getAccumulatedError();
-    final double omegaControllerError = omegaController.getAccumulatedError();
+    double yControllerError = yController.getAccumulatedError();
+    double omegaControllerError = omegaController.getAccumulatedError();
 
     hawkTuah("Accumulated Y Error", yControllerError);
     hawkTuah("Accumulated Omega Error", omegaControllerError);

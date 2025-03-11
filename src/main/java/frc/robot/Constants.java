@@ -56,13 +56,14 @@ public final class Constants {
       public static final double reefToAprilTagOffset = 0.25; //to measure
 
       //PID Y Controller Constants
-      public static final TrapezoidProfile.Constraints yConstraints = new TrapezoidProfile.Constraints(3, 2);
+      public static final TrapezoidProfile.Constraints yConstraints = new TrapezoidProfile.Constraints(12, 16);
       public static final double yControllerTolerance = 0.02;
-      public static  double kPY = 0.18;
+      public static  double kPY = 0.13;
       public static  double kIY = 0;
       public static  double kDY = 0;
 
-      public static double kPY2 = 0.07;
+    
+      public static double kPY2 = 0.05;
       public static double kIY2 = 0;
       public static double kDY2 = 0;
 
