@@ -16,6 +16,7 @@ public class CameraInterface extends SubsystemBase {
     private boolean targetIsVisible = false;
     private double targetYaw = 0;
     private int aprilTagID = -1;
+    private double aprilTagArea = 0;
     public AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
     
 
@@ -47,8 +48,6 @@ public class CameraInterface extends SubsystemBase {
      * @return Whether the April Tag the camera sees is the correct one or not.
      */    
     public boolean cameraViewingCorrectAprilTag() {
-        //final double determinant = getAprilTagRotation() - RobotContainer.m_swerveSubsystem.getHeading().getRadians();
-        //return determinant <= 0.261799; //15 degrees
         return true;
     }
 
@@ -151,7 +150,7 @@ public class CameraInterface extends SubsystemBase {
     public boolean cameraHasSeenAprilTag() {
         resetTargetDetector(); //resets target detector so that we don't get old results 
         getCameraResults(); //gets results from camera
-        return cameraSawTarget(); //returns whether the camera has seen an april tag or not
+        return cameraSawTarget() && cameraViewingCorrectAprilTag(); //returns whether the camera has seen an april tag or not
     }
 
     /**
@@ -164,7 +163,8 @@ public class CameraInterface extends SubsystemBase {
             var result = results.get(results.size() - 1);
             if (result.hasTargets()) {
                 for (final var target : result.getTargets()) {
-                    if (target.getArea() >= VisionConstants.kAprilTagAreaLimit) {
+                    aprilTagArea = target.getArea();
+                    if (aprilTagArea >= VisionConstants.kAprilTagAreaLimit) {
                         aprilTagID = target.getFiducialId();
                         if (isReefAprilTag()) {
                             targetYaw = target.getYaw();
@@ -183,6 +183,7 @@ public class CameraInterface extends SubsystemBase {
         SmartDashboard.putNumber("April Tag Yaw", getAprilTagYaw());
         SmartDashboard.putNumber("April Tag ID", getTargetAprilTagID());
         SmartDashboard.putNumber("April Tag Rotation", getAprilTagRotation());
+        SmartDashboard.putNumber("April Tag Area", aprilTagArea);
         
         VisionConstants.kPY2 = SmartDashboard.getNumber("kPY Close", VisionConstants.kPY2);
         VisionConstants.kIY2 = SmartDashboard.getNumber("kIY Close", VisionConstants.kIY2);
