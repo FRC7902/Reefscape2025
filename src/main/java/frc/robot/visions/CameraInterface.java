@@ -106,21 +106,21 @@ public class CameraInterface extends SubsystemBase {
             switch (aprilTagID) {
                 case 17: return -1.047; //60 degrees
                 case 18: return 0; //0 degrees
-                case 19: return 5.236; //300 degrees
-                case 20: return 4.189; //240 degrees
-                case 21: return 0; //180 degrees
-                case 22: return 2.094; //120 degrees
+                case 19: return -5.236; //300 degrees
+                case 20: return -4.189; //240 degrees
+                case 21: return 3.142; //180 degrees
+                case 22: return -2.094; //120 degrees
             }
         }
 
         else if (alliance.get() == Alliance.Red) {
             switch (aprilTagID) {
-                case 6: return 5.236; //300 degrees
+                case 6: return -5.236; //300 degrees //check
                 case 7: return 0; //0 degrees
-                case 8: return 1.047; //60 degrees
-                case 9: return 2.094; //120 degrees
+                case 8: return -1.047; //60 degrees
+                case 9: return -2.094; //120 degrees
                 case 10: return 3.142; //180 degrees
-                case 11: return 4.189; //240 degrees
+                case 11: return -4.189; //240 degrees
             }
         }
         return 0;
