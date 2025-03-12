@@ -58,7 +58,7 @@ public final class Constants {
       //PID Y Controller Constants
       public static final TrapezoidProfile.Constraints yConstraints = new TrapezoidProfile.Constraints(60, 40);
       public static final double yControllerTolerance = 0.02;
-      public static  double kPY = 0.08;
+      public static  double kPY = 0.10;
       public static  double kIY = 0;
       public static  double kDY = 0;
 
