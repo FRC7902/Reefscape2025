@@ -72,7 +72,7 @@ public class AlignToReef extends Command {
     yController = new ProfiledPIDController(VisionConstants.kPY, VisionConstants.kIY, VisionConstants.kDY, VisionConstants.yConstraints); //to tune
     y2Controller = new ProfiledPIDController(VisionConstants.kPY2, VisionConstants.kIY2, VisionConstants.kDY2, VisionConstants.yConstraints); //to tune
 
-    if (m_autoAlignCam.getAprilTagYaw() < 10) {
+    if ((m_autoAlignCam.getAprilTagYaw() < 10 && m_autoAlignCam.getAprilTagYaw() > 0) || (m_autoAlignCam.getAprilTagYaw() >= -10 && m_autoAlignCam.getAprilTagYaw() < 0)) {
       yController = y2Controller;
     }
 

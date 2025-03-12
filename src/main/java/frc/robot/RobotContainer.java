@@ -78,6 +78,8 @@ public class RobotContainer {
     private final SendableChooser<Command> autoChooser;
 
     private final CameraInterface rightCamera = new CameraInterface("quandale", 0);
+    private final CameraInterface leftCamera = new CameraInterface("skibidi", 0);
+
     //private final CameraInterface leftCamera = new CameraInterface("quandale", 0);
 
 
