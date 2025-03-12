@@ -47,8 +47,9 @@ public class CameraInterface extends SubsystemBase {
      * @return Whether the April Tag the camera sees is the correct one or not.
      */    
     public boolean cameraViewingCorrectAprilTag() {
-        final double determinant = getAprilTagRotation() - RobotContainer.m_swerveSubsystem.getHeading().getRadians();
-        return determinant <= 0.261799; //15 degrees
+        //final double determinant = getAprilTagRotation() - RobotContainer.m_swerveSubsystem.getHeading().getRadians();
+        //return determinant <= 0.261799; //15 degrees
+        return true;
     }
 
 
@@ -102,7 +103,7 @@ public class CameraInterface extends SubsystemBase {
         final Optional<Alliance> alliance = DriverStation.getAlliance();
         if (alliance.get() == Alliance.Blue) {
             switch (aprilTagID) {
-                case 17: return 1.047; //60 degrees
+                case 17: return -1.047; //60 degrees
                 case 18: return 0; //0 degrees
                 case 19: return 5.236; //300 degrees
                 case 20: return 4.189; //240 degrees

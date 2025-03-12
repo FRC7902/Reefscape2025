@@ -87,7 +87,7 @@ public class RobotContainer {
      * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular
      * velocity.
      */
-    SwerveInputStream driveAngularVelocity = SwerveInputStream
+    public SwerveInputStream driveAngularVelocity = SwerveInputStream
             .of(m_swerveSubsystem.getSwerveDrive(), () -> m_driverController.getLeftY() * -1,
                     () -> m_driverController.getLeftX() * -1)
             .withControllerRotationAxis(() -> m_driverController.getRightX() * -1)
@@ -247,8 +247,8 @@ public class RobotContainer {
         //m_driverController.leftTrigger(0.05).whileTrue(new SequentialCommandGroup(new CheckForAprilTag(0), new AlignToReef(this, 0)));
         //m_driverController.rightTrigger(0.05).whileTrue(new SequentialCommandGroup(new CheckForAprilTag(1), new AlignToReef(this, 1)));
 
-        m_driverController.leftTrigger(0.05).whileTrue(new ConditionalCommand(new SequentialCommandGroup(new CheckForAprilTag(rightCamera), new AlignToReef(rightCamera)), m_swerveSubsystem.driveFieldOriented(driveAngularVelocity), rightCamera::cameraHasSeenAprilTag));
-        m_driverController.rightTrigger(0.05).whileTrue(new ConditionalCommand(new SequentialCommandGroup(new CheckForAprilTag(leftCamera), new AlignToReef(leftCamera)), m_swerveSubsystem.driveFieldOriented(driveAngularVelocity), leftCamera::cameraHasSeenAprilTag));
+        m_driverController.leftTrigger(0.05).whileTrue(new ConditionalCommand(new SequentialCommandGroup(new CheckForAprilTag(rightCamera), new AlignToReef(rightCamera, this)), m_swerveSubsystem.driveFieldOriented(driveAngularVelocity), rightCamera::cameraHasSeenAprilTag));
+        m_driverController.rightTrigger(0.05).whileTrue(new ConditionalCommand(new SequentialCommandGroup(new CheckForAprilTag(leftCamera), new AlignToReef(leftCamera, this)), m_swerveSubsystem.driveFieldOriented(driveAngularVelocity), leftCamera::cameraHasSeenAprilTag));
 
 /* 
         // Climb controls

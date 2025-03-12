@@ -25,12 +25,15 @@ public class AlignToReef extends Command {
   private double aprilTagRotation;
 
   private double aprilTagID;
+
+  private final RobotContainer m_RobotContainer;
   
 
-  public AlignToReef(CameraInterface m_autoAlignCamera) {
+  public AlignToReef(CameraInterface m_autoAlignCamera, RobotContainer m_RobotContainer) {
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(RobotContainer.m_swerveSubsystem);
     this.m_autoAlignCam = m_autoAlignCamera;
+    this.m_RobotContainer = m_RobotContainer;
   }
 
   // Called when the command is initially scheduled.
@@ -74,7 +77,7 @@ public class AlignToReef extends Command {
     }
 
     else {
-      RobotContainer.m_swerveSubsystem.drive(new ChassisSpeeds(0, 0, 0));
+      RobotContainer.m_swerveSubsystem.driveFieldOriented(m_RobotContainer.driveAngularVelocity);
     }
 }
     
