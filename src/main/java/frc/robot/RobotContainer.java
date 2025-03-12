@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -181,14 +182,18 @@ public class RobotContainer {
         return m_elevatorSubsystem.getElevatorEnumPosition();
     }
 
-    private final Command m_selectIntakeCommand = new SelectCommand<>(
+    private final Command m_whileTrueSelectIntakeCommand = new SelectCommand<>(
             Map.ofEntries(Map.entry(ElevatorPosition.ALGAE_LOW, new IntakeAlgaeCommand()),
-                    Map.entry(ElevatorPosition.ALGAE_HIGH, new IntakeAlgaeCommand()),
-                    // Pre-spin the coral indexer if deep beam is not broken
-                    Map.entry(ElevatorPosition.CORAL_STATION_AND_PROCESSOR,
-                            new ManualIntakeCoralCommand(
-                                    Constants.CoralIndexerConstants.kIntakePower))),
+                    Map.entry(ElevatorPosition.ALGAE_HIGH, new IntakeAlgaeCommand())),
             this::select);
+
+    private final Command m_onTrueSelectIntakeCommand =
+            new SelectCommand<>(
+                    Map.ofEntries(Map.entry(ElevatorPosition.CORAL_STATION_AND_PROCESSOR,
+                            new ManualIntakeCoralCommand(
+                                    Constants.CoralIndexerConstants.kIntakePower).withTimeout(5))),
+                    this::select);
+
 
     private final Command m_selectOuttakeCommand =
             new SelectCommand<>(Map.ofEntries(
@@ -238,7 +243,12 @@ public class RobotContainer {
         m_operatorController.start().whileTrue(m_swerveSubsystem.centerModulesCommand());
 
         // Raise elevator (by height of Algae diameter) while intaking algae
-        m_driverController.leftBumper().whileTrue(m_selectIntakeCommand);
+        // m_driverController.leftBumper().whileTrue(m_whileTrueSelectIntakeCommand);
+        m_driverController.leftBumper()
+                .whileTrue(new ParallelCommandGroup(
+                        m_whileTrueSelectIntakeCommand
+                                .until(() -> !m_driverController.leftBumper().getAsBoolean()),
+                        m_onTrueSelectIntakeCommand));
         m_driverController.rightBumper().whileTrue(m_selectOuttakeCommand);
 
         // Strafe controls
