@@ -5,14 +5,11 @@
 package frc.robot.commands.teleop.visions;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.RobotContainer;
 import frc.robot.visions.CameraInterface;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class CheckForAprilTag extends Command {
   /** Creates a new AlignToReefCommand. */
-  private boolean endCommand = false;
-
   private CameraInterface m_autoAlignCam;
 
 
@@ -34,13 +31,7 @@ public class CheckForAprilTag extends Command {
   
   @Override 
   public void execute() {
-    System.out.println("we sigma");
     m_autoAlignCam.getCameraResults();
-    final boolean hasAprilTag = m_autoAlignCam.cameraSawTarget();
-    if (hasAprilTag) {
-        endCommand = true;
-    }
- 
 }
     
   // Called once the command ends or is interrupted.
@@ -51,8 +42,7 @@ public class CheckForAprilTag extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return endCommand;
+    return m_autoAlignCam.cameraSawTarget();
   }
-
 
 }

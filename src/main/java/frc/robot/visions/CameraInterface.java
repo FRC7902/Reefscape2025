@@ -1,41 +1,22 @@
 package frc.robot.visions;
 
-import java.util.List;
 import java.util.Optional;
 import org.photonvision.PhotonCamera;
-import org.photonvision.PhotonUtils;
-import org.photonvision.estimation.TargetModel;
-import org.photonvision.simulation.PhotonCameraSim;
-import org.photonvision.simulation.SimCameraProperties;
-import org.photonvision.simulation.VisionSystemSim;
-import org.photonvision.simulation.VisionTargetSim;
-import org.photonvision.targeting.PhotonPipelineResult;
-import org.photonvision.targeting.PhotonTrackedTarget;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.VisionConstants;
-import frc.robot.RobotContainer;
 
 public class CameraInterface extends SubsystemBase {
-    public final PhotonCamera camera;
-    public boolean targetIsVisible = false;
-    public double targetYaw = 0;
+    private final PhotonCamera camera;
+    private boolean targetIsVisible = false;
+    private double targetYaw = 0;
+    private int aprilTagID = -1;
     public AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
-    public int aprilTagID = -1;
     
-    private double cameraOffsetToRobot = 0;
-
 
      /**
      * Creates a new camera object for each camera attached to the Raspberry Pi.
@@ -43,9 +24,8 @@ public class CameraInterface extends SubsystemBase {
      * 
      * @param cameraName
      *      */     
-    public CameraInterface(String cameraName, double cameraOffsetToRobot) {
+    public CameraInterface(String cameraName) {
         camera = new PhotonCamera(cameraName);
-        this.cameraOffsetToRobot = cameraOffsetToRobot;
           
         SmartDashboard.putNumber("kPY Close", VisionConstants.kPY2);
         SmartDashboard.putNumber("kIY Close", VisionConstants.kIY2);
@@ -55,7 +35,7 @@ public class CameraInterface extends SubsystemBase {
         SmartDashboard.putNumber("kIY Far", VisionConstants.kIY);
         SmartDashboard.putNumber("kDY Far", VisionConstants.kDY);
 
-        SmartDashboard.putNumber("April Tag Offset", VisionConstants.kAprilTagOffset);
+        SmartDashboard.putNumber("Y Controller Tolerance", VisionConstants.yControllerTolerance);
     }
 
      /**
@@ -65,11 +45,6 @@ public class CameraInterface extends SubsystemBase {
      * 
      * @return Whether the April Tag detected by the camera is an April Tag on the reef or not.
      */ 
-
-    public double getCameraOffset() {
-        return cameraOffsetToRobot;
-    }
-
     public boolean isReefAprilTag(int aprilTagID) {
         switch (aprilTagID) {
             case -1: return false;
@@ -95,6 +70,7 @@ public class CameraInterface extends SubsystemBase {
     public boolean cameraSawTarget() {
         return targetIsVisible;
     }
+
      /**
      * Gets the rotation of the April Tag relative to the camera.
      *
@@ -105,19 +81,12 @@ public class CameraInterface extends SubsystemBase {
     }
 
     /**
-     * Sets the targetIsVisible boolean to false which is used to determine if the camera saw a valid April Tag.
+     * Gets the rotation of the April Tag relative to the field.
      *
-     */ 
-    public void resetTargetDetector() {
-        targetIsVisible = false;
-    } 
-
-    public int getTargetAprilTagID() {
-        return aprilTagID;
-    }
-
+     * @return The rotation of the April Tag relative to the field (in radians).
+     */      
     public double getAprilTagRotation() {
-        int aprilTagID = getTargetAprilTagID();
+        final int aprilTagID = getTargetAprilTagID();
         final Optional<Alliance> alliance = DriverStation.getAlliance();
         if (alliance.get() == Alliance.Blue) {
             switch (aprilTagID) {
@@ -125,7 +94,7 @@ public class CameraInterface extends SubsystemBase {
                 case 18: return 0; //0 degrees
                 case 19: return 5.236; //300 degrees
                 case 20: return 4.189; //240 degrees
-                case 21: return 3.142; //180 degrees
+                case 21: return 0; //180 degrees
                 case 22: return 2.094; //120 degrees
             }
         }
@@ -143,22 +112,46 @@ public class CameraInterface extends SubsystemBase {
         return 0;
     }
 
-    public boolean cameraHasSeenAprilTag() {
-        resetTargetDetector();
-        getCameraResults();
-        return cameraSawTarget();
+
+    /**
+     * Sets the targetIsVisible boolean to false which is used to determine if the camera saw a valid April Tag.
+     *
+     */ 
+    public void resetTargetDetector() {
+        targetIsVisible = false;
+    } 
+
+    /**
+     * Gets the ID of the April Tag that is detected by the camera.
+     *
+     * @return The ID of the April Tag.
+     */    
+    public int getTargetAprilTagID() {
+        return aprilTagID;
     }
 
+    /**
+     * Checks the camera to see whether an April Tag is in view of the camera. This is used to determine whether the auto-align command should run or not.
+     *
+     * @return Whether an April Tag is in view of the camera or not.
+     */        
+    public boolean cameraHasSeenAprilTag() {
+        resetTargetDetector(); //resets target detector so that we don't get old results 
+        getCameraResults(); //gets results from camera
+        return cameraSawTarget(); //returns whether the camera has seen an april tag or not
+    }
+
+    /**
+     * Runs the camera to check for an April Tag. If an April Tag is in sight, the method gathers the yaw and the ID of the April Tag.
+     *
+     */   
     public void getCameraResults() {
         final var results = camera.getAllUnreadResults();
-        //System.out.println("sigma");
         if (!results.isEmpty()) {
-            //System.out.println("YAAAAAAA");
             var result = results.get(results.size() - 1);
             if (result.hasTargets()) {
-                //System.out.println("WE GOT APRIL TAGSSS");
                 for (final var target : result.getTargets()) {
-                    if (target.getArea() >= VisionConstants.kAprilTagArea) {
+                    if (target.getArea() >= VisionConstants.kAprilTagAreaLimit) {
                         final int targetID = target.getFiducialId();
                         if (isReefAprilTag(targetID)) {
                             targetYaw = target.getYaw();
@@ -169,26 +162,22 @@ public class CameraInterface extends SubsystemBase {
                 }
             }
         }
-    }
+    } 
 
     @Override
     public void periodic() {
 
         SmartDashboard.putNumber("April Tag Yaw", getAprilTagYaw());
     
+        VisionConstants.kPY2 = SmartDashboard.getNumber("kPY Close", VisionConstants.kPY2);
+        VisionConstants.kIY2 = SmartDashboard.getNumber("kIY Close", VisionConstants.kIY2);
+        VisionConstants.kDY2 = SmartDashboard.getNumber("kDY Close", VisionConstants.kDY2);
 
-        SmartDashboard.getNumber("kPY Close", VisionConstants.kPY2);
-        SmartDashboard.getNumber("kIY Close", VisionConstants.kIY2);
-        SmartDashboard.getNumber("kDY Close", VisionConstants.kDY2);
+        VisionConstants.kPY = SmartDashboard.getNumber("kPY Far", VisionConstants.kPY);
+        VisionConstants.kIY = SmartDashboard.getNumber("kIY Far", VisionConstants.kIY);
+        VisionConstants.kDY = SmartDashboard.getNumber("kDY Far", VisionConstants.kDY);
 
-        SmartDashboard.getNumber("kPY Far", VisionConstants.kPY);
-        SmartDashboard.getNumber("kIY Far", VisionConstants.kIY);
-        SmartDashboard.getNumber("kDY Far", VisionConstants.kDY);
-
-        SmartDashboard.getNumber("April Tag Offset", VisionConstants.kAprilTagOffset);
-
-
-
+        VisionConstants.yControllerTolerance = SmartDashboard.getNumber("Y Controller Tolerance", VisionConstants.yControllerTolerance);
     }
 
 }

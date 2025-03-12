@@ -739,7 +739,7 @@ public class SwerveSubsystem extends SubsystemBase {
                 && swerveDrive.getRobotVelocity().omegaRadiansPerSecond < 0.1);
     }
 
-    public void snapToAprilTagAngle(double angleDegrees, double xTranslation, double yTranslation, double toleranceDegrees) {
+    public void alignRobotToAprilTag(double angleDegrees, double xTranslation, double yTranslation, double toleranceDegrees) {
         SwerveController controller = swerveDrive.getSwerveController();
 
             swerveDrive.drive(ChassisSpeeds.fromRobotRelativeSpeeds(xTranslation, yTranslation,
