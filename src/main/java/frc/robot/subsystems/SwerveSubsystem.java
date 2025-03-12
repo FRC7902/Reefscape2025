@@ -93,7 +93,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
         }
 
-        swerveDrive.setAngularVelocityCompensation(false, false, 0); // Correct for skew that
+        swerveDrive.setAngularVelocityCompensation(false, false, 0.08); // Correct for skew that
                                                                       // gets
                                                                       // worse as angular
                                                                       // velocity
