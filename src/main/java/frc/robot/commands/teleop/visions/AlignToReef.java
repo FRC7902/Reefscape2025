@@ -42,21 +42,17 @@ public class AlignToReef extends Command {
 
   private double aprilTagRotation;
 
-  double distanceToCenterOfAprilTag = 0;
-  double initialRobotPosition = 0;
+  //double distanceToCenterOfAprilTag = 0;
+  //double initialRobotPosition = 0;
   
-  //Command driveRobotOrientedAngularVelocity;
-  //Command driveFieldOrientedAnglularVelocity;
 
-
-  public AlignToReef(RobotContainer m_robotContainer, int triggerType, CameraInterface m_autoAlignCamera) {
+  public AlignToReef(RobotContainer m_robotContainer, CameraInterface m_autoAlignCamera) {
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(RobotContainer.m_swerveSubsystem);
     this.m_robotContainer = m_robotContainer;
     this.m_autoAlignCam = m_autoAlignCamera;
     yController = new ProfiledPIDController(VisionConstants.kPY, VisionConstants.kIY, VisionConstants.kDY, VisionConstants.yConstraints); //to tune
     y2Controller = new ProfiledPIDController(VisionConstants.kPY2, VisionConstants.kIY2, VisionConstants.kDY2, VisionConstants.yConstraints); //to tune
-    omegaController = new ProfiledPIDController(VisionConstants.kPOmega, VisionConstants.kIOmega, VisionConstants.kDOmega, VisionConstants.omegaConstraints); //to tune
 
   }
 
@@ -79,18 +75,15 @@ public class AlignToReef extends Command {
     yController.reset(m_autoAlignCam.getAprilTagYaw());
     yController.setTolerance(VisionConstants.yControllerTolerance);
 
-
-    omegaController.reset(robotPose.getRotation().getRadians());
-    omegaController.setTolerance(VisionConstants.omegaControllerTolerance);
-    omegaController = new ProfiledPIDController(VisionConstants.kPOmega, VisionConstants.kIOmega, VisionConstants.kDOmega, VisionConstants.omegaConstraints); //to tune
-    
-    distanceToCenterOfAprilTag = m_autoAlignCam.getAprilTagYaw();
-    initialRobotPosition = RobotContainer.m_swerveSubsystem.getPose().getY();
+    //distanceToCenterOfAprilTag = m_autoAlignCam.getAprilTagYaw();
+    //initialRobotPosition = RobotContainer.m_swerveSubsystem.getPose().getY();
 
     //driveRobotOrientedAngularVelocity = RobotContainer.m_swerveSubsystem.driveFieldOriented(m_robotContainer.driveRobotOriented);
     //driveFieldOrientedAnglularVelocity = RobotContainer.m_swerveSubsystem.driveFieldOriented(m_robotContainer.driveAngularVelocity);
 
     aprilTagRotation = m_autoAlignCam.getAprilTagRotation();
+
+    yController.setGoal(0);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -103,10 +96,7 @@ public class AlignToReef extends Command {
     System.out.println("HAWK TUAH!");
     //closestAprilTagPose = m_autoAlignCam.poseOfAprilTag;
 
-    yController.setGoal(0);
-    omegaController.setGoal(0);
-
-    double robotDisplacement = RobotContainer.m_swerveSubsystem.getPose().getY() - initialRobotPosition;
+    //double robotDisplacement = RobotContainer.m_swerveSubsystem.getPose().getY() - initialRobotPosition;
     //var ySpeed = yController.calculate(robotDisplacement);
     var ySpeed = yController.calculate(m_autoAlignCam.getAprilTagYaw());
     if (yController.atGoal()) {
@@ -114,21 +104,13 @@ public class AlignToReef extends Command {
       ySpeed = 0;
     }
 
-    var omegaSpeed = omegaController.calculate(robotRotation);
-    if (omegaController.atGoal()) {
-      System.out.println("Omega Controller at Goal");
-      omegaSpeed = 0;
-    }
-
     double yControllerError = yController.getAccumulatedError();
-    double omegaControllerError = omegaController.getAccumulatedError();
 
     hawkTuah("Accumulated Y Error", yControllerError);
-    hawkTuah("Accumulated Omega Error", omegaControllerError);
 
     //drivebase.setDefaultCommand(driveRobotOrientedAngularVelocity);
 
-    RobotContainer.m_swerveSubsystem.snapToAprilTagAngle(0, getDriverControllerLeftY(), ySpeed, 0.5);
+    RobotContainer.m_swerveSubsystem.snapToAprilTagAngle(m_autoAlignCam.getAprilTagRotation(), getDriverControllerLeftY(), ySpeed, 0.5);
 
     //RobotContainer.m_swerveSubsystem.drive(
       //ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, omegaSpeed, robotPose.getRotation()));

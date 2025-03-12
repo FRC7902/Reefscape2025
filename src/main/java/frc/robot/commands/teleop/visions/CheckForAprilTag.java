@@ -12,15 +12,13 @@ import frc.robot.visions.CameraInterface;
 public class CheckForAprilTag extends Command {
   /** Creates a new AlignToReefCommand. */
   private boolean endCommand = false;
-  private double triggerType = 0;
 
   private CameraInterface m_autoAlignCam;
 
 
-  public CheckForAprilTag(int triggerType, CameraInterface m_autoAlignCam) {
+  public CheckForAprilTag(CameraInterface m_autoAlignCam) {
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements();
-    this.triggerType = triggerType;
     this.m_autoAlignCam = m_autoAlignCam;
 
   }
