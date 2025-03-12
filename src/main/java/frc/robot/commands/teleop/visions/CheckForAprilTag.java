@@ -42,7 +42,7 @@ public class CheckForAprilTag extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return m_autoAlignCam.cameraSawTarget();
+    return m_autoAlignCam.cameraSawTarget() && m_autoAlignCam.cameraViewingCorrectAprilTag();
   }
 
 }

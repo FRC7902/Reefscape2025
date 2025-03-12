@@ -739,37 +739,19 @@ public class SwerveSubsystem extends SubsystemBase {
                 && swerveDrive.getRobotVelocity().omegaRadiansPerSecond < 0.1);
     }
 
-    public void alignRobotToAprilTag(double angleDegrees, double xTranslation, double yTranslation, double toleranceDegrees) {
+    public void alignRobotToAprilTag(double radiansHeading, double xTranslation, double yTranslation, double toleranceDegrees) {
         SwerveController controller = swerveDrive.getSwerveController();
 
             swerveDrive.drive(ChassisSpeeds.fromRobotRelativeSpeeds(xTranslation, yTranslation,
-                    -controller.headingCalculate(
-                            swerveDrive.getOdometryHeading().unaryMinus().getRadians(),
-                            new Rotation2d(Math.toRadians(angleDegrees)).getRadians()),
-                    swerveDrive.getPose().getRotation()));
-            SmartDashboard.putNumber("Odom Heading (rad)",
-                    swerveDrive.getOdometryHeading().unaryMinus().getRadians());
-            SmartDashboard.putNumber("Target Heading (rad)", Math.toRadians(angleDegrees));
-            SmartDashboard.putNumber("Error (rad)",
-                    Math.abs(new Rotation2d(Math.toRadians(angleDegrees))
-                            .minus(swerveDrive.getOdometryHeading().unaryMinus()).getRadians()));}
+                    -controller.headingCalculate(swerveDrive.getOdometryHeading().unaryMinus().getRadians(), new Rotation2d(radiansHeading).getRadians()), swerveDrive.getPose().getRotation()));
+            SmartDashboard.putNumber("Odom Heading (rad)", swerveDrive.getOdometryHeading().unaryMinus().getRadians());
+            SmartDashboard.putNumber("Target Heading (rad)", radiansHeading);
+            SmartDashboard.putNumber("Error (rad)", Math.abs(new Rotation2d(radiansHeading).minus(swerveDrive.getOdometryHeading().unaryMinus()).getRadians()));}
 
-
+    //NOTE!!! THIS IS NOT A CORRECT STRAFE COMMAND!!! THIS WILL CAUSE YOUR ROBOT TO SPIN VIGOROUSLY. DO NOT MISTAKE THIS FOR STRAFE!!!!!!!
     public void strafe(double strafePower, double rotationalPower, double speedMultiplier) {
         swerveDrive.drive(new Translation2d(
                 strafePower * Math.abs(speedMultiplier) * swerveDrive.getMaximumChassisVelocity(), 0),
                 rotationalPower, true, false);
     }
-
-    
-    public Command createPathToAprilTag(Pose2d robotToAprilTagPose) {
-        System.out.println("I SAID THIS IS HOW THE STORY GOESSSSS");
-        return driveWithSetpointGeneratorFieldRelative(() -> new ChassisSpeeds(
-            getFieldVelocity().vxMetersPerSecond, getFieldVelocity().vyMetersPerSecond,
-            swerveDrive.swerveController.headingCalculate(getHeading().getRadians(), robotToAprilTagPose.getRotation().getRadians())
-            
-        ));
-    }
-
-
 }

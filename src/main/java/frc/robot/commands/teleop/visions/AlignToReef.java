@@ -7,6 +7,7 @@ package frc.robot.commands.teleop.visions;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
@@ -22,6 +23,8 @@ public class AlignToReef extends Command {
 
   private CameraInterface m_autoAlignCam;
   private double aprilTagRotation;
+
+  private double aprilTagID;
   
 
   public AlignToReef(CameraInterface m_autoAlignCamera) {
@@ -37,6 +40,7 @@ public class AlignToReef extends Command {
 
     final double aprilTagYaw = m_autoAlignCam.getAprilTagYaw();
     aprilTagRotation = m_autoAlignCam.getAprilTagRotation();
+    aprilTagID = m_autoAlignCam.getTargetAprilTagID();
 
     y2Controller = new ProfiledPIDController(VisionConstants.kPY2, VisionConstants.kIY2, VisionConstants.kDY2, VisionConstants.yConstraints); //to tune
 
@@ -58,15 +62,20 @@ public class AlignToReef extends Command {
   @Override 
   public void execute() {
     m_autoAlignCam.getCameraResults();
-    var ySpeed = yController.calculate(m_autoAlignCam.getAprilTagYaw());
-    if (yController.atGoal()) {
-      System.out.println("Y Controller at Goal");
-      ySpeed = 0;
+    if (aprilTagID == m_autoAlignCam.getTargetAprilTagID()) {
+      var ySpeed = yController.calculate(m_autoAlignCam.getAprilTagYaw());
+      if (yController.atGoal()) {
+        System.out.println("Y Controller at Goal");
+        ySpeed = 0;
+      }
+      hawkTuah("Accumulated Y Error", yController.getAccumulatedError());
+
+      RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(aprilTagRotation, getDriverControllerLeftY(), ySpeed, 0.5);
     }
 
-    hawkTuah("Accumulated Y Error", yController.getAccumulatedError());
-
-    RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(aprilTagRotation, getDriverControllerLeftY(), ySpeed, 0.5);
+    else {
+      RobotContainer.m_swerveSubsystem.drive(new ChassisSpeeds(0, 0, 0));
+    }
 }
     
   // Called once the command ends or is interrupted.

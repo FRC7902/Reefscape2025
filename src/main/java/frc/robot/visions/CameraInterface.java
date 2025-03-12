@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.RobotContainer;
 import frc.robot.Constants.VisionConstants;
 
 public class CameraInterface extends SubsystemBase {
@@ -38,14 +39,25 @@ public class CameraInterface extends SubsystemBase {
         SmartDashboard.putNumber("Y Controller Tolerance", VisionConstants.yControllerTolerance);
     }
 
+   
+     /**
+     * Determines whether the heading of the robot is similar to the rotation of the detected April Tag relative to the field.  
+     * If the angle difference between the robot's heading and the detected April Tag's angle is greater than 15 degrees, it will be assumed that the camera read the wrong April Tag.    
+     * 
+     * @return Whether the April Tag the camera sees is the correct one or not.
+     */    
+    public boolean cameraViewingCorrectAprilTag() {
+        final double determinant = getAprilTagRotation() - RobotContainer.m_swerveSubsystem.getHeading().getRadians();
+        return determinant <= 0.261799; //15 degrees
+    }
+
+
      /**
      * Determines whether the April Tag scanned by the camera is an April Tag on the reef (for auto-align).
-     *
-     * @param aprilTagID
      * 
      * @return Whether the April Tag detected by the camera is an April Tag on the reef or not.
      */ 
-    public boolean isReefAprilTag(int aprilTagID) {
+    public boolean isReefAprilTag() {
         switch (aprilTagID) {
             case -1: return false;
             case 1: return false;
@@ -152,8 +164,8 @@ public class CameraInterface extends SubsystemBase {
             if (result.hasTargets()) {
                 for (final var target : result.getTargets()) {
                     if (target.getArea() >= VisionConstants.kAprilTagAreaLimit) {
-                        final int targetID = target.getFiducialId();
-                        if (isReefAprilTag(targetID)) {
+                        aprilTagID = target.getFiducialId();
+                        if (isReefAprilTag()) {
                             targetYaw = target.getYaw();
                             targetIsVisible = true;
                             break;
@@ -168,7 +180,9 @@ public class CameraInterface extends SubsystemBase {
     public void periodic() {
 
         SmartDashboard.putNumber("April Tag Yaw", getAprilTagYaw());
-    
+        SmartDashboard.putNumber("April Tag ID", getTargetAprilTagID());
+        SmartDashboard.putNumber("April Tag Rotation", getAprilTagRotation());
+        
         VisionConstants.kPY2 = SmartDashboard.getNumber("kPY Close", VisionConstants.kPY2);
         VisionConstants.kIY2 = SmartDashboard.getNumber("kIY Close", VisionConstants.kIY2);
         VisionConstants.kDY2 = SmartDashboard.getNumber("kDY Close", VisionConstants.kDY2);
@@ -179,5 +193,4 @@ public class CameraInterface extends SubsystemBase {
 
         VisionConstants.yControllerTolerance = SmartDashboard.getNumber("Y Controller Tolerance", VisionConstants.yControllerTolerance);
     }
-
 }
