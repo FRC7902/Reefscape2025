@@ -187,7 +187,7 @@ public class RobotContainer {
                     // Pre-spin the coral indexer if deep beam is not broken
                     Map.entry(ElevatorPosition.CORAL_STATION_AND_PROCESSOR,
                             new ManualIntakeCoralCommand(
-                                    Constants.CoralIndexerConstants.kIntakePower).withTimeout(5))),
+                                    Constants.CoralIndexerConstants.kIntakePower))),
             this::select);
 
     private final Command m_selectOuttakeCommand =
