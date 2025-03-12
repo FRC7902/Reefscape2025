@@ -40,9 +40,15 @@ public final class Constants {
       public static final double kCameraPitch = 0; //to measure
       public static final double kGroundToCamera = 0.38735;
 
+      //Skibidi Offsets
+      public static final double kSkibidiAprilTagAreaLimit = 5.5;
+
+      //Quandale Offsets
+      public static final double kQuandaleAprilTagAreaLimit = 3.4;
+
       //April Tag Offset
       public static final double kGroundToAprilTagDistance = 0.171; //in meters
-      public static final double kAprilTagAreaLimit = 3.5;
+      public static final double kAprilTagAreaLimit = 4.5;
 
       //Reef Offset
       public static final double reefToAprilTagOffset = 0; //to measure

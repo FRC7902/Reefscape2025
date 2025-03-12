@@ -17,6 +17,7 @@ public class CameraInterface extends SubsystemBase {
     private double targetYaw = 0;
     private int aprilTagID = -1;
     private double aprilTagArea = 0;
+    private final double aprilTagAreaLimit;
     public AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
     
 
@@ -26,8 +27,9 @@ public class CameraInterface extends SubsystemBase {
      * 
      * @param cameraName
      *      */     
-    public CameraInterface(String cameraName) {
+    public CameraInterface(String cameraName, double aprilTagAreaLimit) {
         camera = new PhotonCamera(cameraName);
+        this.aprilTagAreaLimit = aprilTagAreaLimit;
           
         SmartDashboard.putNumber("kPY Close", VisionConstants.kPY2);
         SmartDashboard.putNumber("kIY Close", VisionConstants.kIY2);
@@ -164,7 +166,7 @@ public class CameraInterface extends SubsystemBase {
             if (result.hasTargets()) {
                 for (final var target : result.getTargets()) {
                     aprilTagArea = target.getArea();
-                    if (aprilTagArea >= VisionConstants.kAprilTagAreaLimit) {
+                    if (aprilTagArea >= aprilTagAreaLimit) {
                         aprilTagID = target.getFiducialId();
                         if (isReefAprilTag()) {
                             targetYaw = target.getYaw();
@@ -184,7 +186,7 @@ public class CameraInterface extends SubsystemBase {
         SmartDashboard.putNumber("April Tag ID", getTargetAprilTagID());
         SmartDashboard.putNumber("April Tag Rotation", getAprilTagRotation());
         SmartDashboard.putNumber("April Tag Area", aprilTagArea);
-        
+
         VisionConstants.kPY2 = SmartDashboard.getNumber("kPY Close", VisionConstants.kPY2);
         VisionConstants.kIY2 = SmartDashboard.getNumber("kIY Close", VisionConstants.kIY2);
         VisionConstants.kDY2 = SmartDashboard.getNumber("kDY Close", VisionConstants.kDY2);

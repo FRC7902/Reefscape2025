@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.teleop.NullCommand;
 import frc.robot.commands.teleop.SwerveCommands.StrafeLeftCommand;
 import frc.robot.commands.teleop.SwerveCommands.StrafeRightCommand;
@@ -77,8 +78,8 @@ public class RobotContainer {
 
     private final SendableChooser<Command> autoChooser;
 
-    private static final CameraInterface rightCamera = new CameraInterface("quandale");
-    private static final CameraInterface leftCamera = new CameraInterface("skibidi");
+    private static final CameraInterface rightCamera = new CameraInterface("quandale", VisionConstants.kQuandaleAprilTagAreaLimit);
+    private static final CameraInterface leftCamera = new CameraInterface("skibidi", VisionConstants.kSkibidiAprilTagAreaLimit);
 
     //private final CameraInterface leftCamera = new CameraInterface("quandale", 0);
 
