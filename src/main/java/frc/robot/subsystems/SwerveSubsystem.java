@@ -52,6 +52,8 @@ import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 
+import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
+
 public class SwerveSubsystem extends SubsystemBase {
 
     /**
@@ -110,6 +112,8 @@ public class SwerveSubsystem extends SubsystemBase {
         swerveDrive.swerveController.setMaximumChassisAngularVelocity(20);
 
         setupPathPlanner();
+
+        RobotModeTriggers.autonomous().onTrue(Commands.runOnce(this::zeroGyro));
     }
 
     /**
@@ -564,8 +568,7 @@ public class SwerveSubsystem extends SubsystemBase {
         if (isRedAlliance()) {
             zeroGyro();
             // Set the pose 180 degrees
-            // resetOdometry(new Pose2d(getPose().getTranslation(),
-            // Rotation2d.fromDegrees(180)));
+            resetOdometry(new Pose2d(getPose().getTranslation(), Rotation2d.fromDegrees(180)));
         } else {
             zeroGyro();
         }
