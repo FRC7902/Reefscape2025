@@ -251,8 +251,8 @@ public class RobotContainer {
         //m_driverController.leftTrigger(0.05).whileTrue(new SequentialCommandGroup(new CheckForAprilTag(0), new AlignToReef(this, 0)));
         //m_driverController.rightTrigger(0.05).whileTrue(new SequentialCommandGroup(new CheckForAprilTag(1), new AlignToReef(this, 1)));
 
-        m_driverController.leftTrigger(0.05).whileTrue(new ConditionalCommand(new SequentialCommandGroup(new CheckForAprilTag(0, rightCamera), new AlignToReef(this, 0, rightCamera)), m_swerveSubsystem.driveFieldOriented(driveAngularVelocity), rightCamera::cameraHasSeenAprilTag));
-        m_driverController.rightTrigger(0.05).whileTrue(new ConditionalCommand(new SequentialCommandGroup(new CheckForAprilTag(1, rightCamera), new AlignToReef(this, 0, rightCamera)), m_swerveSubsystem.driveFieldOriented(driveAngularVelocity), rightCamera::cameraHasSeenAprilTag));
+        m_driverController.leftTrigger(0.05).whileTrue(new ConditionalCommand(new SequentialCommandGroup(new CheckForAprilTag(1, rightCamera), new AlignToReef(this, 1, rightCamera)), m_swerveSubsystem.driveFieldOriented(driveAngularVelocity), rightCamera::cameraHasSeenAprilTag));
+        m_driverController.rightTrigger(0.05).whileTrue(new ConditionalCommand(new SequentialCommandGroup(new CheckForAprilTag(0, leftCamera), new AlignToReef(this, 0, leftCamera)), m_swerveSubsystem.driveFieldOriented(driveAngularVelocity), leftCamera::cameraHasSeenAprilTag));
 
 
         // Climb controls
