@@ -245,7 +245,7 @@ public class RobotContainer {
         // Raise elevator (by height of Algae diameter) while intaking algae
         // m_driverController.leftBumper().whileTrue(m_whileTrueSelectIntakeCommand);
         m_driverController.leftBumper()
-                .whileTrue(new ParallelCommandGroup(
+                .onTrue(new ParallelCommandGroup(
                         m_whileTrueSelectIntakeCommand
                                 .until(() -> !m_driverController.leftBumper().getAsBoolean()),
                         m_onTrueSelectIntakeCommand));
