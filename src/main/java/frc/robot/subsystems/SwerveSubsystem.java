@@ -100,7 +100,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
         }
 
-        swerveDrive.setAngularVelocityCompensation(false, false, 0); // Correct for skew that
+        swerveDrive.setAngularVelocityCompensation(true, false, 0.08); // Correct for skew that
                                                                       // gets
                                                                       // worse as angular
                                                                       // velocity
@@ -755,10 +755,10 @@ public class SwerveSubsystem extends SubsystemBase {
                             .minus(swerveDrive.getOdometryHeading().unaryMinus()).getRadians()));}
 
 
-    public void strafe(double strafePower, double speedMultiplier) {
-        swerveDrive.drive(new Translation2d(0,
-                strafePower * Math.abs(speedMultiplier) * swerveDrive.getMaximumChassisVelocity()),
-                0, false, false);
+    public void strafe(double strafePower, double rotationalPower, double speedMultiplier) {
+        swerveDrive.drive(new Translation2d(
+                strafePower * Math.abs(speedMultiplier) * swerveDrive.getMaximumChassisVelocity(), 0),
+                rotationalPower, true, false);
     }
 
     
@@ -771,26 +771,5 @@ public class SwerveSubsystem extends SubsystemBase {
         ));
     }
 
-
-
-    public void driveToAprilTag(DoubleSupplier xTrans, DoubleSupplier yTrans, DoubleSupplier angularVel) {
-        //System.out.println("X TRANSLATION:" + xTrans.getAsDouble());
-        //System.out.println("Y TRANSLATION:" + yTrans.getAsDouble());
-        //System.out.println("ANGLE:" + angularVel.getAsDouble());
-
-        double time = yTrans.getAsDouble() / angularVel.getAsDouble();
-
-        Timer timer = new Timer();
-
-        timer.start();
-
-        if (!(timer.get() >= time)) {
-            strafe(1, 1);
-        }
-        else if (timer.get() >= time) {
-            timer.stop();
-            System.out.println("TIMER:" + timer.get());
-        }
-    }
 
 }

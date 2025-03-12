@@ -250,7 +250,7 @@ public class RobotContainer {
         m_driverController.leftTrigger(0.05).whileTrue(new ConditionalCommand(new SequentialCommandGroup(new CheckForAprilTag(rightCamera), new AlignToReef(this, rightCamera)), m_swerveSubsystem.driveFieldOriented(driveAngularVelocity), rightCamera::cameraHasSeenAprilTag));
         m_driverController.rightTrigger(0.05).whileTrue(new ConditionalCommand(new SequentialCommandGroup(new CheckForAprilTag(leftCamera), new AlignToReef(this, leftCamera)), m_swerveSubsystem.driveFieldOriented(driveAngularVelocity), leftCamera::cameraHasSeenAprilTag));
 
-
+/* 
         // Climb controls
         m_driverController.povUp()
                 .whileTrue(new ConditionalCommand(new ManualClimb(m_climbSubsystem, 12),
@@ -258,6 +258,10 @@ public class RobotContainer {
         m_driverController.povDown()
                 .whileTrue(new ConditionalCommand(new ManualClimb(m_climbSubsystem, -12),
                         new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
+       
+   */     
+        
+                        
         m_driverController.povLeft()
                 .onTrue(new ConditionalCommand(new MoveClimbUpCommand(m_climbSubsystem),
                         new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
@@ -265,6 +269,12 @@ public class RobotContainer {
                 .onTrue(new ConditionalCommand(new MoveClimbDownCommand(m_climbSubsystem),
                         new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
 
+        
+        
+        m_driverController.povUp().whileTrue(new StrafeRightCommand());
+        m_driverController.povDown().whileTrue(new StrafeLeftCommand());
+
+        
         m_indexSubsystem
                 .setDefaultCommand(
                         new IntakeCoralCommand(Constants.CoralIndexerConstants.kIntakePower)
