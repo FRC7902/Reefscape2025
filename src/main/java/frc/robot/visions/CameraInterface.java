@@ -1,9 +1,21 @@
 package frc.robot.visions;
 
+import java.util.List;
 import java.util.Optional;
 import org.photonvision.PhotonCamera;
+import org.photonvision.estimation.TargetModel;
+import org.photonvision.simulation.PhotonCameraSim;
+import org.photonvision.simulation.SimCameraProperties;
+import org.photonvision.simulation.VisionSystemSim;
+import org.photonvision.simulation.VisionTargetSim;
+import org.photonvision.targeting.TargetCorner;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -19,7 +31,12 @@ public class CameraInterface extends SubsystemBase {
     private double aprilTagArea = 0;
     private final double aprilTagAreaLimit;
     public AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
-    
+    private VisionSystemSim visionSim;
+    private AprilTagFieldLayout tagLayout;
+
+    private double yTranslation;
+
+
 
      /**
      * Creates a new camera object for each camera attached to the Raspberry Pi.
@@ -40,6 +57,48 @@ public class CameraInterface extends SubsystemBase {
         SmartDashboard.putNumber("kDY Far", VisionConstants.kDY);
 
         SmartDashboard.putNumber("Y Controller Tolerance", VisionConstants.yControllerTolerance);
+        visionSim = new VisionSystemSim("main");
+        TargetModel targetModel = new TargetModel(0.5, 0.25);
+        Pose3d targetPose = new Pose3d(16, 4, 2, new Rotation3d(0, 0, Math.PI));
+        VisionTargetSim visionTarget = new VisionTargetSim(targetPose, targetModel);
+
+        visionSim.addVisionTargets(visionTarget);
+
+        try {
+            tagLayout = AprilTagFieldLayout.loadFromResource(AprilTagFields.kDefaultField.m_resourceFile);
+            System.out.println("YAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+        }
+        catch (Exception e) {
+            System.out.println("TUAHTUAHTUAHTUAHTUAHTUAHTUATHUATHAJDKHAKSDHJKASDHKJASHDJKASHDJKAHSDKJAHSDKJAHSDKJHASJDKHAWDUIWAIUDASHK");
+        }
+
+        visionSim.addAprilTags(tagLayout);
+
+        SimCameraProperties cameraProp = new SimCameraProperties();
+        cameraProp.setCalibration(640, 480, Rotation2d.fromDegrees(1));
+        // Approximate detection noise with average and standard deviation error in pixels.
+        cameraProp.setCalibError(0.25, 0.08);
+        // Set the camera image capture framerate (Note: this is limited by robot loop rate).
+        cameraProp.setFPS(20);
+        // The average and standard deviation in milliseconds of image data latency.
+        cameraProp.setAvgLatencyMs(35);
+        cameraProp.setLatencyStdDevMs(5);
+
+        PhotonCameraSim cameraSim = new PhotonCameraSim(camera, cameraProp);
+        Translation3d robotToCameraTrl = new Translation3d(0.1, 0, 0.5);
+        // and pitched 15 degrees up.
+        Rotation3d robotToCameraRot = new Rotation3d(0, Math.toRadians(-15), 0);
+        Transform3d robotToCamera = new Transform3d(robotToCameraTrl, robotToCameraRot);
+
+        // Add this camera to the vision system simulation with the given robot-to-camera transform.
+        visionSim.addCamera(cameraSim, robotToCamera);
+
+        visionSim.getDebugField();
+
+        cameraSim.enableRawStream(true);
+        cameraSim.enableProcessedStream(true);
+
+        cameraSim.enableDrawWireframe(true);
     }
 
    
@@ -92,6 +151,10 @@ public class CameraInterface extends SubsystemBase {
      */ 
     public double getAprilTagYaw() {
         return targetYaw;
+    }
+
+    public double getAprilTagYTranslation() {
+        return yTranslation;
     }
 
     /**
@@ -171,6 +234,7 @@ public class CameraInterface extends SubsystemBase {
                         if (isReefAprilTag()) {
                             targetYaw = target.getYaw();
                             targetIsVisible = true;
+                            yTranslation = target.getBestCameraToTarget().getY();
                             break;
                         }
                     }
@@ -196,5 +260,10 @@ public class CameraInterface extends SubsystemBase {
         VisionConstants.kDY = SmartDashboard.getNumber("kDY Far", VisionConstants.kDY);
 
         VisionConstants.yControllerTolerance = SmartDashboard.getNumber("Y Controller Tolerance", VisionConstants.yControllerTolerance);
+    }
+
+    @Override
+    public void simulationPeriodic() {
+        visionSim.update(RobotContainer.m_swerveSubsystem.getPose());
     }
 }

@@ -50,6 +50,8 @@ public final class Constants {
       public static final double kGroundToAprilTagDistance = 0.171; //in meters
       public static final double kAprilTagAreaLimit = 4.5;
 
+      public static final double kAprilTagOffset = 0;
+
       //Reef Offset
       public static final double reefToAprilTagOffset = 0; //to measure
 

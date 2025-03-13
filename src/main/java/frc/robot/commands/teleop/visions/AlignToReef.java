@@ -57,7 +57,7 @@ public class AlignToReef extends Command {
 
     yController.reset(aprilTagYaw);
     yController.setTolerance(VisionConstants.yControllerTolerance);
-    yController.setGoal(0);
+    yController.setGoal(VisionConstants.kAprilTagOffset);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -65,21 +65,15 @@ public class AlignToReef extends Command {
   @Override 
   public void execute() {
     m_autoAlignCam.getCameraResults();
-    if (aprilTagID == m_autoAlignCam.getTargetAprilTagID()) {
-      var ySpeed = yController.calculate(m_autoAlignCam.getAprilTagYaw());
-      if (yController.atGoal()) {
-        System.out.println("Y Controller at Goal");
-        ySpeed = 0;
-      }
-      hawkTuah("Accumulated Y Error", yController.getAccumulatedError());
-
-      RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(aprilTagRotation, getDriverControllerLeftY(), ySpeed, 0.5);
+    var ySpeed = yController.calculate(m_autoAlignCam.getAprilTagYTranslation());
+    if (yController.atGoal()) {
+      System.out.println("Y Controller at Goal");
+      ySpeed = 0;
     }
+    hawkTuah("Accumulated Y Error", yController.getAccumulatedError());
 
-    else {
-      RobotContainer.m_swerveSubsystem.driveFieldOriented(m_RobotContainer.driveAngularVelocity);
-    }
-}
+    RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(aprilTagRotation, getDriverControllerLeftY(), ySpeed, 0.5);
+  }
     
   // Called once the command ends or is interrupted.
   @Override
