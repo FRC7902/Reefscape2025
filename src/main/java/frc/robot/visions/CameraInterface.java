@@ -8,6 +8,7 @@ import org.photonvision.simulation.PhotonCameraSim;
 import org.photonvision.simulation.SimCameraProperties;
 import org.photonvision.simulation.VisionSystemSim;
 import org.photonvision.simulation.VisionTargetSim;
+import org.photonvision.targeting.PhotonTrackedTarget;
 import org.photonvision.targeting.TargetCorner;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -16,6 +17,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -35,6 +38,8 @@ public class CameraInterface extends SubsystemBase {
     private AprilTagFieldLayout tagLayout;
 
     private double yTranslation;
+
+    private NetworkTable m_networkTable;
 
 
 
@@ -75,7 +80,7 @@ public class CameraInterface extends SubsystemBase {
         visionSim.addAprilTags(tagLayout);
 
         SimCameraProperties cameraProp = new SimCameraProperties();
-        cameraProp.setCalibration(640, 480, Rotation2d.fromDegrees(1));
+        cameraProp.setCalibration(1920, 1080, Rotation2d.fromDegrees(1));
         // Approximate detection noise with average and standard deviation error in pixels.
         cameraProp.setCalibError(0.25, 0.08);
         // Set the camera image capture framerate (Note: this is limited by robot loop rate).
@@ -99,19 +104,9 @@ public class CameraInterface extends SubsystemBase {
         cameraSim.enableProcessedStream(true);
 
         cameraSim.enableDrawWireframe(true);
-    }
 
-   
-     /**
-     * Determines whether the heading of the robot is similar to the rotation of the detected April Tag relative to the field.  
-     * If the angle difference between the robot's heading and the detected April Tag's angle is greater than 15 degrees, it will be assumed that the camera read the wrong April Tag.    
-     * 
-     * @return Whether the April Tag the camera sees is the correct one or not.
-     */    
-    public boolean cameraViewingCorrectAprilTag() {
-        return true;
+        m_networkTable = NetworkTableInstance.getDefault().getTable("photonvision");
     }
-
 
      /**
      * Determines whether the April Tag scanned by the camera is an April Tag on the reef (for auto-align).
@@ -215,7 +210,7 @@ public class CameraInterface extends SubsystemBase {
     public boolean cameraHasSeenAprilTag() {
         resetTargetDetector(); //resets target detector so that we don't get old results 
         getCameraResults(); //gets results from camera
-        return cameraSawTarget() && cameraViewingCorrectAprilTag(); //returns whether the camera has seen an april tag or not
+        return cameraSawTarget(); //returns whether the camera has seen an april tag or not
     }
 
     /**
@@ -234,7 +229,7 @@ public class CameraInterface extends SubsystemBase {
                         if (isReefAprilTag()) {
                             targetYaw = target.getYaw();
                             targetIsVisible = true;
-                            yTranslation = target.getBestCameraToTarget().getY();
+                            yTranslation = m_networkTable.getEntry("targetPixelsY").getDouble(yTranslation);
                             break;
                         }
                     }
@@ -247,6 +242,7 @@ public class CameraInterface extends SubsystemBase {
     public void periodic() {
 
         SmartDashboard.putNumber("April Tag Yaw", getAprilTagYaw());
+        SmartDashboard.putNumber("April Tag Y Translation", getAprilTagYTranslation());
         SmartDashboard.putNumber("April Tag ID", getTargetAprilTagID());
         SmartDashboard.putNumber("April Tag Rotation", getAprilTagRotation());
         SmartDashboard.putNumber("April Tag Area", aprilTagArea);

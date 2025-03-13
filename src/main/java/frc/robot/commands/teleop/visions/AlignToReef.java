@@ -47,7 +47,7 @@ public class AlignToReef extends Command {
 
     y2Controller = new ProfiledPIDController(VisionConstants.kPY2, VisionConstants.kIY2, VisionConstants.kDY2, VisionConstants.yConstraints); //to tune
 
-    if (Math.abs(aprilTagYaw) < 13) {
+    if (Math.abs(aprilTagYaw) < VisionConstants.kRotationalLimit) {
       yController = y2Controller;
     }
 

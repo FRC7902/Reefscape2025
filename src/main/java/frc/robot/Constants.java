@@ -55,6 +55,9 @@ public final class Constants {
       //Reef Offset
       public static final double reefToAprilTagOffset = 0; //to measure
 
+      //Robot Constants
+      public static final double kRotationalLimit = 13;
+
       //PID Y Controller Constants
       public static final TrapezoidProfile.Constraints yConstraints = new TrapezoidProfile.Constraints(60, 40);
       public static double yControllerTolerance = 0.02;
