@@ -36,10 +36,16 @@ public class CameraInterface extends SubsystemBase {
     public AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
     private VisionSystemSim visionSim;
     private AprilTagFieldLayout tagLayout;
+    private double cornerAverage = 0;
 
     private double yTranslation;
 
     private NetworkTable m_networkTable;
+
+    double FOV_X = 70.0;  // Degrees
+    double FOV_Y = 55.0;  // Degrees
+    int RES_X = 640;
+    int RES_Y = 480;
 
 
 
@@ -62,6 +68,8 @@ public class CameraInterface extends SubsystemBase {
         SmartDashboard.putNumber("kDY Far", VisionConstants.kDY);
 
         SmartDashboard.putNumber("Y Controller Tolerance", VisionConstants.yControllerTolerance);
+
+        /* 
         visionSim = new VisionSystemSim("main");
         TargetModel targetModel = new TargetModel(0.5, 0.25);
         Pose3d targetPose = new Pose3d(16, 4, 2, new Rotation3d(0, 0, Math.PI));
@@ -104,8 +112,9 @@ public class CameraInterface extends SubsystemBase {
         cameraSim.enableProcessedStream(true);
 
         cameraSim.enableDrawWireframe(true);
-
-        m_networkTable = NetworkTableInstance.getDefault().getTable("photonvision");
+        */
+        m_networkTable = NetworkTableInstance.getDefault().getTable("photonvision/skibidi");
+        
     }
 
      /**
@@ -216,7 +225,49 @@ public class CameraInterface extends SubsystemBase {
     /**
      * Runs the camera to check for an April Tag. If an April Tag is in sight, the method gathers the yaw and the ID of the April Tag.
      *
-     */   
+     */
+    
+    public double getCentroid(List<TargetCorner> sigma) {
+        // Define the four points (x, y) in order
+
+        /*
+ ⟶ +X  4 ----- 3
+ |      |       |
+ V      |       |
+ +Y     1 ----- 2    
+         */
+
+        SmartDashboard.putNumber("sigma size", sigma.size());
+
+        SmartDashboard.putString("XY 0", String.valueOf(sigma.get(0).x) + String.valueOf(sigma.get(0).y)); 
+        SmartDashboard.putString("XY 1", String.valueOf(sigma.get(1).x) + String.valueOf(sigma.get(1).y)); 
+        SmartDashboard.putString("XY 2", String.valueOf(sigma.get(2).x) + String.valueOf(sigma.get(2).y)); 
+        SmartDashboard.putString("XY 3", String.valueOf(sigma.get(3).x) + String.valueOf(sigma.get(3).y)); 
+
+
+        double x1 = sigma.get(0).x, y1 = sigma.get(0).y;
+        double x2 = sigma.get(1).x, y2 = sigma.get(1).y;
+        double x3 = sigma.get(2).x, y3 = sigma.get(2).y;
+        double x4 = sigma.get(3).x, y4 = sigma.get(3).y;
+
+        // Calculate the centroids of two triangles (x1,y1,x2,y2,x3,y3) and (x1,y1,x3,y3,x4,y4)
+        double cx1 = (x1 + x2 + x3) / 3;
+        double cy1 = (y1 + y2 + y3) / 3;
+        double cx2 = (x1 + x3 + x4) / 3;
+        double cy2 = (y1 + y3 + y4) / 3;
+
+        // Calculate the areas of the two triangles using the determinant formula
+        double area1 = Math.abs((x1 * (y2 - y3) + x2 * (y3 - y1) + x3 * (y1 - y2)) / 2.0);
+        double area2 = Math.abs((x1 * (y3 - y4) + x3 * (y4 - y1) + x4 * (y1 - y3)) / 2.0);
+
+        // Compute the centroid of the quadrilateral weighted by the triangle areas
+        double centroidX = (cx1 * area1 + cx2 * area2) / (area1 + area2);
+        double centroidY = (cy1 * area1 + cy2 * area2) / (area1 + area2);
+
+        // Print the centroid coordinates
+        return centroidX;
+    }
+
     public void getCameraResults() {
         final var results = camera.getAllUnreadResults();
         if (!results.isEmpty()) {
@@ -228,8 +279,17 @@ public class CameraInterface extends SubsystemBase {
                         aprilTagID = target.getFiducialId();
                         if (isReefAprilTag()) {
                             targetYaw = target.getYaw();
+
                             targetIsVisible = true;
-                            yTranslation = m_networkTable.getEntry("targetPixelsY").getDouble(yTranslation);
+                            cornerAverage = getCentroid(target.getDetectedCorners());
+
+                            int x_pixel = (int) (((targetYaw + (FOV_X / 2)) / FOV_X) * RES_X);
+
+                            //SmartDashboard.putNumber("TUAH TO THE HAWK TO THE TUAH", sigma);
+                            //yTranslation = m_networkTable.getEntry("targetPixelsY").getDouble(yTranslation);
+
+                            SmartDashboard.putNumber("skibidi sigma HOOOOYAAAAAAA", x_pixel);
+
                             break;
                         }
                     }
@@ -242,10 +302,11 @@ public class CameraInterface extends SubsystemBase {
     public void periodic() {
 
         SmartDashboard.putNumber("April Tag Yaw", getAprilTagYaw());
-        SmartDashboard.putNumber("April Tag Y Translation", getAprilTagYTranslation());
+        SmartDashboard.putNumber("April Tag X Translation", cornerAverage);
         SmartDashboard.putNumber("April Tag ID", getTargetAprilTagID());
         SmartDashboard.putNumber("April Tag Rotation", getAprilTagRotation());
         SmartDashboard.putNumber("April Tag Area", aprilTagArea);
+        SmartDashboard.putNumber("hawk tuah", aprilTagArea + getAprilTagYTranslation());
 
         VisionConstants.kPY2 = SmartDashboard.getNumber("kPY Close", VisionConstants.kPY2);
         VisionConstants.kIY2 = SmartDashboard.getNumber("kIY Close", VisionConstants.kIY2);
@@ -260,6 +321,6 @@ public class CameraInterface extends SubsystemBase {
 
     @Override
     public void simulationPeriodic() {
-        visionSim.update(RobotContainer.m_swerveSubsystem.getPose());
+        //visionSim.update(RobotContainer.m_swerveSubsystem.getPose());
     }
 }
