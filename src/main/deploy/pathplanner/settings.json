@@ -2,9 +2,12 @@
   "robotWidth": 0.864,
   "robotLength": 0.864,
   "holonomicMode": true,
-  "pathFolders": [],
+  "pathFolders": [
+    "With vision",
+    "No vision"
+  ],
   "autoFolders": [
-    "AB"
+    "COMPETITION AUTOS "
   ],
   "defaultMaxVel": 5.0,
   "defaultMaxAccel": 2.75,

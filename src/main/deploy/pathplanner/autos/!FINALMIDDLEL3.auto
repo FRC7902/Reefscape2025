@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "V2FinalPathRight1"
+            "pathName": "Middle1"
           }
         },
         {
@@ -19,25 +19,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "V2FinalPathRight2"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 1.7
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "V2FinalPathRight3"
+            "pathName": "Middle2"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "COMPETITION AUTOS ",
   "choreoAuto": false
 }
