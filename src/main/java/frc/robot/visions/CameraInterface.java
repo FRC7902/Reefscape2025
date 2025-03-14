@@ -38,7 +38,7 @@ public class CameraInterface extends SubsystemBase {
     private AprilTagFieldLayout tagLayout;
     private double cornerAverage = 0;
 
-    private double yTranslation;
+    private double xTranslation;
 
     private NetworkTable m_networkTable;
 
@@ -157,8 +157,8 @@ public class CameraInterface extends SubsystemBase {
         return targetYaw;
     }
 
-    public double getAprilTagYTranslation() {
-        return yTranslation;
+    public double getAprilTagxTranslation() {
+        return xTranslation;
     }
 
     /**
@@ -281,14 +281,13 @@ public class CameraInterface extends SubsystemBase {
                             targetYaw = target.getYaw();
 
                             targetIsVisible = true;
-                            cornerAverage = getCentroid(target.getDetectedCorners());
+                            xTranslation = target.getBestCameraToTarget().getY();
+                            //cornerAverage = getCentroid(target.getDetectedCorners());
 
-                            int x_pixel = (int) (((targetYaw + (FOV_X / 2)) / FOV_X) * RES_X);
+                            //int x_pixel = (int) (((targetYaw + (FOV_X / 2)) / FOV_X) * RES_X);
 
-                            //SmartDashboard.putNumber("TUAH TO THE HAWK TO THE TUAH", sigma);
+                            SmartDashboard.putNumber("TUAH TO THE HAWK TO THE TUAH", xTranslation);
                             //yTranslation = m_networkTable.getEntry("targetPixelsY").getDouble(yTranslation);
-
-                            SmartDashboard.putNumber("skibidi sigma HOOOOYAAAAAAA", x_pixel);
 
                             break;
                         }
@@ -306,7 +305,7 @@ public class CameraInterface extends SubsystemBase {
         SmartDashboard.putNumber("April Tag ID", getTargetAprilTagID());
         SmartDashboard.putNumber("April Tag Rotation", getAprilTagRotation());
         SmartDashboard.putNumber("April Tag Area", aprilTagArea);
-        SmartDashboard.putNumber("hawk tuah", aprilTagArea + getAprilTagYTranslation());
+        SmartDashboard.putNumber("hawk tuah", aprilTagArea + getAprilTagxTranslation());
 
         VisionConstants.kPY2 = SmartDashboard.getNumber("kPY Close", VisionConstants.kPY2);
         VisionConstants.kIY2 = SmartDashboard.getNumber("kIY Close", VisionConstants.kIY2);

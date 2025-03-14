@@ -65,7 +65,7 @@ public class AlignToReef extends Command {
   @Override 
   public void execute() {
     m_autoAlignCam.getCameraResults();
-    var ySpeed = yController.calculate(m_autoAlignCam.getAprilTagYTranslation());
+    var ySpeed = yController.calculate(m_autoAlignCam.getAprilTagxTranslation());
     if (yController.atGoal()) {
       System.out.println("Y Controller at Goal");
       ySpeed = 0;
