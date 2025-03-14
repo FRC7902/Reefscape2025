@@ -26,14 +26,19 @@ public class AlignToReef extends Command {
 
   private double aprilTagID;
 
+  private double aprilTagDistance;
+
   private final RobotContainer m_RobotContainer;
+
+  private final int triggerPressed;
   
 
-  public AlignToReef(CameraInterface m_autoAlignCamera, RobotContainer m_RobotContainer) {
+  public AlignToReef(CameraInterface m_autoAlignCamera, RobotContainer m_RobotContainer, int triggerPressed) {
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(RobotContainer.m_swerveSubsystem);
     this.m_autoAlignCam = m_autoAlignCamera;
     this.m_RobotContainer = m_RobotContainer;
+    this.triggerPressed = triggerPressed;
   }
 
   // Called when the command is initially scheduled.
@@ -41,13 +46,12 @@ public class AlignToReef extends Command {
   public void initialize() {
     //endCommand = !RobotContainer.m_indexSubsystem.hasCoral();
 
-    final double aprilTagYaw = m_autoAlignCam.getAprilTagYaw();
     aprilTagRotation = m_autoAlignCam.getAprilTagRotation();
     aprilTagID = m_autoAlignCam.getTargetAprilTagID();
 
     y2Controller = new ProfiledPIDController(VisionConstants.kPY2, VisionConstants.kIY2, VisionConstants.kDY2, VisionConstants.yConstraints); //to tune
 
-    if (Math.abs(aprilTagYaw) < 13) {
+    if (Math.abs(aprilTagDistance) < VisionConstants.kSecondPIDControllerStartingPoint) {
       yController = y2Controller;
     }
 
@@ -55,31 +59,26 @@ public class AlignToReef extends Command {
       yController = new ProfiledPIDController(VisionConstants.kPY, VisionConstants.kIY, VisionConstants.kDY, VisionConstants.yConstraints); //to tune
     }
 
-    yController.reset(aprilTagYaw);
+    yController.reset(aprilTagDistance);
     yController.setTolerance(VisionConstants.yControllerTolerance);
-    yController.setGoal(0);
+    yController.setGoal(VisionConstants.kAprilTagOffset);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   
   @Override 
   public void execute() {
-    m_autoAlignCam.getCameraResults();
-    if (aprilTagID == m_autoAlignCam.getTargetAprilTagID()) {
-      var ySpeed = yController.calculate(m_autoAlignCam.getAprilTagYaw());
-      if (yController.atGoal()) {
-        System.out.println("Y Controller at Goal");
-        ySpeed = 0;
-      }
-      hawkTuah("Accumulated Y Error", yController.getAccumulatedError());
-
-      RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(aprilTagRotation, getDriverControllerLeftY(), ySpeed, 0.5);
+    aprilTagDistance = m_autoAlignCam.getTx();
+    var ySpeed = yController.calculate(aprilTagDistance);
+    if (yController.atGoal()) {
+      System.out.println("Y Controller at Goal");
+      ySpeed = 0;
     }
+    
+    hawkTuah("Accumulated Y Error", yController.getAccumulatedError());
 
-    else {
-      RobotContainer.m_swerveSubsystem.driveFieldOriented(m_RobotContainer.driveAngularVelocity);
-    }
-}
+    RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(aprilTagRotation, getDriverControllerLeftY(), ySpeed, 0.5);
+  }
     
   // Called once the command ends or is interrupted.
   @Override

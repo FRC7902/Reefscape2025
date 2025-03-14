@@ -48,7 +48,6 @@ import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.commands.teleop.climb.ManualClimb;
 import swervelib.SwerveInputStream;
 import frc.robot.commands.teleop.visions.AlignToReef;
-import frc.robot.commands.teleop.visions.CheckForAprilTag;
 
 
 /**
@@ -78,8 +77,7 @@ public class RobotContainer {
 
     private final SendableChooser<Command> autoChooser;
 
-    private static final CameraInterface rightCamera = new CameraInterface("quandale", VisionConstants.kQuandaleAprilTagAreaLimit);
-    private static final CameraInterface leftCamera = new CameraInterface("skibidi", VisionConstants.kSkibidiAprilTagAreaLimit);
+    private static final CameraInterface m_cameraSubsystem = new CameraInterface("limelight");
 
     //private final CameraInterface leftCamera = new CameraInterface("quandale", 0);
 
@@ -248,8 +246,8 @@ public class RobotContainer {
         //m_driverController.leftTrigger(0.05).whileTrue(new SequentialCommandGroup(new CheckForAprilTag(0), new AlignToReef(this, 0)));
         //m_driverController.rightTrigger(0.05).whileTrue(new SequentialCommandGroup(new CheckForAprilTag(1), new AlignToReef(this, 1)));
 
-        m_driverController.rightTrigger(0.05).whileTrue(new ConditionalCommand(new SequentialCommandGroup(new CheckForAprilTag(rightCamera), new AlignToReef(rightCamera, this)), m_swerveSubsystem.driveFieldOriented(driveAngularVelocity), rightCamera::cameraHasSeenAprilTag));
-        m_driverController.leftTrigger(0.05).whileTrue(new ConditionalCommand(new SequentialCommandGroup(new CheckForAprilTag(leftCamera), new AlignToReef(leftCamera, this)), m_swerveSubsystem.driveFieldOriented(driveAngularVelocity), leftCamera::cameraHasSeenAprilTag));
+        m_driverController.rightTrigger(0.05).whileTrue(new ConditionalCommand(new AlignToReef(m_cameraSubsystem, this, 0), m_swerveSubsystem.driveFieldOriented(driveAngularVelocity), m_cameraSubsystem::cameraSawTarget));
+        m_driverController.leftTrigger(0.05).whileTrue(new ConditionalCommand(new AlignToReef(m_cameraSubsystem, this, 1), m_swerveSubsystem.driveFieldOriented(driveAngularVelocity), m_cameraSubsystem::cameraSawTarget));
 
 /* 
         // Climb controls

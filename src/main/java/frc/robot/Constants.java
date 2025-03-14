@@ -49,6 +49,7 @@ public final class Constants {
       //April Tag Offset
       public static final double kGroundToAprilTagDistance = 0.171; //in meters
       public static final double kAprilTagAreaLimit = 4.5;
+      public static final double kAprilTagOffset = 0;
 
       //Reef Offset
       public static final double reefToAprilTagOffset = 0; //to measure
@@ -63,6 +64,8 @@ public final class Constants {
       public static double kPY2 = 0.05;
       public static double kIY2 = 0;
       public static double kDY2 = 0;
+
+      public static double kSecondPIDControllerStartingPoint = 13;
     }
     
     public static class PathPlanner {
@@ -73,6 +76,7 @@ public final class Constants {
         public static final double kPAngle = 2.6;
         public static final double kIAngle = 0;
         public static final double kDAngle = 0.01;
+
     }
 
     public static class ClimbConstants {

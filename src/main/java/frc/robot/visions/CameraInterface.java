@@ -4,20 +4,25 @@ import java.util.Optional;
 import org.photonvision.PhotonCamera;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.filter.LinearFilter;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.Constants.VisionConstants;
+import frc.robot.LimelightHelpers;
 
 public class CameraInterface extends SubsystemBase {
-    private final PhotonCamera camera;
-    private boolean targetIsVisible = false;
-    private double targetYaw = 0;
+    private final NetworkTable camera;
+
+    private final LinearFilter xTranslationFilterController;
+    private double xTranslationFiltered = 0;
     private int aprilTagID = -1;
     private double aprilTagArea = 0;
-    private final double aprilTagAreaLimit;
+    private final String LIMELIGHT_KEY;
     public AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
     
 
@@ -27,9 +32,10 @@ public class CameraInterface extends SubsystemBase {
      * 
      * @param cameraName
      *      */     
-    public CameraInterface(String cameraName, double aprilTagAreaLimit) {
-        camera = new PhotonCamera(cameraName);
-        this.aprilTagAreaLimit = aprilTagAreaLimit;
+    public CameraInterface(String cameraName) {
+        camera = NetworkTableInstance.getDefault().getTable("limelight");
+        xTranslationFilterController = LinearFilter.movingAverage(10);
+        LIMELIGHT_KEY = cameraName;
           
         SmartDashboard.putNumber("kPY Close", VisionConstants.kPY2);
         SmartDashboard.putNumber("kIY Close", VisionConstants.kIY2);
@@ -42,17 +48,6 @@ public class CameraInterface extends SubsystemBase {
         SmartDashboard.putNumber("Y Controller Tolerance", VisionConstants.yControllerTolerance);
     }
 
-   
-     /**
-     * Determines whether the heading of the robot is similar to the rotation of the detected April Tag relative to the field.  
-     * If the angle difference between the robot's heading and the detected April Tag's angle is greater than 15 degrees, it will be assumed that the camera read the wrong April Tag.    
-     * 
-     * @return Whether the April Tag the camera sees is the correct one or not.
-     */    
-    public boolean cameraViewingCorrectAprilTag() {
-        return true;
-    }
-
 
      /**
      * Determines whether the April Tag scanned by the camera is an April Tag on the reef (for auto-align).
@@ -60,7 +55,7 @@ public class CameraInterface extends SubsystemBase {
      * @return Whether the April Tag detected by the camera is an April Tag on the reef or not.
      */ 
     public boolean isReefAprilTag() {
-        switch (aprilTagID) {
+        switch (getTargetAprilTagID()) {
             case -1: return false;
             case 1: return false;
             case 2: return false;
@@ -82,17 +77,18 @@ public class CameraInterface extends SubsystemBase {
      * @return Whether a valid April Tag was detected or not.
      */ 
     public boolean cameraSawTarget() {
-        return targetIsVisible;
+        return camera.getEntry("tv").getDouble(0) != 0 && isReefAprilTag();
     }
 
-     /**
-     * Gets the rotation of the April Tag relative to the camera.
-     *
-     * @return The rotation of the April Tag relative to the camera (in degrees).
-     */ 
-    public double getAprilTagYaw() {
-        return targetYaw;
+    public double getAprilTagArea() {
+        return camera.getEntry("ta").getDouble(0);
     }
+
+    public double getTx() {
+        // tx: Horizontal Offset From Crosshair To Target (LL1: -27 degrees to 27
+        // degrees | LL2: -29.8 to 29.8 degrees)
+        return LimelightHelpers.getTX(LIMELIGHT_KEY);
+      }
 
     /**
      * Gets the rotation of the April Tag relative to the field.
@@ -127,62 +123,14 @@ public class CameraInterface extends SubsystemBase {
     }
 
 
-    /**
-     * Sets the targetIsVisible boolean to false which is used to determine if the camera saw a valid April Tag.
-     *
-     */ 
-    public void resetTargetDetector() {
-        targetIsVisible = false;
-    } 
-
-    /**
-     * Gets the ID of the April Tag that is detected by the camera.
-     *
-     * @return The ID of the April Tag.
-     */    
     public int getTargetAprilTagID() {
-        return aprilTagID;
+        return (int) camera.getEntry("tid").getInteger(-1);
     }
 
-    /**
-     * Checks the camera to see whether an April Tag is in view of the camera. This is used to determine whether the auto-align command should run or not.
-     *
-     * @return Whether an April Tag is in view of the camera or not.
-     */        
-    public boolean cameraHasSeenAprilTag() {
-        resetTargetDetector(); //resets target detector so that we don't get old results 
-        getCameraResults(); //gets results from camera
-        return cameraSawTarget() && cameraViewingCorrectAprilTag(); //returns whether the camera has seen an april tag or not
-    }
-
-    /**
-     * Runs the camera to check for an April Tag. If an April Tag is in sight, the method gathers the yaw and the ID of the April Tag.
-     *
-     */   
-    public void getCameraResults() {
-        final var results = camera.getAllUnreadResults();
-        if (!results.isEmpty()) {
-            var result = results.get(results.size() - 1);
-            if (result.hasTargets()) {
-                for (final var target : result.getTargets()) {
-                    aprilTagArea = target.getArea();
-                    if (aprilTagArea >= aprilTagAreaLimit) {
-                        aprilTagID = target.getFiducialId();
-                        if (isReefAprilTag()) {
-                            targetYaw = target.getYaw();
-                            targetIsVisible = true;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-    } 
 
     @Override
     public void periodic() {
 
-        SmartDashboard.putNumber("April Tag Yaw", getAprilTagYaw());
         SmartDashboard.putNumber("April Tag ID", getTargetAprilTagID());
         SmartDashboard.putNumber("April Tag Rotation", getAprilTagRotation());
         SmartDashboard.putNumber("April Tag Area", aprilTagArea);
