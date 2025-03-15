@@ -60,7 +60,7 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "ElevatorL3",
+      "name": "ElevatorL2",
       "waypointRelativePos": 0.5506204044117649,
       "endWaypointRelativePos": null,
       "command": null
