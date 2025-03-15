@@ -1,8 +1,13 @@
 package frc.robot.visions;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonPoseEstimator;
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.estimation.TargetModel;
 import org.photonvision.simulation.PhotonCameraSim;
 import org.photonvision.simulation.SimCameraProperties;
@@ -12,11 +17,16 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 import org.photonvision.targeting.TargetCorner;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -37,17 +47,22 @@ public class CameraInterface extends SubsystemBase {
     private VisionSystemSim visionSim;
     private AprilTagFieldLayout tagLayout;
     private double cornerAverage = 0;
+    private final PhotonPoseEstimator photonEstimator; //creates pose estimator object
+    private Matrix<N3, N1> curStdDevs; //creates matrix for current standard deviations
+
+
+    Transform3d kRobotToCam;
 
     private double xTranslation;
 
     private NetworkTable m_networkTable;
 
+    private List<Pose2d> detectedPoses;
+
     double FOV_X = 70.0;  // Degrees
     double FOV_Y = 55.0;  // Degrees
     int RES_X = 640;
     int RES_Y = 480;
-
-
 
      /**
      * Creates a new camera object for each camera attached to the Raspberry Pi.
@@ -55,10 +70,13 @@ public class CameraInterface extends SubsystemBase {
      * 
      * @param cameraName
      *      */     
-    public CameraInterface(String cameraName, double aprilTagAreaLimit) {
+    public CameraInterface(String cameraName, double aprilTagAreaLimit, Transform3d kRobotToCam) {
         camera = new PhotonCamera(cameraName);
         this.aprilTagAreaLimit = aprilTagAreaLimit;
-          
+        this.kRobotToCam = kRobotToCam;
+        
+        detectedPoses = new ArrayList<>();
+
         SmartDashboard.putNumber("kPY Close", VisionConstants.kPY2);
         SmartDashboard.putNumber("kIY Close", VisionConstants.kIY2);
         SmartDashboard.putNumber("kDY Close", VisionConstants.kDY2);
@@ -68,6 +86,76 @@ public class CameraInterface extends SubsystemBase {
         SmartDashboard.putNumber("kDY Far", VisionConstants.kDY);
 
         SmartDashboard.putNumber("Y Controller Tolerance", VisionConstants.yControllerTolerance);
+        photonEstimator = new PhotonPoseEstimator(AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark), PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, kRobotToCam);
+        //creates a PhotonPoseEstimator object which fuses the camera odometry and estimates the robot's position based on the april tag field layout
+        //the camera will combine the poses of the april tags it detects into one pose estimate
+        //an offset must be set if the camera is not centered
+        photonEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+
+        //detectedPoses.add(new Pose2d(0, 0, new Rotation2d(0)));
+    }
+
+
+    public Pose2d getClosestPose(Pose2d robotPose) {
+        //return robotPose.nearest(detectedPoses);
+        return aprilTagFieldLayout.getTagPose(18).get().toPose2d();
+    }
+
+
+    public Optional<EstimatedRobotPose> getEstimatedGlobalPose() {
+        Optional<EstimatedRobotPose> visionEst = Optional.empty();
+        //creates a new container object that can hold null values and non-null values
+        for (var change : camera.getAllUnreadResults()) {
+            //gets the latest results from the camera
+            visionEst = photonEstimator.update(change);
+            //updates vision estimates. will not update if no april tags have been detected
+            updateEstimationStdDevs(visionEst, change.getTargets());
+            //updates the estimated standard deviations with the results
+        }
+        return visionEst;
+    }
+
+    private void updateEstimationStdDevs(Optional<EstimatedRobotPose> estimatedPose, List<PhotonTrackedTarget> targets) {
+        if (estimatedPose.isEmpty()) {
+            // No pose input. Default to single-tag std devs
+            curStdDevs = VisionConstants.kSingleTagStdDevs;
+
+        } else {
+            // Pose present. Start running Heuristic
+            var estStdDevs = VisionConstants.kSingleTagStdDevs;
+            int numTags = 0;
+            double avgDist = 0;
+
+            // Precalculation - see how many tags we found, and calculate an average-distance metric
+            for (var tgt : targets) {
+                //gets the raw data from the camera
+                var tagPose = photonEstimator.getFieldTags().getTagPose(tgt.getFiducialId());
+                //obtains the pose value from the april tag that is detected by the camera
+                if (tagPose.isEmpty()) continue; //skips current iteration if there is no target detected
+                numTags++; //counts the number of tags the camera saw
+                //adds the average distance from the robot to the april tag
+                //to be used to calculate the average distance
+                avgDist += tagPose.get().toPose2d().getTranslation().getDistance(estimatedPose.get().estimatedPose.toPose2d().getTranslation());
+            }
+
+            if (numTags == 0) {
+                // No tags visible. Default to single-tag std devs
+                curStdDevs = VisionConstants.kSingleTagStdDevs;
+            } else {
+                // One or more tags visible, run the full heuristic.
+                avgDist /= numTags;
+                //find saverage distance from robot to camera
+                // Decrease std devs if multiple targets are visible
+                if (numTags > 1) estStdDevs = VisionConstants.kMultiTagStdDevs;
+                // Increase std devs based on (average) distance
+                if (numTags == 1 && avgDist > 4)
+                    estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
+                else estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
+                curStdDevs = estStdDevs;
+            }
+        }
+        }
+    
 
         /* 
         visionSim = new VisionSystemSim("main");
@@ -113,9 +201,8 @@ public class CameraInterface extends SubsystemBase {
 
         cameraSim.enableDrawWireframe(true);
         */
-        m_networkTable = NetworkTableInstance.getDefault().getTable("photonvision/skibidi");
         
-    }
+    
 
      /**
      * Determines whether the April Tag scanned by the camera is an April Tag on the reef (for auto-align).
@@ -200,6 +287,8 @@ public class CameraInterface extends SubsystemBase {
      */ 
     public void resetTargetDetector() {
         targetIsVisible = false;
+        detectedPoses.clear();
+        
     } 
 
     /**
@@ -217,55 +306,16 @@ public class CameraInterface extends SubsystemBase {
      * @return Whether an April Tag is in view of the camera or not.
      */        
     public boolean cameraHasSeenAprilTag() {
+        /* 
         resetTargetDetector(); //resets target detector so that we don't get old results 
         getCameraResults(); //gets results from camera
         return cameraSawTarget(); //returns whether the camera has seen an april tag or not
+        */
+        return true;
     }
 
-    /**
-     * Runs the camera to check for an April Tag. If an April Tag is in sight, the method gathers the yaw and the ID of the April Tag.
-     *
-     */
-    
-    public double getCentroid(List<TargetCorner> sigma) {
-        // Define the four points (x, y) in order
-
-        /*
- ⟶ +X  4 ----- 3
- |      |       |
- V      |       |
- +Y     1 ----- 2    
-         */
-
-        SmartDashboard.putNumber("sigma size", sigma.size());
-
-        SmartDashboard.putString("XY 0", String.valueOf(sigma.get(0).x) + String.valueOf(sigma.get(0).y)); 
-        SmartDashboard.putString("XY 1", String.valueOf(sigma.get(1).x) + String.valueOf(sigma.get(1).y)); 
-        SmartDashboard.putString("XY 2", String.valueOf(sigma.get(2).x) + String.valueOf(sigma.get(2).y)); 
-        SmartDashboard.putString("XY 3", String.valueOf(sigma.get(3).x) + String.valueOf(sigma.get(3).y)); 
-
-
-        double x1 = sigma.get(0).x, y1 = sigma.get(0).y;
-        double x2 = sigma.get(1).x, y2 = sigma.get(1).y;
-        double x3 = sigma.get(2).x, y3 = sigma.get(2).y;
-        double x4 = sigma.get(3).x, y4 = sigma.get(3).y;
-
-        // Calculate the centroids of two triangles (x1,y1,x2,y2,x3,y3) and (x1,y1,x3,y3,x4,y4)
-        double cx1 = (x1 + x2 + x3) / 3;
-        double cy1 = (y1 + y2 + y3) / 3;
-        double cx2 = (x1 + x3 + x4) / 3;
-        double cy2 = (y1 + y3 + y4) / 3;
-
-        // Calculate the areas of the two triangles using the determinant formula
-        double area1 = Math.abs((x1 * (y2 - y3) + x2 * (y3 - y1) + x3 * (y1 - y2)) / 2.0);
-        double area2 = Math.abs((x1 * (y3 - y4) + x3 * (y4 - y1) + x4 * (y1 - y3)) / 2.0);
-
-        // Compute the centroid of the quadrilateral weighted by the triangle areas
-        double centroidX = (cx1 * area1 + cx2 * area2) / (area1 + area2);
-        double centroidY = (cy1 * area1 + cy2 * area2) / (area1 + area2);
-
-        // Print the centroid coordinates
-        return centroidX;
+    public List<Pose2d> getDetectedPoses() {
+        return detectedPoses;
     }
 
     public void getCameraResults() {
@@ -279,9 +329,9 @@ public class CameraInterface extends SubsystemBase {
                         aprilTagID = target.getFiducialId();
                         if (isReefAprilTag()) {
                             targetYaw = target.getYaw();
-
+                            detectedPoses.add(aprilTagFieldLayout.getTagPose(aprilTagID).get().toPose2d());
                             targetIsVisible = true;
-                            xTranslation = target.getBestCameraToTarget().getY();
+                            //xTranslation = target.getBestCameraToTarget().getY();
                             //cornerAverage = getCentroid(target.getDetectedCorners());
 
                             //int x_pixel = (int) (((targetYaw + (FOV_X / 2)) / FOV_X) * RES_X);
@@ -297,15 +347,13 @@ public class CameraInterface extends SubsystemBase {
         }
     } 
 
+    public Matrix<N3, N1> getEstimationStdDevs() {
+        return curStdDevs;
+    }
+
+
     @Override
     public void periodic() {
-
-        SmartDashboard.putNumber("April Tag Yaw", getAprilTagYaw());
-        SmartDashboard.putNumber("April Tag X Translation", cornerAverage);
-        SmartDashboard.putNumber("April Tag ID", getTargetAprilTagID());
-        SmartDashboard.putNumber("April Tag Rotation", getAprilTagRotation());
-        SmartDashboard.putNumber("April Tag Area", aprilTagArea);
-        SmartDashboard.putNumber("hawk tuah", aprilTagArea + getAprilTagxTranslation());
 
         VisionConstants.kPY2 = SmartDashboard.getNumber("kPY Close", VisionConstants.kPY2);
         VisionConstants.kIY2 = SmartDashboard.getNumber("kIY Close", VisionConstants.kIY2);
@@ -316,6 +364,8 @@ public class CameraInterface extends SubsystemBase {
         VisionConstants.kDY = SmartDashboard.getNumber("kDY Far", VisionConstants.kDY);
 
         VisionConstants.yControllerTolerance = SmartDashboard.getNumber("Y Controller Tolerance", VisionConstants.yControllerTolerance);
+
+        getCameraResults();
     }
 
     @Override

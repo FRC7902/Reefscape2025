@@ -7,6 +7,7 @@ package frc.robot;
 import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -37,6 +38,13 @@ public final class Constants {
 
     public static class VisionConstants {
       //Camera Offset
+
+      public static final Transform3d kRobotToCamRight = new Transform3d(new Translation3d(0.226103, 0.336825, 0.261), new Rotation3d(0, 0, 0)); // to measure
+      public static final Transform3d kRobotToCamLeft = new Transform3d(new Translation3d(0.226103, -0.336825, 0.261), new Rotation3d(0, 0, 0)); // to measure
+
+      public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(2, 2, 4); // to test
+      public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(1, 1, 1); // to test
+      
       public static final double kCameraPitch = 0; //to measure
       public static final double kGroundToCamera = 0.38735;
 
@@ -60,7 +68,7 @@ public final class Constants {
 
       //PID Y Controller Constants
       public static final TrapezoidProfile.Constraints yConstraints = new TrapezoidProfile.Constraints(60, 40);
-      public static double yControllerTolerance = 0.005;
+      public static double yControllerTolerance = 0;
       public static double kPY = 0.07;
       public static double kIY = 0;
       public static double kDY = 0;

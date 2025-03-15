@@ -78,8 +78,8 @@ public class RobotContainer {
 
     private final SendableChooser<Command> autoChooser;
 
-    private static final CameraInterface rightCamera = new CameraInterface("quandale", VisionConstants.kQuandaleAprilTagAreaLimit);
-    private static final CameraInterface leftCamera = new CameraInterface("skibidi", VisionConstants.kSkibidiAprilTagAreaLimit);
+    public static final CameraInterface rightCamera = new CameraInterface("quandale", VisionConstants.kQuandaleAprilTagAreaLimit, VisionConstants.kRobotToCamRight);
+    public static final CameraInterface leftCamera = new CameraInterface("skibidi", VisionConstants.kSkibidiAprilTagAreaLimit, VisionConstants.kRobotToCamLeft);
 
     //private final CameraInterface leftCamera = new CameraInterface("quandale", 0);
 
@@ -225,9 +225,9 @@ public class RobotContainer {
                 m_swerveSubsystem.driveFieldOriented(driveAngularVelocityKeyboard);
 
         // Default to field-centric swerve drive
-        //m_swerveSubsystem.setDefaultCommand(driveFieldOrientedAnglularVelocity);
-
         m_swerveSubsystem.setDefaultCommand(driveFieldOrientedAnglularVelocity);
+
+ //       m_swerveSubsystem.setDefaultCommand(driveRobotOrientedAngularVelocity);
 
         m_climbSubsystem.setDefaultCommand(new LockFunnelCommand());
 
@@ -248,8 +248,11 @@ public class RobotContainer {
         //m_driverController.leftTrigger(0.05).whileTrue(new SequentialCommandGroup(new CheckForAprilTag(0), new AlignToReef(this, 0)));
         //m_driverController.rightTrigger(0.05).whileTrue(new SequentialCommandGroup(new CheckForAprilTag(1), new AlignToReef(this, 1)));
 
-        m_driverController.rightTrigger(0.05).whileTrue(new ConditionalCommand(new SequentialCommandGroup(new CheckForAprilTag(rightCamera), new AlignToReef(rightCamera, this)), m_swerveSubsystem.driveFieldOriented(driveAngularVelocity), rightCamera::cameraHasSeenAprilTag));
-        m_driverController.leftTrigger(0.05).whileTrue(new ConditionalCommand(new SequentialCommandGroup(new CheckForAprilTag(leftCamera), new AlignToReef(leftCamera, this)), m_swerveSubsystem.driveFieldOriented(driveAngularVelocity), leftCamera::cameraHasSeenAprilTag));
+        //m_driverController.rightTrigger(0.05).whileTrue(new ConditionalCommand(new SequentialCommandGroup(new CheckForAprilTag(rightCamera), new AlignToReef(rightCamera, this)), m_swerveSubsystem.driveFieldOriented(driveAngularVelocity), rightCamera::cameraHasSeenAprilTag));
+        //m_driverController.leftTrigger(0.05).whileTrue(new ConditionalCommand(new SequentialCommandGroup(new CheckForAprilTag(leftCamera), new AlignToReef(leftCamera, this)), m_swerveSubsystem.driveFieldOriented(driveAngularVelocity), leftCamera::cameraHasSeenAprilTag));
+
+        m_driverController.rightTrigger(0.05).whileTrue(new AlignToReef(leftCamera, this));
+        m_driverController.leftTrigger(0.05).whileTrue(new AlignToReef(rightCamera, this));
 
 /* 
         // Climb controls

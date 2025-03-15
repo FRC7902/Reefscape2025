@@ -24,14 +24,14 @@ public class CheckForAprilTag extends Command {
   @Override
   public void initialize() {
     //endCommand = !RobotContainer.m_indexSubsystem.hasCoral();
-    m_autoAlignCam.resetTargetDetector();
+    //m_autoAlignCam.resetTargetDetector();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   
   @Override 
   public void execute() {
-    m_autoAlignCam.getCameraResults();
+    //m_autoAlignCam.getCameraResults();
 }
     
   // Called once the command ends or is interrupted.
