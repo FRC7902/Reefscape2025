@@ -42,7 +42,7 @@ public class AlignToReef extends Command {
     //endCommand = !RobotContainer.m_indexSubsystem.hasCoral();
 
     final double aprilTagYaw = m_autoAlignCam.getAprilTagYaw();
-    aprilTagRotation = m_autoAlignCam.getAprilTagRotation();
+    aprilTagRotation = m_autoAlignCam.getAprilTagRotation(5);
     aprilTagID = m_autoAlignCam.getTargetAprilTagID();
 
     y2Controller = new ProfiledPIDController(VisionConstants.kPY2, VisionConstants.kIY2, VisionConstants.kDY2, VisionConstants.yConstraints); //to tune

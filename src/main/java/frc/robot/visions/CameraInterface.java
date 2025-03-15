@@ -166,8 +166,8 @@ public class CameraInterface extends SubsystemBase {
      *
      * @return The rotation of the April Tag relative to the field (in radians).
      */      
-    public double getAprilTagRotation() {
-        final int aprilTagID = getTargetAprilTagID();
+    public double getAprilTagRotation(int fidicualID) {
+        final int aprilTagID = fidicualID;
         final Optional<Alliance> alliance = DriverStation.getAlliance();
         if (alliance.get() == Alliance.Blue) {
             switch (aprilTagID) {
@@ -303,7 +303,7 @@ public class CameraInterface extends SubsystemBase {
         SmartDashboard.putNumber("April Tag Yaw", getAprilTagYaw());
         SmartDashboard.putNumber("April Tag X Translation", cornerAverage);
         SmartDashboard.putNumber("April Tag ID", getTargetAprilTagID());
-        SmartDashboard.putNumber("April Tag Rotation", getAprilTagRotation());
+        SmartDashboard.putNumber("April Tag Rotation", getAprilTagRotation(6));
         SmartDashboard.putNumber("April Tag Area", aprilTagArea);
         SmartDashboard.putNumber("hawk tuah", aprilTagArea + getAprilTagxTranslation());
 

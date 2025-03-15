@@ -723,17 +723,17 @@ public class SwerveSubsystem extends SubsystemBase {
 
         return run(() -> {
             swerveDrive.drive(ChassisSpeeds.fromFieldRelativeSpeeds(0, 0,
-                    controller.headingCalculate(
+                    0.15 * controller.headingCalculate(
                             swerveDrive.getOdometryHeading().unaryMinus().getRadians(),
-                            new Rotation2d(Math.toRadians(angleDegrees)).getRadians()),
+                            new Rotation2d(angleDegrees).getRadians()),
                     swerveDrive.getPose().getRotation()));
             SmartDashboard.putNumber("Odom Heading (rad)",
                     swerveDrive.getOdometryHeading().unaryMinus().getRadians());
-            SmartDashboard.putNumber("Target Heading (rad)", Math.toRadians(angleDegrees));
+            SmartDashboard.putNumber("Target Heading (rad)",angleDegrees);
             SmartDashboard.putNumber("Error (rad)",
                     Math.abs(new Rotation2d(Math.toRadians(angleDegrees))
                             .minus(swerveDrive.getOdometryHeading().unaryMinus()).getRadians()));
-        }).until(() -> (Math.abs(new Rotation2d(Math.toRadians(angleDegrees))
+        }).until(() -> (Math.abs(new Rotation2d(angleDegrees)
                 .minus(swerveDrive.getOdometryHeading().unaryMinus())
                 .getDegrees()) < toleranceDegrees)
                 && swerveDrive.getRobotVelocity().omegaRadiansPerSecond < 0.1);
