@@ -37,6 +37,7 @@ public class ManualIntakeCoralCommand extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return RobotContainer.m_indexSubsystem.hasCoral();
+    // return RobotContainer.m_indexSubsystem.hasCoral();
+    return RobotContainer.m_indexSubsystem.isBeamBroken();
   }
 }
