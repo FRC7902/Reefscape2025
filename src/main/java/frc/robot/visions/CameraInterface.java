@@ -59,6 +59,7 @@ public class CameraInterface extends SubsystemBase {
         camera = new PhotonCamera(cameraName);
         this.aprilTagAreaLimit = aprilTagAreaLimit;
           
+        /* 
         SmartDashboard.putNumber("kPY Close", VisionConstants.kPY2);
         SmartDashboard.putNumber("kIY Close", VisionConstants.kIY2);
         SmartDashboard.putNumber("kDY Close", VisionConstants.kDY2);
@@ -68,6 +69,23 @@ public class CameraInterface extends SubsystemBase {
         SmartDashboard.putNumber("kDY Far", VisionConstants.kDY);
 
         SmartDashboard.putNumber("Y Controller Tolerance", VisionConstants.yControllerTolerance);
+        */
+        SmartDashboard.putNumber("Fidicual ID", VisionConstants.kFidicualID);
+
+        SmartDashboard.putNumber("ID 6", VisionConstants.tag6);
+        SmartDashboard.putNumber("ID 7", VisionConstants.tag7);
+        SmartDashboard.putNumber("ID 8", VisionConstants.tag8);
+        SmartDashboard.putNumber("ID 9", VisionConstants.tag9);
+        SmartDashboard.putNumber("ID 10", VisionConstants.tag10);
+        SmartDashboard.putNumber("ID 11", VisionConstants.tag11);
+
+        SmartDashboard.putNumber("ID 17", VisionConstants.tag17);
+        SmartDashboard.putNumber("ID 18", VisionConstants.tag18);
+        SmartDashboard.putNumber("ID 19", VisionConstants.tag19);
+        SmartDashboard.putNumber("ID 20", VisionConstants.tag20);
+        SmartDashboard.putNumber("ID 21", VisionConstants.tag21);
+        SmartDashboard.putNumber("ID 22", VisionConstants.tag22);
+
 
         /* 
         visionSim = new VisionSystemSim("main");
@@ -171,23 +189,23 @@ public class CameraInterface extends SubsystemBase {
         final Optional<Alliance> alliance = DriverStation.getAlliance();
         if (alliance.get() == Alliance.Blue) {
             switch (aprilTagID) {
-                case 17: return -1.047; //60 degrees
-                case 18: return 0; //0 degrees
-                case 19: return -5.236; //300 degrees
-                case 20: return -4.189; //240 degrees
-                case 21: return 3.142; //180 degrees
-                case 22: return -2.094; //120 degrees
+                case 17: return VisionConstants.tag17; //60 degrees
+                case 18: return VisionConstants.tag18; //0 degrees
+                case 19: return VisionConstants.tag19; //300 degrees
+                case 20: return VisionConstants.tag20; //240 degrees
+                case 21: return VisionConstants.tag21; //180 degrees
+                case 22: return VisionConstants.tag22; //120 degrees
             }
         }
 
         else if (alliance.get() == Alliance.Red) {
             switch (aprilTagID) {
-                case 6: return -5.236; //300 degrees //check
-                case 7: return 0; //0 degrees
-                case 8: return -1.047; //60 degrees
-                case 9: return -2.094; //120 degrees
-                case 10: return 3.142; //180 degrees
-                case 11: return -4.189; //240 degrees
+                case 6: return VisionConstants.tag6; //300 degrees //check
+                case 7: return VisionConstants.tag7; //0 degrees
+                case 8: return VisionConstants.tag8; //60 degrees
+                case 9: return VisionConstants.tag9; //120 degrees
+                case 10: return VisionConstants.tag10; //180 degrees
+                case 11: return VisionConstants.tag11; //240 degrees
             }
         }
         return 0;
@@ -300,6 +318,7 @@ public class CameraInterface extends SubsystemBase {
     @Override
     public void periodic() {
 
+        /* 
         SmartDashboard.putNumber("April Tag Yaw", getAprilTagYaw());
         SmartDashboard.putNumber("April Tag X Translation", cornerAverage);
         SmartDashboard.putNumber("April Tag ID", getTargetAprilTagID());
@@ -316,6 +335,25 @@ public class CameraInterface extends SubsystemBase {
         VisionConstants.kDY = SmartDashboard.getNumber("kDY Far", VisionConstants.kDY);
 
         VisionConstants.yControllerTolerance = SmartDashboard.getNumber("Y Controller Tolerance", VisionConstants.yControllerTolerance);
+
+        */
+        VisionConstants.kFidicualID = (int) SmartDashboard.getNumber("Fidicual ID", VisionConstants.kFidicualID);
+
+        VisionConstants.tag6 = (int) SmartDashboard.getNumber("ID 6", VisionConstants.tag6);
+        VisionConstants.tag7 = (int) SmartDashboard.getNumber("ID 7", VisionConstants.tag7);
+        VisionConstants.tag8 = (int) SmartDashboard.getNumber("ID 8", VisionConstants.tag8);
+        VisionConstants.tag9 = (int) SmartDashboard.getNumber("ID 9", VisionConstants.tag9);
+        VisionConstants.tag10 = (int) SmartDashboard.getNumber("ID 10", VisionConstants.tag10);
+        VisionConstants.tag11 = (int) SmartDashboard.getNumber("ID 11", VisionConstants.tag11);
+
+        VisionConstants.tag17 = (int) SmartDashboard.getNumber("ID 17", VisionConstants.tag17);
+        VisionConstants.tag18 = (int) SmartDashboard.getNumber("ID 18", VisionConstants.tag18);
+        VisionConstants.tag19 = (int) SmartDashboard.getNumber("ID 19", VisionConstants.tag19);
+        VisionConstants.tag20 = (int) SmartDashboard.getNumber("ID 20", VisionConstants.tag20);
+        VisionConstants.tag21 = (int) SmartDashboard.getNumber("ID 21", VisionConstants.tag21);
+        VisionConstants.tag22 = (int) SmartDashboard.getNumber("ID 22", VisionConstants.tag22);
+
+
     }
 
     @Override

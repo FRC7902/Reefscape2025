@@ -51,12 +51,53 @@ public final class Constants {
       public static final double kAprilTagAreaLimit = 4.5;
 
       public static final double kAprilTagOffset = 0;
+      public static int kFidicualID = 8;
 
+      public static double tag17 = -1.047; //-60 degrees
+      public static double tag18 = 0; // 0 degrees
+      public static double tag19 = -5.236; // - 300 degrees
+      public static double tag20 = -4.189; // -240 degrees
+      public static double tag21 = 3.142; // 180 degrees
+      public static double tag22 = -2.094; //-120 degrees
+      
+      public static double tag6 = -5.236; //-300 degrees
+      public static double tag7 = 0; // 0 degrees
+      public static double tag8 = -1.047; //-60 degrees
+      public static double tag9 = -2.094; // -120 degrees
+      public static double tag10 = 3.142; // 180 degrees
+      public static double tag11 = -4.189; // -240 degrees
+
+
+
+  /* 
+          if (alliance.get() == Alliance.Blue) {
+            switch (aprilTagID) {
+                case 17: return -1.047; //60 degrees
+                case 18: return 0; //0 degrees
+                case 19: return -5.236; //300 degrees
+                case 20: return -4.189; //240 degrees
+                case 21: return 3.142; //180 degrees
+                case 22: return -2.094; //120 degrees
+            }
+        }
+
+        else if (alliance.get() == Alliance.Red) {
+            switch (aprilTagID) {
+                case 6: return -5.236; //300 degrees //check
+                case 7: return 0; //0 degrees
+                case 8: return -1.047; //60 degrees
+                case 9: return -2.094; //120 degrees
+                case 10: return 3.142; //180 degrees
+                case 11: return -4.189; //240 degrees
+            }
+  */
+  
       //Reef Offset
       public static final double reefToAprilTagOffset = 0; //to measure
 
       //Robot Constants
       public static final double kRotationalLimit = 13;
+  
 
       //PID Y Controller Constants
       public static final TrapezoidProfile.Constraints yConstraints = new TrapezoidProfile.Constraints(60, 40);
