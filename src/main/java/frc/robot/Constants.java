@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 
 /**
@@ -28,6 +29,41 @@ public final class Constants {
         public static final double kPAngle = 2.6;
         public static final double kIAngle = 0;
         public static final double kDAngle = 0.01;
+    }
+    
+    public static class VisionConstants {
+      //Camera Offset
+      public static final double kCameraPitch = 0; //to measure
+      public static final double kGroundToCamera = 0.38735;
+
+      //Skibidi Offsets
+      public static final double kSkibidiAprilTagAreaLimit = 5.5;
+
+      //Quandale Offsets
+      public static final double kQuandaleAprilTagAreaLimit = 3.4;
+
+      //April Tag Offset
+      public static final double kGroundToAprilTagDistance = 0.171; //in meters
+      public static final double kAprilTagAreaLimit = 4.5;
+
+      public static final double kAprilTagOffset = 0;
+
+      //Reef Offset
+      public static final double reefToAprilTagOffset = 0; //to measure
+
+      //Robot Constants
+      public static final double kRotationalLimit = 13;
+
+      //PID Y Controller Constants
+      public static final TrapezoidProfile.Constraints yConstraints = new TrapezoidProfile.Constraints(60, 40);
+      public static double yControllerTolerance = 0.005;
+      public static double kPY = 0.07;
+      public static double kIY = 0;
+      public static double kDY = 0;
+
+      public static double kPY2 = 0.05;
+      public static double kIY2 = 0;
+      public static double kDY2 = 0;
     }
 
     public static class ClimbConstants {

@@ -19,10 +19,12 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.teleop.NullCommand;
 import frc.robot.commands.teleop.SwerveCommands.StrafeLeftCommand;
 import frc.robot.commands.teleop.SwerveCommands.StrafeRightCommand;
@@ -37,12 +39,15 @@ import frc.robot.commands.teleop.coral_indexer.ManualIntakeCoralCommand;
 import frc.robot.commands.teleop.coral_indexer.AutomaticIntakeCoralCommand;
 import frc.robot.commands.teleop.coral_indexer.OuttakeCoralCommand;
 import frc.robot.commands.teleop.elevator.SetElevatorPositionCommand;
+import frc.robot.commands.teleop.visions.AlignToReef;
+import frc.robot.commands.teleop.visions.CheckForAprilTag;
 import frc.robot.subsystems.AlgaeManipulatorSubsystem;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.CoralIndexerSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem.ElevatorPosition;
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.visions.CameraInterface;
 import frc.robot.commands.teleop.climb.ManualClimb;
 import swervelib.SwerveInputStream;
 
@@ -72,6 +77,10 @@ public class RobotContainer {
             new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
 
     private final SendableChooser<Command> autoChooser;
+    
+    private static final CameraInterface rightCamera = new CameraInterface("quandale", VisionConstants.kQuandaleAprilTagAreaLimit);
+    private static final CameraInterface leftCamera = new CameraInterface("skibidi", VisionConstants.kSkibidiAprilTagAreaLimit);
+
 
     /**
      * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular
@@ -252,8 +261,11 @@ public class RobotContainer {
         m_driverController.rightBumper().whileTrue(m_selectOuttakeCommand);
 
         // Strafe controls
-        m_driverController.leftTrigger(0.05).whileTrue(new StrafeLeftCommand());
-        m_driverController.rightTrigger(0.05).whileTrue(new StrafeRightCommand());
+        //m_driverController.leftTrigger(0.05).whileTrue(new StrafeLeftCommand());
+        //m_driverController.rightTrigger(0.05).whileTrue(new StrafeRightCommand());
+
+        m_driverController.rightTrigger(0.05).whileTrue(new ConditionalCommand(new SequentialCommandGroup(new CheckForAprilTag(rightCamera), new AlignToReef(rightCamera, this)), m_swerveSubsystem.driveFieldOriented(driveAngularVelocity), rightCamera::cameraHasSeenAprilTag));
+        m_driverController.leftTrigger(0.05).whileTrue(new ConditionalCommand(new SequentialCommandGroup(new CheckForAprilTag(leftCamera), new AlignToReef(leftCamera, this)), m_swerveSubsystem.driveFieldOriented(driveAngularVelocity), leftCamera::cameraHasSeenAprilTag));
 
         // Climb controls
         m_driverController.povUp()
@@ -264,10 +276,10 @@ public class RobotContainer {
                         new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
         m_driverController.povLeft()
                 .onTrue(new ConditionalCommand(new MoveClimbUpCommand(m_climbSubsystem),
-                        new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
+                        new StrafeLeftCommand(), m_climbSubsystem::isFunnelUnlocked));
         m_driverController.povRight()
                 .onTrue(new ConditionalCommand(new MoveClimbDownCommand(m_climbSubsystem),
-                        new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
+                        new StrafeRightCommand(), m_climbSubsystem::isFunnelUnlocked));
 
         m_indexSubsystem.setDefaultCommand(
                 new AutomaticIntakeCoralCommand(Constants.CoralIndexerConstants.kIntakePower)

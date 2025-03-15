@@ -692,6 +692,23 @@ public class SwerveSubsystem extends SubsystemBase {
                 && swerveDrive.getRobotVelocity().omegaRadiansPerSecond < 0.1);
     }
 
+    public void alignRobotToAprilTag(double radiansHeading, double xTranslation, double yTranslation, double toleranceDegrees) {
+        SwerveController controller = swerveDrive.getSwerveController();
+
+        /* 
+            swerveDrive.drive(ChassisSpeeds.fromRobotRelativeSpeeds(xTranslation, yTranslation,
+                    -controller.headingCalculate(swerveDrive.getOdometryHeading().unaryMinus().getRadians(), new Rotation2d(radiansHeading).getRadians()), swerveDrive.getPose().getRotation()));
+            
+           */ 
+            swerveDrive.drive(new Translation2d(xTranslation, yTranslation),
+                -controller.headingCalculate(swerveDrive.getOdometryHeading().unaryMinus().getRadians(), new Rotation2d(radiansHeading).getRadians()),
+                 false, false);
+
+            SmartDashboard.putNumber("Odom Heading (rad)", swerveDrive.getOdometryHeading().unaryMinus().getRadians());
+            SmartDashboard.putNumber("Target Heading (rad)", radiansHeading);
+            SmartDashboard.putNumber("Error (rad)", Math.abs(new Rotation2d(radiansHeading).minus(swerveDrive.getOdometryHeading().unaryMinus()).getRadians()));
+    }
+
     public void strafe(double strafePower, double speedMultiplier) {
         swerveDrive.drive(new Translation2d(0,
                 strafePower * Math.abs(speedMultiplier) * swerveDrive.getMaximumChassisVelocity()),
