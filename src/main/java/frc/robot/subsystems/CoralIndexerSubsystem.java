@@ -41,7 +41,7 @@ public class CoralIndexerSubsystem extends SubsystemBase {
 
         m_encoder = m_indexMotor.getEncoder();
         m_beamSensor = new DigitalInput(Constants.CoralIndexerConstants.kBeamSensorPort);
-        m_debouncedBeamBreak = new Debouncer(1);
+        m_debouncedBeamBreak = new Debouncer(0.5);
     }
 
     public void setSpeed(double speed) {
