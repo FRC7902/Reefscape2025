@@ -24,9 +24,8 @@ public class AlignToReef extends Command {
   private boolean endCommand = false;
 
   private ProfiledPIDController yController;
-  private ProfiledPIDController y2Controller;
-
-  private CameraInterface m_autoAlignCam;
+  private final CameraInterface rightCamera;
+  private final CameraInterface leftCamera;
   private double aprilTagRotation;
 
   private double aprilTagID;
@@ -40,82 +39,90 @@ public class AlignToReef extends Command {
   private Pose2d robotPose;
 
   private double targetRotation;
+
+  private int triggerType;
+
+  private double aprilTagOffset;
   
 
-  public AlignToReef(CameraInterface m_autoAlignCamera, RobotContainer m_RobotContainer) {
+  public AlignToReef(CameraInterface rightCamera, CameraInterface leftCamera, RobotContainer m_RobotContainer, int triggerType) {
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(RobotContainer.m_swerveSubsystem);
-    this.m_autoAlignCam = m_autoAlignCamera;
+    this.rightCamera = rightCamera;
+    this.leftCamera = leftCamera;
     this.m_RobotContainer = m_RobotContainer;
-    System.out.println("hawk tuerrererererere");
+    this.triggerType = triggerType;
   }
 
-  // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    //endCommand = !RobotContainer.m_indexSubsystem.hasCoral();
     System.out.println("what the HAWWWWWWWWWWWWWWWWWWWWWWWK");
 
+    // var visionEst = rightCamera.getEstimatedGlobalPose();
+    // visionEst.ifPresent(
+    //   est -> {
+    //     var estStdDevs = rightCamera.getEstimationStdDevs();
+    //     RobotContainer.m_swerveSubsystem.getSwerveDrive().addVisionMeasurement(est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
+    //   }
+    // );
 
-    var visionEst = RobotContainer.rightCamera.getEstimatedGlobalPose();
+    // var visionEst2 = leftCamera.getEstimatedGlobalPose();
 
-    visionEst.ifPresent(
-      est -> {
-        var estStdDevs = RobotContainer.rightCamera.getEstimationStdDevs();
-        RobotContainer.m_swerveSubsystem.getSwerveDrive().addVisionMeasurement(est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
-      }
-    );
-
-    var visionEst2 = RobotContainer.leftCamera.getEstimatedGlobalPose();
-
-    visionEst2.ifPresent(
-      est -> {
-        var estStdDevs2 = RobotContainer.rightCamera.getEstimationStdDevs();
-        RobotContainer.m_swerveSubsystem.getSwerveDrive().addVisionMeasurement(est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs2);
-      }
-    );
+    // visionEst2.ifPresent(
+    //   est -> {
+    //     var estStdDevs2 = rightCamera.getEstimationStdDevs();
+    //     RobotContainer.m_swerveSubsystem.getSwerveDrive().addVisionMeasurement(est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs2);
+    //   }
+    // );
     
-    //List<Pose2d> tagsDetected = RobotContainer.rightCamera.getDetectedPoses();
-    //List<Pose2d> tagsDetectedLeft = RobotContainer.leftCamera.getDetectedPoses();
+    // if (triggerType == 0) {
+    //   aprilTagOffset = VisionConstants.kAprilTagOffset;
+    // }
 
-    //tagsDetected.addAll(tagsDetectedLeft);
-    
+    // else if (triggerType == 1) {
+    //   aprilTagOffset = -VisionConstants.kAprilTagOffset;
+    // }
+
+    // List<Pose2d> tagsDetected = rightCamera.getDetectedPoses();
+    // List<Pose2d> tagsDetectedLeft = leftCamera.getDetectedPoses();
+
+    // tagsDetected.addAll(tagsDetectedLeft);
+    // robotPose = RobotContainer.m_swerveSubsystem.getPose();
+    // closestTagPose = robotPose.nearest(tagsDetected);
+    //targetRotation = closestTagPose.getRotation().getRadians();
+
     robotPose = RobotContainer.m_swerveSubsystem.getPose();
-
-    //closestTagPose = robotPose.nearest(tagsDetected);
-
-    closestTagPose = RobotContainer.rightCamera.getClosestPose(robotPose);
-
+    closestTagPose =  RobotContainer.leftCamera.aprilTagFieldLayout.getTagPose(VisionConstants.kTagID).get().toPose2d(); 
     targetRotation = closestTagPose.getRotation().getRadians();
 
     yController = new ProfiledPIDController(VisionConstants.kPY, VisionConstants.kIY, VisionConstants.kDY, VisionConstants.yConstraints); //to tune
-
     
     yController.reset(robotPose.getY());
     yController.setTolerance(VisionConstants.yControllerTolerance);
-    yController.setGoal(closestTagPose.getY() + VisionConstants.kAprilTagOffset);
+    yController.setGoal(closestTagPose.getY());
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   
   @Override 
   public void execute() {
-    robotPose = RobotContainer.m_swerveSubsystem.getPose();
-    var ySpeed = yController.calculate(closestTagPose.getY());
+    robotPose = RobotContainer.m_swerveSubsystem.getSwerveDrive().getPose();
+    var ySpeed = yController.calculate(robotPose.getY());
     if (yController.atGoal()) {
       System.out.println("Y Controller at Goal");
       ySpeed = 0;
     }
     hawkTuah("Accumulated Y Error", yController.getAccumulatedError());
-
     System.out.println(closestTagPose.getY());
-
+    System.out.println(robotPose.getY() + " AAAAAAAAAAAAAAAAAAAAAAAAAAAA");
     RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(targetRotation, getDriverControllerLeftY(), ySpeed, 0.1);
   }
     
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    rightCamera.resetTargetDetector();
+    leftCamera.resetTargetDetector();
   }
 
 
@@ -133,4 +140,5 @@ public class AlignToReef extends Command {
   public void hawkTuah(String text, double key) {
     SmartDashboard.putNumber(text, key);
   }
+
 }

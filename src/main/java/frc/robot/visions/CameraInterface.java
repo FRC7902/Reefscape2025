@@ -44,25 +44,12 @@ public class CameraInterface extends SubsystemBase {
     private double aprilTagArea = 0;
     private final double aprilTagAreaLimit;
     public AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
-    private VisionSystemSim visionSim;
     private AprilTagFieldLayout tagLayout;
-    private double cornerAverage = 0;
     private final PhotonPoseEstimator photonEstimator; //creates pose estimator object
     private Matrix<N3, N1> curStdDevs; //creates matrix for current standard deviations
-
-
-    Transform3d kRobotToCam;
-
+    private final Transform3d kRobotToCam;
     private double xTranslation;
-
-    private NetworkTable m_networkTable;
-
     private List<Pose2d> detectedPoses;
-
-    double FOV_X = 70.0;  // Degrees
-    double FOV_Y = 55.0;  // Degrees
-    int RES_X = 640;
-    int RES_Y = 480;
 
      /**
      * Creates a new camera object for each camera attached to the Raspberry Pi.
@@ -86,19 +73,19 @@ public class CameraInterface extends SubsystemBase {
         SmartDashboard.putNumber("kDY Far", VisionConstants.kDY);
 
         SmartDashboard.putNumber("Y Controller Tolerance", VisionConstants.yControllerTolerance);
+
+        SmartDashboard.putNumber("TAG ID", VisionConstants.kTagID);
+
         photonEstimator = new PhotonPoseEstimator(AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark), PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, kRobotToCam);
         //creates a PhotonPoseEstimator object which fuses the camera odometry and estimates the robot's position based on the april tag field layout
         //the camera will combine the poses of the april tags it detects into one pose estimate
         //an offset must be set if the camera is not centered
         photonEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
-
-        //detectedPoses.add(new Pose2d(0, 0, new Rotation2d(0)));
     }
 
 
     public Pose2d getClosestPose(Pose2d robotPose) {
-        //return robotPose.nearest(detectedPoses);
-        return aprilTagFieldLayout.getTagPose(18).get().toPose2d();
+        return robotPose.nearest(detectedPoses);
     }
 
 
@@ -154,55 +141,7 @@ public class CameraInterface extends SubsystemBase {
                 curStdDevs = estStdDevs;
             }
         }
-        }
-    
-
-        /* 
-        visionSim = new VisionSystemSim("main");
-        TargetModel targetModel = new TargetModel(0.5, 0.25);
-        Pose3d targetPose = new Pose3d(16, 4, 2, new Rotation3d(0, 0, Math.PI));
-        VisionTargetSim visionTarget = new VisionTargetSim(targetPose, targetModel);
-
-        visionSim.addVisionTargets(visionTarget);
-
-        try {
-            tagLayout = AprilTagFieldLayout.loadFromResource(AprilTagFields.kDefaultField.m_resourceFile);
-            System.out.println("YAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-        }
-        catch (Exception e) {
-            System.out.println("TUAHTUAHTUAHTUAHTUAHTUAHTUATHUATHAJDKHAKSDHJKASDHKJASHDJKASHDJKAHSDKJAHSDKJAHSDKJHASJDKHAWDUIWAIUDASHK");
-        }
-
-        visionSim.addAprilTags(tagLayout);
-
-        SimCameraProperties cameraProp = new SimCameraProperties();
-        cameraProp.setCalibration(1920, 1080, Rotation2d.fromDegrees(1));
-        // Approximate detection noise with average and standard deviation error in pixels.
-        cameraProp.setCalibError(0.25, 0.08);
-        // Set the camera image capture framerate (Note: this is limited by robot loop rate).
-        cameraProp.setFPS(20);
-        // The average and standard deviation in milliseconds of image data latency.
-        cameraProp.setAvgLatencyMs(35);
-        cameraProp.setLatencyStdDevMs(5);
-
-        PhotonCameraSim cameraSim = new PhotonCameraSim(camera, cameraProp);
-        Translation3d robotToCameraTrl = new Translation3d(0.1, 0, 0.5);
-        // and pitched 15 degrees up.
-        Rotation3d robotToCameraRot = new Rotation3d(0, Math.toRadians(-15), 0);
-        Transform3d robotToCamera = new Transform3d(robotToCameraTrl, robotToCameraRot);
-
-        // Add this camera to the vision system simulation with the given robot-to-camera transform.
-        visionSim.addCamera(cameraSim, robotToCamera);
-
-        visionSim.getDebugField();
-
-        cameraSim.enableRawStream(true);
-        cameraSim.enableProcessedStream(true);
-
-        cameraSim.enableDrawWireframe(true);
-        */
-        
-    
+    }    
 
      /**
      * Determines whether the April Tag scanned by the camera is an April Tag on the reef (for auto-align).
@@ -248,38 +187,6 @@ public class CameraInterface extends SubsystemBase {
         return xTranslation;
     }
 
-    /**
-     * Gets the rotation of the April Tag relative to the field.
-     *
-     * @return The rotation of the April Tag relative to the field (in radians).
-     */      
-    public double getAprilTagRotation() {
-        final int aprilTagID = getTargetAprilTagID();
-        final Optional<Alliance> alliance = DriverStation.getAlliance();
-        if (alliance.get() == Alliance.Blue) {
-            switch (aprilTagID) {
-                case 17: return -1.047; //60 degrees
-                case 18: return 0; //0 degrees
-                case 19: return -5.236; //300 degrees
-                case 20: return -4.189; //240 degrees
-                case 21: return 3.142; //180 degrees
-                case 22: return -2.094; //120 degrees
-            }
-        }
-
-        else if (alliance.get() == Alliance.Red) {
-            switch (aprilTagID) {
-                case 6: return -5.236; //300 degrees //check
-                case 7: return 0; //0 degrees
-                case 8: return -1.047; //60 degrees
-                case 9: return -2.094; //120 degrees
-                case 10: return 3.142; //180 degrees
-                case 11: return -4.189; //240 degrees
-            }
-        }
-        return 0;
-    }
-
 
     /**
      * Sets the targetIsVisible boolean to false which is used to determine if the camera saw a valid April Tag.
@@ -290,28 +197,16 @@ public class CameraInterface extends SubsystemBase {
         detectedPoses.clear();
         
     } 
-
-    /**
-     * Gets the ID of the April Tag that is detected by the camera.
-     *
-     * @return The ID of the April Tag.
-     */    
-    public int getTargetAprilTagID() {
-        return aprilTagID;
-    }
-
+    
     /**
      * Checks the camera to see whether an April Tag is in view of the camera. This is used to determine whether the auto-align command should run or not.
      *
      * @return Whether an April Tag is in view of the camera or not.
      */        
-    public boolean cameraHasSeenAprilTag() {
-        /* 
+    public boolean cameraHasSeenAprilTag() { 
         resetTargetDetector(); //resets target detector so that we don't get old results 
         getCameraResults(); //gets results from camera
         return cameraSawTarget(); //returns whether the camera has seen an april tag or not
-        */
-        return true;
     }
 
     public List<Pose2d> getDetectedPoses() {
@@ -331,14 +226,6 @@ public class CameraInterface extends SubsystemBase {
                             targetYaw = target.getYaw();
                             detectedPoses.add(aprilTagFieldLayout.getTagPose(aprilTagID).get().toPose2d());
                             targetIsVisible = true;
-                            //xTranslation = target.getBestCameraToTarget().getY();
-                            //cornerAverage = getCentroid(target.getDetectedCorners());
-
-                            //int x_pixel = (int) (((targetYaw + (FOV_X / 2)) / FOV_X) * RES_X);
-
-                            SmartDashboard.putNumber("TUAH TO THE HAWK TO THE TUAH", xTranslation);
-                            //yTranslation = m_networkTable.getEntry("targetPixelsY").getDouble(yTranslation);
-
                             break;
                         }
                     }
@@ -363,13 +250,12 @@ public class CameraInterface extends SubsystemBase {
         VisionConstants.kIY = SmartDashboard.getNumber("kIY Far", VisionConstants.kIY);
         VisionConstants.kDY = SmartDashboard.getNumber("kDY Far", VisionConstants.kDY);
 
+        VisionConstants.kTagID = (int) SmartDashboard.getNumber("TAG ID", VisionConstants.kTagID);
+
         VisionConstants.yControllerTolerance = SmartDashboard.getNumber("Y Controller Tolerance", VisionConstants.yControllerTolerance);
 
-        getCameraResults();
-    }
+        SmartDashboard.putNumber("April Tag Yaw", aprilTagFieldLayout.getTagPose(VisionConstants.kTagID).get().toPose2d().getRotation().getRadians());
 
-    @Override
-    public void simulationPeriodic() {
-        //visionSim.update(RobotContainer.m_swerveSubsystem.getPose());
+        getCameraResults();
     }
 }
