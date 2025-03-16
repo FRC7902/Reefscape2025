@@ -13,19 +13,31 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 5.0
+            "waitTime": 2.0
           }
         },
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "coraloutakeoff"
+            "pathName": "New Path"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.7
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Copy of New Path"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "COMPETITION AUTOS ",
   "choreoAuto": false
 }

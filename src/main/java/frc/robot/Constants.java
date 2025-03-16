@@ -21,11 +21,11 @@ public final class Constants {
 
     
     public static class PathPlanner {
-        public static final double kPDrive = 0.9;
+        public static final double kPDrive = 1.95;
         public static final double kIDrive = 0;
         public static final double kDDrive = 0.01;
 
-        public static final double kPAngle = 0.7;
+        public static final double kPAngle = 2.6;
         public static final double kIAngle = 0;
         public static final double kDAngle = 0.01;
     }
@@ -66,7 +66,7 @@ public final class Constants {
 
         // Joystick Deadband
         // Also make sure to set the angleJoystickRadiusDeadband in controllerproperties.json
-        public static final double DEADBAND = 0.10;
+        public static final double DEADBAND = 0.15;
     }
 
     public static class AlgaeManipulatorConstants {
@@ -110,7 +110,7 @@ public final class Constants {
         // Elevator Dimensions
         public static final double kElevatorHeightMeters = 0.0;
         public static final double kElevatorMinHeightMeters = 0.0;
-        public static final double kElevatorMaxHeightMeters = 0.87;
+        public static final double kElevatorMaxHeightMeters = 0.88;
 
         // Motion Constraints
         public static final double kElevatorMaxVelocity =
@@ -137,7 +137,7 @@ public final class Constants {
         public static final double kElevatorCoralLevel3Height = 0.548;
 
         public static final double kElevatorAlgaeLowHeight = 0.604;
-        public static final double kElevatorAlgaeHighHeight = 0.804;
+        public static final double kElevatorAlgaeHighHeight = 0.88;
         // ==============================
 
         // ===== Control Parameters =====

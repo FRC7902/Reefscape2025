@@ -7,19 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "S3L1"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 5.0
+            "pathName": "pit test"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "CSS3L1"
+            "pathName": "turn right"
           }
         }
       ]

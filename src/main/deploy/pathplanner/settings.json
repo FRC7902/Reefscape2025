@@ -1,21 +1,23 @@
 {
-  "robotWidth": 0.889,
-  "robotLength": 0.889,
+  "robotWidth": 0.864,
+  "robotLength": 0.864,
   "holonomicMode": true,
-  "pathFolders": [],
-  "autoFolders": [
-    "KL",
-    "AB"
+  "pathFolders": [
+    "With vision",
+    "No vision"
   ],
-  "defaultMaxVel": 4.0,
-  "defaultMaxAccel": 4.0,
+  "autoFolders": [
+    "COMPETITION AUTOS "
+  ],
+  "defaultMaxVel": 5.0,
+  "defaultMaxAccel": 2.75,
   "defaultMaxAngVel": 540.0,
   "defaultMaxAngAccel": 720.0,
   "defaultNominalVoltage": 12.0,
   "robotMass": 70.307,
   "robotMOI": 6.883,
   "robotTrackwidth": 0.546,
-  "driveWheelRadius": 0.05,
+  "driveWheelRadius": 0.0494,
   "driveGearing": 6.86,
   "maxDriveSpeed": 4.0,
   "driveMotorType": "falcon500",

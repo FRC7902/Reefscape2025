@@ -7,25 +7,37 @@
         {
           "type": "path",
           "data": {
-            "pathName": "S1L1"
+            "pathName": "V2FinalPathRight1"
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 5.0
+            "waitTime": 2.0
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Copy of S1L1"
+            "pathName": "V2FinalPathRight2"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.7
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "V2FinalPathRight3"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "COMPETITION AUTOS ",
   "choreoAuto": false
 }

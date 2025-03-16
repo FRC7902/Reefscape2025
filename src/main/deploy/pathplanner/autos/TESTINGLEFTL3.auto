@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "L1S1K"
+            "pathName": "Left1"
           }
         },
         {
@@ -19,37 +19,37 @@
         {
           "type": "path",
           "data": {
-            "pathName": "L1KCS"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "coraloutakeoff"
+            "pathName": "Left2"
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 1.0
+            "waitTime": 0.3
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "L1CSL"
+            "pathName": "Left3"
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 2.0
+            "waitTime": 1.5
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Left4"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "KL",
+  "folder": "COMPETITION AUTOS ",
   "choreoAuto": false
 }

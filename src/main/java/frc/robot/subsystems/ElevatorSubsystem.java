@@ -5,7 +5,6 @@
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Volts;
-
 import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -17,7 +16,6 @@ import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.ReverseLimitValue;
-
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -37,25 +35,27 @@ import frc.robot.Constants.ElevatorConstants;
 
 public class ElevatorSubsystem extends SubsystemBase {
 
-    // create an enum
+    /** Enum representing elevator positions */
     public enum ElevatorPosition {
-        CORAL_L1, CORAL_L2, CORAL_L3, CORAL_STATION_AND_PROCESSOR, ALGAE_HIGH, ALGAE_LOW
+        CORAL_L1, CORAL_L2, CORAL_L3, CORAL_STATION_AND_PROCESSOR, ALGAE_HIGH, ALGAE_LOW, UNKNOWN
     }
 
-    // Declare motor controllers
+    /** TalonFX leader motor controller object */
     private final TalonFX m_leaderMotor = new TalonFX(ElevatorConstants.kElevatorLeaderCAN);
+
+    /** TalonFX follower motor controller object */
     private final TalonFX m_followerMotor = new TalonFX(ElevatorConstants.kElevatorFollowerCAN);
 
-    // Declare motor configuration
+    /** Configuration object for the TalonFX motor */
     private final TalonFXConfiguration m_motorConfig = new TalonFXConfiguration();
 
-    // Declare voltage output
+    /** Voltage control request object for the TalonFX motor controller */
     private final VoltageOut m_voltReq = new VoltageOut(0.0);
 
-    // Declare Motion Magic voltage
+    /** Motion magic voltage control request object for the TalonFX motor controller */
     private MotionMagicVoltage m_request = new MotionMagicVoltage(0).withSlot(0);
 
-    // Declare orchestra
+    /** Object of the Phoenix Orchestra */
     private Orchestra m_orchestra = new Orchestra();
 
     /** Object of a simulated elevator */
@@ -66,13 +66,18 @@ public class ElevatorSubsystem extends SubsystemBase {
             ElevatorConstants.kElevatorHeightMeters, 0.01, // add some noise
             0);
 
-    private final Mechanism2d m_mech2d = new Mechanism2d(Units.inchesToMeters(10), Units.inchesToMeters(50));
-    private final MechanismRoot2d m_mech2dRoot = m_mech2d.getRoot("Elevator Root", Units.inchesToMeters(5),
-            Units.inchesToMeters(0.5));
-    private final MechanismLigament2d m_elevatorMech2d = m_mech2dRoot.append(new MechanismLigament2d("Elevator",
-            m_elevatorSim.getPositionMeters(), 90, 7, new Color8Bit(Color.kAntiqueWhite)));
+    /** Mechanism2d object of an elevator */
+    private final Mechanism2d m_mech2d =
+            new Mechanism2d(Units.inchesToMeters(10), Units.inchesToMeters(50));
+    /** MechanismRoot2d object of an elevator */
+    private final MechanismRoot2d m_mech2dRoot =
+            m_mech2d.getRoot("Elevator Root", Units.inchesToMeters(5), Units.inchesToMeters(0.5));
+    /** MechanismLigament2d object of an elevator */
+    private final MechanismLigament2d m_elevatorMech2d =
+            m_mech2dRoot.append(new MechanismLigament2d("Elevator",
+                    m_elevatorSim.getPositionMeters(), 90, 7, new Color8Bit(Color.kAntiqueWhite)));
 
-    // System identification routine
+    /** Object of a system identification routine */
     private final SysIdRoutine m_sysIdRoutine = new SysIdRoutine(
             new SysIdRoutine.Config(null, Volts.of(4), null,
                     (state) -> SignalLogger.writeString("state", state.toString())),
@@ -80,10 +85,14 @@ public class ElevatorSubsystem extends SubsystemBase {
                     (volts) -> m_leaderMotor.setControl(m_voltReq.withOutput(volts.in(Volts))),
                     null, this));
 
+    /** Target setpoint for the elevator in meters */
     private double m_setpoint;
+
+    /** Indicates whether the elevator has been homed */
     private boolean m_homed;
 
-    private String[] m_songs = new String[] { "song1.chrp", "song2.chrp" };
+    /** Array of songs to be played by the Phoenix Orchestra */
+    private String[] m_songs = new String[] {"song1.chrp", "song2.chrp"};
 
     /** Creates a new ElevatorSubsystem */
     public ElevatorSubsystem() {
@@ -96,7 +105,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         m_motorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         m_motorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-        // Set slot
+        // Set slot 0 values
         m_motorConfig.Slot0.kP = ElevatorConstants.kElevatorP;
         m_motorConfig.Slot0.kI = ElevatorConstants.kElevatorI;
         m_motorConfig.Slot0.kD = ElevatorConstants.kElevatorD;
@@ -109,18 +118,16 @@ public class ElevatorSubsystem extends SubsystemBase {
         m_motorConfig.Slot0.GravityType = GravityTypeValue.Elevator_Static;
 
         // Set motion magic
-        m_motorConfig.MotionMagic.MotionMagicCruiseVelocity = ElevatorConstants.kElevatorMaxVelocity; // Target cruise
-                                                                                                      // velocity of 80
-                                                                                                      // rps
-        m_motorConfig.MotionMagic.MotionMagicAcceleration = 160; // Target acceleration of 160 rps/s
-                                                                 // (0.5 seconds)
+        m_motorConfig.MotionMagic.MotionMagicCruiseVelocity =
+                ElevatorConstants.kElevatorMaxVelocity;
+        m_motorConfig.MotionMagic.MotionMagicAcceleration = 160;
         // m_motorConfig.MotionMagic.MotionMagicJerk = 1600; // Target jerk of 1600
-        // rps/s/s (0.1 seconds)
 
         // Set safety limits
         m_motorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-        m_motorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = ElevatorConstants.kElevatorMaxHeightMeters
-                / ElevatorConstants.kElevatorMetersPerMotorRotation;
+        m_motorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
+                ElevatorConstants.kElevatorMaxHeightMeters
+                        / ElevatorConstants.kElevatorMetersPerMotorRotation;
         m_motorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
         m_motorConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0;
 
@@ -165,17 +172,29 @@ public class ElevatorSubsystem extends SubsystemBase {
         m_homed = false;
     }
 
-    /** Gets the current position of the elevator in rotations */
+    /**
+     * Gets the current position of the elevator in rotations
+     * 
+     * @return The current position of the elevator in rotations
+     */
     public double getPosition() {
         return m_leaderMotor.getPosition().getValueAsDouble();
     }
 
-    /** Gets the current position of the elevator in meters */
+    /**
+     * Gets the current position of the elevator in meters
+     * 
+     * @return The current position of the elevator in meters
+     */
     public double getPositionMeters() {
         return getPosition() * ElevatorConstants.kElevatorMetersPerMotorRotation;
     }
 
-    /** Gets the current velocity of the elevator in m/s */
+    /**
+     * Gets the current velocity of the elevator in m/s
+     * 
+     * @return The current velocity of the elevator in m/s
+     */
     public double getVelocityMetersPerSecond() {
         return m_leaderMotor.getVelocity().getValueAsDouble()
                 * ElevatorConstants.kElevatorMetersPerMotorRotation;
@@ -186,7 +205,11 @@ public class ElevatorSubsystem extends SubsystemBase {
         m_leaderMotor.setPosition(0);
     }
 
-    /** Returns whether the elevator is at the setpoint */
+    /**
+     * Returns whether the elevator is at the setpoint within the target error range
+     * 
+     * @return Whether the elevator is at the setpoint
+     */
     public boolean atHeight() {
         return Math.abs(getPositionMeters() - m_setpoint) < ElevatorConstants.kElevatorTargetError;
     }
@@ -203,16 +226,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     /**
-     * Set the setpoint of the elevator
-     * 
-     * @param setpoint The setpoint in meters
-     */
-    public void setSetpoint(double setpoint) {
-        m_setpoint = setpoint;
-    }
-
-    /**
-     * Set the position of the elevator
+     * Set the position of the elevator using Motion Magic control
      * 
      * @param position The position in meters
      */
@@ -231,14 +245,17 @@ public class ElevatorSubsystem extends SubsystemBase {
         m_leaderMotor.setControl(m_request);
     }
 
-    /** Returns whether the elevator is at the retract limit */
+    /**
+     * Returns whether the elevator is at the retract limit
+     * 
+     * @return Whether the elevator is at the retract limit
+     */
     public boolean isAtRetractLimit() {
         return m_leaderMotor.getReverseLimit().getValue() == ReverseLimitValue.ClosedToGround;
     }
 
     /**
-     * Returns a command that will execute a quasistatic test in the given
-     * direction.
+     * Returns a command that will execute a quasistatic test in the given direction
      *
      * @param direction The direction (forward or reverse) to run the test in
      */
@@ -247,7 +264,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     /**
-     * Returns a command that will execute a dynamic test in the given direction.
+     * Returns a command that will execute a dynamic test in the given direction
      *
      * @param direction The direction (forward or reverse) to run the test in
      */
@@ -255,13 +272,27 @@ public class ElevatorSubsystem extends SubsystemBase {
         return m_sysIdRoutine.dynamic(direction);
     }
 
-    // CORAL_L1 = kkElevatorCoralLevel1Height
-    // CORAL_L2 = kElevatorCoralLevel2Height
-    // CORAL_L3 = kElevatorCoralLevel3Height
-    // CORAL_STATION = kElevatorCoralStationHeight
-    // ALGAE_HIGH = kElevatorAlgaeHighHeight
-    // ALGAE_LOW = kElevatorAlgaeLowHeight
-    // PROCESSOR = kElevatorProcessorHeight
+    /**
+     * Returns the current position of the elevator as an enum
+     * <ul>
+     * <li><strong>CORAL_L1</strong>: Represents the first level of the Coral height
+     * (kElevatorCoralLevel1Height)</li>
+     * <li><strong>CORAL_L2</strong>: Represents the second level of the Coral height
+     * (kElevatorCoralLevel2Height)</li>
+     * <li><strong>CORAL_L3</strong>: Represents the third level of the Coral height
+     * (kElevatorCoralLevel3Height)</li>
+     * <li><strong>CORAL_STATION</strong>: Represents the Coral station height
+     * (kElevatorCoralStationHeight)</li>
+     * <li><strong>ALGAE_HIGH</strong>: Represents the high Algae position
+     * (kElevatorAlgaeHighHeight)</li>
+     * <li><strong>ALGAE_LOW</strong>: Represents the low Algae position
+     * (kElevatorAlgaeLowHeight)</li>
+     * <li><strong>PROCESSOR</strong>: Represents the processor height
+     * (kElevatorProcessorHeight)</li>
+     * </ul>
+     * 
+     * @return The current position of the elevator as an enum
+     */
     public ElevatorPosition getElevatorEnumPosition() {
         // Match current position to known positions
         double currentPosition = getPositionMeters();
@@ -292,7 +323,7 @@ public class ElevatorSubsystem extends SubsystemBase {
             return ElevatorPosition.ALGAE_LOW;
         } else {
             // Return null or a default value if no position matches
-            return ElevatorPosition.CORAL_STATION_AND_PROCESSOR;
+            return ElevatorPosition.UNKNOWN;
         }
     }
 

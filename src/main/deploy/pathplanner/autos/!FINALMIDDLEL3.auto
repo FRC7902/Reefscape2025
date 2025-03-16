@@ -7,25 +7,25 @@
         {
           "type": "path",
           "data": {
-            "pathName": "S3L1"
+            "pathName": "Middle1"
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 5.0
+            "waitTime": 2.0
           }
         },
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "coraloutakeoff"
+            "pathName": "Middle2"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "COMPETITION AUTOS ",
   "choreoAuto": false
 }
