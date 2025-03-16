@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ElevatorConstants;
@@ -239,7 +240,9 @@ public class RobotContainer {
         m_driverController.back()
                 .whileTrue(Commands.parallel(new OuttakeAlgaeCommand(), new OuttakeCoralCommand()));
 
-        m_operatorController.back().whileTrue(new InitiateClimbCommand());
+        // m_operatorController.back().whileTrue(new InitiateClimbCommand());
+        m_operatorController.back().onTrue(new SequentialCommandGroup(new SetElevatorPositionCommand(
+                ElevatorConstants.kElevatorCoralStationAndProcessorHeight), new InitiateClimbCommand().withTimeout(1), new MoveClimbDownCommand(m_climbSubsystem)));
         m_operatorController.start().whileTrue(m_swerveSubsystem.centerModulesCommand());
 
         // Raise elevator (by height of Algae diameter) while intaking algae
