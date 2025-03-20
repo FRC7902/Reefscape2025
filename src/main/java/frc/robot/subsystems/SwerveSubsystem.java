@@ -739,7 +739,7 @@ public class SwerveSubsystem extends SubsystemBase {
                 && swerveDrive.getRobotVelocity().omegaRadiansPerSecond < 0.1);
     }
 
-    public void alignRobotToAprilTag(double radiansHeading, double xTranslation, double yTranslation, double toleranceDegrees) {
+    public void alignRobotToAprilTag(double radiansHeading, double xTranslation, double yTranslation) {
         SwerveController controller = swerveDrive.getSwerveController();
 
         /* 
@@ -747,13 +747,13 @@ public class SwerveSubsystem extends SubsystemBase {
                     -controller.headingCalculate(swerveDrive.getOdometryHeading().unaryMinus().getRadians(), new Rotation2d(radiansHeading).getRadians()), swerveDrive.getPose().getRotation()));
             
            */ 
-            swerveDrive.drive(new Translation2d(xTranslation, yTranslation),
-                -controller.headingCalculate(swerveDrive.getOdometryHeading().unaryMinus().getRadians(), new Rotation2d(radiansHeading).getRadians()),
-                 false, false);
+        swerveDrive.drive(new Translation2d(xTranslation, yTranslation),
+            -controller.headingCalculate(swerveDrive.getOdometryHeading().unaryMinus().getRadians(), radiansHeading),
+            false, false);
 
-            SmartDashboard.putNumber("Odom Heading (rad)", swerveDrive.getOdometryHeading().unaryMinus().getRadians());
-            SmartDashboard.putNumber("Target Heading (rad)", radiansHeading);
-            SmartDashboard.putNumber("Error (rad)", Math.abs(new Rotation2d(radiansHeading).minus(swerveDrive.getOdometryHeading().unaryMinus()).getRadians()));}
+        SmartDashboard.putNumber("Odom Heading (rad)", swerveDrive.getOdometryHeading().unaryMinus().getRadians());
+        SmartDashboard.putNumber("Target Heading (rad)", radiansHeading);
+        SmartDashboard.putNumber("Error (rad)", Math.abs(new Rotation2d(radiansHeading).minus(swerveDrive.getOdometryHeading().unaryMinus()).getRadians()));}
 
     //NOTE!!! THIS IS NOT A CORRECT STRAFE COMMAND!!! THIS WILL CAUSE YOUR ROBOT TO SPIN VIGOROUSLY. DO NOT MISTAKE THIS FOR STRAFE!!!!!!!
     public void strafe(double strafePower, double rotationalPower, double speedMultiplier) {

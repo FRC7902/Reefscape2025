@@ -6,8 +6,8 @@ package frc.robot.commands.teleop.visions;
 
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.filter.Debouncer;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
@@ -16,21 +16,21 @@ import frc.robot.visions.CameraInterface;
 
 public class AlignToReef extends Command {
   /** Creates a new AlignToReefCommand. */
-  private boolean endCommand = false;
 
   private ProfiledPIDController yController;
-  private ProfiledPIDController y2Controller;
 
   private CameraInterface m_autoAlignCam;
-  private double aprilTagRotation;
-
-  private double aprilTagID;
-
-  private double aprilTagDistance;
 
   private final RobotContainer m_RobotContainer;
 
   private final int triggerPressed;
+
+  private double aprilTagOffset;
+
+  private Pose2d aprilTagPose;
+  private Pose2d robotPose;
+
+  private Transform2d aprilTagDistance;
   
 
   public AlignToReef(CameraInterface m_autoAlignCamera, RobotContainer m_RobotContainer, int triggerPressed) {
@@ -44,40 +44,48 @@ public class AlignToReef extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    //endCommand = !RobotContainer.m_indexSubsystem.hasCoral();
+    robotPose = RobotContainer.m_swerveSubsystem.getPose();
+    aprilTagPose = m_autoAlignCam.getNearestAprilTag(robotPose);
+    aprilTagDistance = aprilTagPose.minus(robotPose);
 
-    aprilTagRotation = m_autoAlignCam.getAprilTagRotation();
-    aprilTagID = m_autoAlignCam.getTargetAprilTagID();
+    if (triggerPressed == 0) {
+      aprilTagOffset = VisionConstants.kAprilTagOffset;
+    }
 
-    y2Controller = new ProfiledPIDController(VisionConstants.kPY2, VisionConstants.kIY2, VisionConstants.kDY2, VisionConstants.yConstraints); //to tune
+    else if (triggerPressed == 1) {
+      aprilTagOffset = -VisionConstants.kAprilTagOffset;
+    }
 
-    if (Math.abs(aprilTagDistance) < VisionConstants.kSecondPIDControllerStartingPoint) {
-      yController = y2Controller;
+    if (Math.abs(aprilTagDistance.getY()) < VisionConstants.kSecondPIDControllerStartingPoint) {
+      yController = new ProfiledPIDController(VisionConstants.kPY2, VisionConstants.kIY2, VisionConstants.kDY2, VisionConstants.yConstraints); //to tune
     }
 
     else {
       yController = new ProfiledPIDController(VisionConstants.kPY, VisionConstants.kIY, VisionConstants.kDY, VisionConstants.yConstraints); //to tune
     }
 
-    yController.reset(aprilTagDistance);
+    yController.reset(aprilTagDistance.getY());
     yController.setTolerance(VisionConstants.yControllerTolerance);
-    yController.setGoal(VisionConstants.kAprilTagOffset);
+    yController.setGoal(aprilTagPose.getY() + aprilTagOffset);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   
   @Override 
   public void execute() {
-    aprilTagDistance = m_autoAlignCam.getTx();
-    var ySpeed = yController.calculate(aprilTagDistance);
+
+    robotPose = RobotContainer.m_swerveSubsystem.getPose();
+    aprilTagDistance = aprilTagPose.minus(robotPose);
+
+    var ySpeed = yController.calculate(robotPose.getY());
     if (yController.atGoal()) {
       System.out.println("Y Controller at Goal");
       ySpeed = 0;
     }
     
-    hawkTuah("Accumulated Y Error", yController.getAccumulatedError());
+    hawkTuah("Y Error", yController.getPositionError());
 
-    RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(aprilTagRotation, getDriverControllerLeftY(), ySpeed, 0.5);
+    RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(aprilTagPose.getRotation().getRadians(), getDriverControllerLeftY(), ySpeed);
   }
     
   // Called once the command ends or is interrupted.
@@ -89,7 +97,6 @@ public class AlignToReef extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    //return endCommand;
     return false;
   }
 

@@ -1,29 +1,21 @@
 package frc.robot.visions;
 
-import java.util.Optional;
-import org.photonvision.PhotonCamera;
+import java.util.ArrayList;
+import java.util.List;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.filter.LinearFilter;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.Constants.VisionConstants;
-import frc.robot.LimelightHelpers;
 
 public class CameraInterface extends SubsystemBase {
-    private final NetworkTable camera;
 
-    private final LinearFilter xTranslationFilterController;
-    private double xTranslationFiltered = 0;
-    private int aprilTagID = -1;
-    private double aprilTagArea = 0;
-    private final String LIMELIGHT_KEY;
+    private final String camera;
     public AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
+    private final List<Pose2d> reefPoses;
     
 
      /**
@@ -32,10 +24,8 @@ public class CameraInterface extends SubsystemBase {
      * 
      * @param cameraName
      *      */     
-    public CameraInterface(String cameraName) {
-        camera = NetworkTableInstance.getDefault().getTable("limelight");
-        xTranslationFilterController = LinearFilter.movingAverage(10);
-        LIMELIGHT_KEY = cameraName;
+    public CameraInterface(String camera) {
+        this.camera = camera;
           
         SmartDashboard.putNumber("kPY Close", VisionConstants.kPY2);
         SmartDashboard.putNumber("kIY Close", VisionConstants.kIY2);
@@ -46,94 +36,59 @@ public class CameraInterface extends SubsystemBase {
         SmartDashboard.putNumber("kDY Far", VisionConstants.kDY);
 
         SmartDashboard.putNumber("Y Controller Tolerance", VisionConstants.yControllerTolerance);
+
+        LimelightHelpers.SetFiducialIDFiltersOverride(camera, new int[]{6, 7, 8, 9, 10, 11, 17, 18, 19, 20, 21, 22}); // Only track these tag IDs
+
+        LimelightHelpers.setCameraPose_RobotSpace(
+            camera, 
+            VisionConstants.kFowardToCamera,    // Forward offset (meters)
+            VisionConstants.kSidewaysToCamera,    // Side offset (meters)
+            VisionConstants.kGroundToCamera,    // Height offset (meters)
+            0.0,    // Roll (degrees)
+            0.0,   // Pitch (degrees)
+            VisionConstants.kCameraRotation     // Yaw (degrees)
+        );
+
+        LimelightHelpers.SetIMUMode(camera, 2);
+        reefPoses = getReefPoses();
     }
-
-
-     /**
-     * Determines whether the April Tag scanned by the camera is an April Tag on the reef (for auto-align).
-     * 
-     * @return Whether the April Tag detected by the camera is an April Tag on the reef or not.
-     */ 
-    public boolean isReefAprilTag() {
-        switch (getTargetAprilTagID()) {
-            case -1: return false;
-            case 1: return false;
-            case 2: return false;
-            case 3: return false;
-            case 4: return false;
-            case 5: return false;
-            case 12: return false;
-            case 13: return false;
-            case 14: return false;
-            case 15: return false;
-            case 16: return false;
-            default: return true;
-        }
-    }
-
-     /**
-     * Determines if the camera saw a valid April Tag.
-     *
-     * @return Whether a valid April Tag was detected or not.
-     */ 
-    public boolean cameraSawTarget() {
-        return camera.getEntry("tv").getDouble(0) != 0 && isReefAprilTag();
-    }
-
-    public double getAprilTagArea() {
-        return camera.getEntry("ta").getDouble(0);
-    }
-
-    public double getTx() {
-        // tx: Horizontal Offset From Crosshair To Target (LL1: -27 degrees to 27
-        // degrees | LL2: -29.8 to 29.8 degrees)
-        return LimelightHelpers.getTX(LIMELIGHT_KEY);
-      }
 
     /**
      * Gets the rotation of the April Tag relative to the field.
      *
      * @return The rotation of the April Tag relative to the field (in radians).
      */      
-    public double getAprilTagRotation() {
-        final int aprilTagID = getTargetAprilTagID();
-        final Optional<Alliance> alliance = DriverStation.getAlliance();
-        if (alliance.get() == Alliance.Blue) {
-            switch (aprilTagID) {
-                case 17: return -1.047; //60 degrees
-                case 18: return 0; //0 degrees
-                case 19: return -5.236; //300 degrees
-                case 20: return -4.189; //240 degrees
-                case 21: return 3.142; //180 degrees
-                case 22: return -2.094; //120 degrees
-            }
+
+    public List<Pose2d> getReefPoses() {
+        List<Pose2d> poses = new ArrayList<>();
+
+        for (int i = 6; i != 12; i++) {
+            poses.add(aprilTagFieldLayout.getTagPose(i).get().toPose2d());
         }
 
-        else if (alliance.get() == Alliance.Red) {
-            switch (aprilTagID) {
-                case 6: return -5.236; //300 degrees //check
-                case 7: return 0; //0 degrees
-                case 8: return -1.047; //60 degrees
-                case 9: return -2.094; //120 degrees
-                case 10: return 3.142; //180 degrees
-                case 11: return -4.189; //240 degrees
-            }
+        for (int i = 17; i != 23; i++) {
+            poses.add(aprilTagFieldLayout.getTagPose(i).get().toPose2d());
         }
-        return 0;
+
+        return poses;
     }
 
+    public Pose2d getNearestAprilTag(Pose2d robotPose) {
+        return robotPose.nearest(reefPoses);
+    }
 
-    public int getTargetAprilTagID() {
-        return (int) camera.getEntry("tid").getInteger(-1);
+    public double getHorizontalDisToTag() {
+        return LimelightHelpers.getTX(camera);
+    }
+
+    public void resetLimelightIMU() {
+        LimelightHelpers.SetIMUMode(camera, 0);
+        LimelightHelpers.SetIMUMode(camera, 2);
     }
 
 
     @Override
     public void periodic() {
-
-        SmartDashboard.putNumber("April Tag ID", getTargetAprilTagID());
-        SmartDashboard.putNumber("April Tag Rotation", getAprilTagRotation());
-        SmartDashboard.putNumber("April Tag Area", aprilTagArea);
 
         VisionConstants.kPY2 = SmartDashboard.getNumber("kPY Close", VisionConstants.kPY2);
         VisionConstants.kIY2 = SmartDashboard.getNumber("kIY Close", VisionConstants.kIY2);
@@ -144,5 +99,24 @@ public class CameraInterface extends SubsystemBase {
         VisionConstants.kDY = SmartDashboard.getNumber("kDY Far", VisionConstants.kDY);
 
         VisionConstants.yControllerTolerance = SmartDashboard.getNumber("Y Controller Tolerance", VisionConstants.yControllerTolerance);
+
+        double robotYaw = RobotContainer.m_swerveSubsystem.getSwerveDrive().getYaw().getDegrees();  
+
+        LimelightHelpers.SetRobotOrientation(camera, robotYaw, 0.0, 0.0, 0.0, 0.0, 0.0);
+
+        // Get the pose estimate
+        LimelightHelpers.PoseEstimate limelightMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(camera);
+
+        double rotationSpeed = RobotContainer.m_swerveSubsystem.getSwerveDrive().getRobotVelocity().omegaRadiansPerSecond;
+        
+        boolean shouldRejectUpdate = rotationSpeed > 6.28319; //360 degrees
+
+        if (!(shouldRejectUpdate)) {
+            RobotContainer.m_swerveSubsystem.getSwerveDrive().addVisionMeasurement(
+                limelightMeasurement.pose,
+                limelightMeasurement.timestampSeconds,
+                VecBuilder.fill(.5, .5, 9999999));  
+        }
+
     }
 }

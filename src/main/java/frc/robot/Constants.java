@@ -37,14 +37,11 @@ public final class Constants {
 
     public static class VisionConstants {
       //Camera Offset
-      public static final double kCameraPitch = 0; //to measure
       public static final double kGroundToCamera = 0.38735;
-
-      //Skibidi Offsets
-      public static final double kSkibidiAprilTagAreaLimit = 5.5;
-
-      //Quandale Offsets
-      public static final double kQuandaleAprilTagAreaLimit = 3.4;
+      public static final double kFowardToCamera = 0; // to measure (meters)
+      public static final double kSidewaysToCamera = 0; // to measure (meters)
+      public static final double kCameraRotation = 0; // to measure (degrees)
+      public static final String kCameraName = "limelight";
 
       //April Tag Offset
       public static final double kGroundToAprilTagDistance = 0.171; //in meters
@@ -65,7 +62,8 @@ public final class Constants {
       public static double kIY2 = 0;
       public static double kDY2 = 0;
 
-      public static double kSecondPIDControllerStartingPoint = 13;
+      public static int kSecondPIDControllerStartingPoint = 13;
+
     }
     
     public static class PathPlanner {
