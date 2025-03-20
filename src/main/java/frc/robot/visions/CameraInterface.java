@@ -107,7 +107,7 @@ public class CameraInterface extends SubsystemBase {
         // Get the pose estimate
         LimelightHelpers.PoseEstimate limelightMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(camera);
 
-        double rotationSpeed = RobotContainer.m_swerveSubsystem.getSwerveDrive().getRobotVelocity().omegaRadiansPerSecond;
+        double rotationSpeed = Math.abs(RobotContainer.m_swerveSubsystem.getSwerveDrive().getRobotVelocity().omegaRadiansPerSecond);
         
         boolean shouldRejectUpdate = rotationSpeed > 6.28319; //360 degrees
 
