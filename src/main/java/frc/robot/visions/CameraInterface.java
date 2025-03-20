@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
+import frc.robot.visions.LimelightHelpers.RawFiducial;
 import frc.robot.Constants.VisionConstants;
 
 public class CameraInterface extends SubsystemBase {
@@ -39,6 +40,8 @@ public class CameraInterface extends SubsystemBase {
 
         LimelightHelpers.SetFiducialIDFiltersOverride(camera, new int[]{6, 7, 8, 9, 10, 11, 17, 18, 19, 20, 21, 22}); // Only track these tag IDs
 
+        LimelightHelpers.setLEDMode_PipelineControl(camera);
+
         LimelightHelpers.setCameraPose_RobotSpace(
             camera, 
             VisionConstants.kFowardToCamera,    // Forward offset (meters)
@@ -50,6 +53,7 @@ public class CameraInterface extends SubsystemBase {
         );
 
         LimelightHelpers.SetIMUMode(camera, 2);
+        LimelightHelpers.setStreamMode_Standard(camera);
         reefPoses = getReefPoses();
     }
 
@@ -61,7 +65,6 @@ public class CameraInterface extends SubsystemBase {
 
     public List<Pose2d> getReefPoses() {
         List<Pose2d> poses = new ArrayList<>();
-
         for (int i = 6; i != 12; i++) {
             poses.add(aprilTagFieldLayout.getTagPose(i).get().toPose2d());
         }
@@ -69,7 +72,6 @@ public class CameraInterface extends SubsystemBase {
         for (int i = 17; i != 23; i++) {
             poses.add(aprilTagFieldLayout.getTagPose(i).get().toPose2d());
         }
-
         return poses;
     }
 
@@ -81,11 +83,46 @@ public class CameraInterface extends SubsystemBase {
         return LimelightHelpers.getTX(camera);
     }
 
+    public double getVerticalDisToTag() {
+        return LimelightHelpers.getTY(camera);
+    }
+
+    public double getAprilTagArea() {
+        return LimelightHelpers.getTA(camera);
+    }
+
+    public boolean cameraSeesAprilTag() {
+        return LimelightHelpers.getTV(camera);
+    }
+
+    public double getAprilTagPoseAmbiguity() {
+        double aprilTagPoseAmbiguity = -1;
+        if (cameraSeesAprilTag()) {
+            RawFiducial[] fiducials = LimelightHelpers.getRawFiducials(camera);
+            for (RawFiducial fidicual : fiducials) {
+                aprilTagPoseAmbiguity = fidicual.ambiguity;
+            }
+        }
+        return aprilTagPoseAmbiguity;
+
+    }
+
     public void resetLimelightIMU() {
         LimelightHelpers.SetIMUMode(camera, 0);
         LimelightHelpers.SetIMUMode(camera, 2);
     }
 
+    public void turnLEDOn() {
+        LimelightHelpers.setLEDMode_ForceOn(camera);
+    }
+
+    public void turnLEDOff() {
+        LimelightHelpers.setLEDMode_ForceOff(camera);
+    }
+
+    public void blinkLED() {
+        LimelightHelpers.setLEDMode_ForceBlink(camera);
+    }
 
     @Override
     public void periodic() {
@@ -108,8 +145,7 @@ public class CameraInterface extends SubsystemBase {
         LimelightHelpers.PoseEstimate limelightMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(camera);
 
         double rotationSpeed = Math.abs(RobotContainer.m_swerveSubsystem.getSwerveDrive().getRobotVelocity().omegaRadiansPerSecond);
-        
-        boolean shouldRejectUpdate = rotationSpeed > 6.28319; //360 degrees
+        boolean shouldRejectUpdate = rotationSpeed > 6.28319 && getAprilTagArea() > 50; //360 degrees
 
         if (!(shouldRejectUpdate)) {
             RobotContainer.m_swerveSubsystem.getSwerveDrive().addVisionMeasurement(

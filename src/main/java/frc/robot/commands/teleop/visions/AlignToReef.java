@@ -64,9 +64,11 @@ public class AlignToReef extends Command {
       yController = new ProfiledPIDController(VisionConstants.kPY, VisionConstants.kIY, VisionConstants.kDY, VisionConstants.yConstraints); //to tune
     }
 
-    yController.reset(aprilTagDistance.getY());
+    yController.reset(robotPose.getY());
     yController.setTolerance(VisionConstants.yControllerTolerance);
     yController.setGoal(aprilTagPose.getY() + aprilTagOffset);
+
+    m_autoAlignCam.turnLEDOn();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -84,20 +86,20 @@ public class AlignToReef extends Command {
     }
     
     hawkTuah("Y Error", yController.getPositionError());
-
     RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(aprilTagPose.getRotation().getRadians(), getDriverControllerLeftY(), ySpeed);
   }
     
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    m_autoAlignCam.turnLEDOff();
   }
 
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return yController.atGoal();
   }
 
   private double getDriverControllerLeftY() {
