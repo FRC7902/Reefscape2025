@@ -10,11 +10,12 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.visions.CameraInterface;
 
-public class AlignToReef extends Command {
+public class AlignToReefWithAprilTag extends Command {
   /** Creates a new AlignToReefCommand. */
 
   private ProfiledPIDController yController;
@@ -25,15 +26,14 @@ public class AlignToReef extends Command {
 
   private final int triggerPressed;
 
-  private double aprilTagOffset;
+  private double aprilTagOffset = 0;
 
-  private Pose2d aprilTagPose;
   private Pose2d robotPose;
 
-  private Transform2d aprilTagDistance;
+  private double targetRotation = 0;
   
 
-  public AlignToReef(CameraInterface m_autoAlignCamera, RobotContainer m_RobotContainer, int triggerPressed) {
+  public AlignToReefWithAprilTag(CameraInterface m_autoAlignCamera, RobotContainer m_RobotContainer, int triggerPressed) {
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(RobotContainer.m_swerveSubsystem);
     this.m_autoAlignCam = m_autoAlignCamera;
@@ -45,18 +45,17 @@ public class AlignToReef extends Command {
   @Override
   public void initialize() {
     robotPose = RobotContainer.m_swerveSubsystem.getPose();
-    aprilTagPose = m_autoAlignCam.getNearestAprilTag(robotPose);
-    aprilTagDistance = aprilTagPose.minus(robotPose);
+    targetRotation = m_autoAlignCam.getNearestAprilTag(robotPose).getRotation().getRadians();
 
     if (triggerPressed == 0) {
-      aprilTagOffset = VisionConstants.reefToAprilTagOffset;
+      aprilTagOffset = VisionConstants.kAprilTagOffset;
     }
 
     else if (triggerPressed == 1) {
-      aprilTagOffset = -VisionConstants.reefToAprilTagOffset;
+      aprilTagOffset = -VisionConstants.kAprilTagOffset;
     }
 
-    if (Math.abs(aprilTagDistance.getY()) < VisionConstants.kSecondPIDControllerStartingPoint) {
+    if (Math.abs(m_autoAlignCam.getHorizontalDisToTag()) < VisionConstants.kSecondPIDControllerStartingPoint) {
       yController = new ProfiledPIDController(VisionConstants.kPY2, VisionConstants.kIY2, VisionConstants.kDY2, VisionConstants.yConstraints); //to tune
     }
 
@@ -64,9 +63,9 @@ public class AlignToReef extends Command {
       yController = new ProfiledPIDController(VisionConstants.kPY, VisionConstants.kIY, VisionConstants.kDY, VisionConstants.yConstraints); //to tune
     }
 
-    yController.reset(robotPose.getY());
+    yController.reset(m_autoAlignCam.getHorizontalDisToTag());
     yController.setTolerance(VisionConstants.yControllerTolerance);
-    yController.setGoal(aprilTagPose.getY() + aprilTagOffset);
+    yController.setGoal(aprilTagOffset);
 
     m_autoAlignCam.turnLEDOn();
   }
@@ -76,17 +75,14 @@ public class AlignToReef extends Command {
   @Override 
   public void execute() {
 
-    robotPose = RobotContainer.m_swerveSubsystem.getPose();
-    aprilTagDistance = aprilTagPose.minus(robotPose);
-
-    var ySpeed = yController.calculate(robotPose.getY());
+    var ySpeed = yController.calculate(m_autoAlignCam.getHorizontalDisToTag());
     if (yController.atGoal()) {
       System.out.println("Y Controller at Goal");
       ySpeed = 0;
     }
     
     hawkTuah("Y Error", yController.getPositionError());
-    RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(aprilTagPose.getRotation().getRadians(), getDriverControllerLeftY(), ySpeed);
+    RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(targetRotation, getDriverControllerLeftY(), ySpeed);
   }
     
   // Called once the command ends or is interrupted.
