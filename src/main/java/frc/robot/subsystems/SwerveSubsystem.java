@@ -748,7 +748,7 @@ public class SwerveSubsystem extends SubsystemBase {
             
            */ 
         swerveDrive.drive(new Translation2d(xTranslation, yTranslation),
-            controller.headingCalculate(Math.abs(swerveDrive.getOdometryHeading().unaryMinus().getRadians()), radiansHeading),
+            controller.headingCalculate(swerveDrive.getOdometryHeading().getRadians(), radiansHeading),
             false, false);
 
         SmartDashboard.putNumber("Odom Heading (rad)", swerveDrive.getOdometryHeading().unaryMinus().getRadians());

@@ -49,11 +49,11 @@ public class AlignToReef extends Command {
     aprilTagDistance = aprilTagPose.minus(robotPose);
 
     if (triggerPressed == 0) {
-      aprilTagOffset = VisionConstants.reefToAprilTagOffset;
+      aprilTagOffset = -VisionConstants.reefToAprilTagOffset;
     }
 
     else if (triggerPressed == 1) {
-      aprilTagOffset = -VisionConstants.reefToAprilTagOffset;
+      aprilTagOffset = VisionConstants.reefToAprilTagOffset;
     }
 
     // if (Math.abs(aprilTagDistance.getY()) < VisionConstants.kSecondPIDControllerStartingPoint) {
@@ -67,9 +67,9 @@ public class AlignToReef extends Command {
     yController = new ProfiledPIDController(VisionConstants.kPY2, VisionConstants.kIY2, VisionConstants.kDY2, VisionConstants.yConstraints); //to tune
 
 
-    yController.reset(robotPose.getY());
+    yController.reset(aprilTagDistance.getY());
     yController.setTolerance(VisionConstants.yControllerTolerance);
-    yController.setGoal(aprilTagPose.getY() + aprilTagOffset);
+    yController.setGoal(0);
 
     m_autoAlignCam.turnLEDOn();
   }
@@ -77,12 +77,12 @@ public class AlignToReef extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   
   @Override 
-  public void execute() {
+  public void execute() {  
 
     robotPose = RobotContainer.m_swerveSubsystem.getPose();
     aprilTagDistance = aprilTagPose.minus(robotPose);
 
-    var ySpeed = yController.calculate(robotPose.getY());
+    var ySpeed = yController.calculate(aprilTagDistance.getY());
     if (yController.atGoal()) {
       System.out.println("Y Controller at Goal");
       ySpeed = 0;
@@ -91,14 +91,24 @@ public class AlignToReef extends Command {
 
     hawkTuah("Y Error", yController.getPositionError());
     hawkTuah("April Tag Rotation", (aprilTagPose.getRotation().getDegrees()));
+    hawkTuah("April Tag Y STUFFERRR", aprilTagDistance.getY());
 
-     int multiplier = (int) Math.round(aprilTagPose.getRotation().getRadians() / Math.abs(aprilTagPose.getRotation().getRadians()));
+     double multiplier = Math.round(aprilTagPose.getRotation().getRadians() / Math.abs(aprilTagPose.getRotation().getRadians()));
 
-     double rotation = aprilTagPose.getRotation().getRadians() - Math.PI * multiplier;
+    double rotation;
+
+    if (aprilTagPose.getRotation().getRadians() == 0) {
+      rotation = Math.PI;
+    }
+    
+    else {
+      rotation = aprilTagPose.getRotation().getRadians() - (Math.PI * multiplier);
+    }
+     //double rotation = aprilTagPose.getRotation().unaryMinus().getRadians();
 
     // hawkTuah("target rotation for tag", Math.toDegrees(rotation));
 
-    RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(rotation, getDriverControllerLeftY(), ySpeed);
+    RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(rotation, getDriverControllerLeftY(), -ySpeed);
   }
     
   // Called once the command ends or is interrupted.
