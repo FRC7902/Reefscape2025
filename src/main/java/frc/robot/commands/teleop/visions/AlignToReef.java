@@ -56,13 +56,16 @@ public class AlignToReef extends Command {
       aprilTagOffset = -VisionConstants.reefToAprilTagOffset;
     }
 
-    if (Math.abs(aprilTagDistance.getY()) < VisionConstants.kSecondPIDControllerStartingPoint) {
-      yController = new ProfiledPIDController(VisionConstants.kPY2, VisionConstants.kIY2, VisionConstants.kDY2, VisionConstants.yConstraints); //to tune
-    }
+    // if (Math.abs(aprilTagDistance.getY()) < VisionConstants.kSecondPIDControllerStartingPoint) {
+    //   yController = new ProfiledPIDController(VisionConstants.kPY2, VisionConstants.kIY2, VisionConstants.kDY2, VisionConstants.yConstraints); //to tune
+    // }
 
-    else {
-      yController = new ProfiledPIDController(VisionConstants.kPY, VisionConstants.kIY, VisionConstants.kDY, VisionConstants.yConstraints); //to tune
-    }
+    // else {
+    //   yController = new ProfiledPIDController(VisionConstants.kPY, VisionConstants.kIY, VisionConstants.kDY, VisionConstants.yConstraints); //to tune
+    // }
+
+    yController = new ProfiledPIDController(VisionConstants.kPY2, VisionConstants.kIY2, VisionConstants.kDY2, VisionConstants.yConstraints); //to tune
+
 
     yController.reset(robotPose.getY());
     yController.setTolerance(VisionConstants.yControllerTolerance);
@@ -84,9 +87,18 @@ public class AlignToReef extends Command {
       System.out.println("Y Controller at Goal");
       ySpeed = 0;
     }
-    
+  
+
     hawkTuah("Y Error", yController.getPositionError());
-    RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(aprilTagPose.getRotation().getRadians(), getDriverControllerLeftY(), ySpeed);
+    hawkTuah("April Tag Rotation", (aprilTagPose.getRotation().getDegrees()));
+
+     int multiplier = (int) Math.round(aprilTagPose.getRotation().getRadians() / Math.abs(aprilTagPose.getRotation().getRadians()));
+
+     double rotation = aprilTagPose.getRotation().getRadians() - Math.PI * multiplier;
+
+    // hawkTuah("target rotation for tag", Math.toDegrees(rotation));
+
+    RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(rotation, getDriverControllerLeftY(), ySpeed);
   }
     
   // Called once the command ends or is interrupted.

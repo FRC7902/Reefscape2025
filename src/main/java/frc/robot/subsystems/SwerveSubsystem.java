@@ -748,12 +748,12 @@ public class SwerveSubsystem extends SubsystemBase {
             
            */ 
         swerveDrive.drive(new Translation2d(xTranslation, yTranslation),
-            -controller.headingCalculate(swerveDrive.getOdometryHeading().unaryMinus().getRadians(), radiansHeading),
+            controller.headingCalculate(Math.abs(swerveDrive.getOdometryHeading().unaryMinus().getRadians()), radiansHeading),
             false, false);
 
         SmartDashboard.putNumber("Odom Heading (rad)", swerveDrive.getOdometryHeading().unaryMinus().getRadians());
         SmartDashboard.putNumber("Target Heading (rad)", radiansHeading);
-        SmartDashboard.putNumber("Error (rad)", Math.abs(new Rotation2d(radiansHeading).minus(swerveDrive.getOdometryHeading().unaryMinus()).getRadians()));}
+        SmartDashboard.putNumber("Error (rad)", new Rotation2d(radiansHeading).minus(swerveDrive.getOdometryHeading().unaryMinus()).getRadians());}
 
     //NOTE!!! THIS IS NOT A CORRECT STRAFE COMMAND!!! THIS WILL CAUSE YOUR ROBOT TO SPIN VIGOROUSLY. DO NOT MISTAKE THIS FOR STRAFE!!!!!!!
     public void strafe(double strafePower, double rotationalPower, double speedMultiplier) {

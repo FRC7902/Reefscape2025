@@ -15,7 +15,7 @@ import frc.robot.Constants.VisionConstants;
 public class CameraInterface extends SubsystemBase {
 
     private final String camera;
-    private final AprilTagFieldLayout aprilTagFieldLayout;
+    private final AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
     private final List<Pose2d> reefPoses;
     
 
@@ -55,8 +55,6 @@ public class CameraInterface extends SubsystemBase {
         LimelightHelpers.SetIMUMode(camera, 2);
         LimelightHelpers.setStreamMode_Standard(camera);
         reefPoses = setReefPoses();
-
-        aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
     }
 
     /**
@@ -149,20 +147,20 @@ public class CameraInterface extends SubsystemBase {
 
         double robotYaw = RobotContainer.m_swerveSubsystem.getSwerveDrive().getYaw().getDegrees();  
 
-        LimelightHelpers.SetRobotOrientation(camera, robotYaw, 0.0, 0.0, 0.0, 0.0, 0.0);
+        // LimelightHelpers.SetRobotOrientation(camera, robotYaw, 0.0, 0.0, 0.0, 0.0, 0.0);
 
-        // Get the pose estimate
-        LimelightHelpers.PoseEstimate limelightMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(camera);
+        // // Get the pose estimate
+        // LimelightHelpers.PoseEstimate limelightMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(camera);
 
-        double rotationSpeed = Math.abs(RobotContainer.m_swerveSubsystem.getSwerveDrive().getRobotVelocity().omegaRadiansPerSecond);
-        boolean shouldRejectUpdate = rotationSpeed < 6.28319 && getAprilTagArea() > 50; //360 degrees
+        // double rotationSpeed = Math.abs(RobotContainer.m_swerveSubsystem.getSwerveDrive().getRobotVelocity().omegaRadiansPerSecond);
+        // boolean shouldRejectUpdate = rotationSpeed < 6.28319 && getAprilTagArea() > 50; //360 degrees
 
-        if (!(shouldRejectUpdate)) {
-            RobotContainer.m_swerveSubsystem.getSwerveDrive().addVisionMeasurement(
-                limelightMeasurement.pose,
-                limelightMeasurement.timestampSeconds,
-                VecBuilder.fill(.5, .5, 9999999));  
-        }
+        // if (!(shouldRejectUpdate)) {
+        //     RobotContainer.m_swerveSubsystem.getSwerveDrive().addVisionMeasurement(
+        //         limelightMeasurement.pose,
+        //         limelightMeasurement.timestampSeconds,
+        //         VecBuilder.fill(.5, .5, 9999999));  
+        // }
 
     }
 }
