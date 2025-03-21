@@ -114,9 +114,8 @@ public class CameraInterface extends SubsystemBase {
         return aprilTagPoseAmbiguity;
     }
 
-    public void resetLimelightIMU() {
+    public void setLimelightIMU() {
         LimelightHelpers.SetIMUMode(camera, 0);
-        LimelightHelpers.SetIMUMode(camera, 2);
     }
 
     public void turnLEDOn() {
@@ -131,6 +130,39 @@ public class CameraInterface extends SubsystemBase {
         LimelightHelpers.setLEDMode_ForceBlink(camera);
     }
 
+    public void updateOdometryWithMegaTag1() {
+        if (cameraSeesAprilTag()) {
+            LimelightHelpers.PoseEstimate limelightMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue(camera);
+            
+            double rotationSpeed = Math.abs(RobotContainer.m_swerveSubsystem.getSwerveDrive().getRobotVelocity().omegaRadiansPerSecond);
+            boolean shouldRejectUpdate = rotationSpeed < 6.28319 && getAprilTagArea() > 50; //360 degrees
+    
+            if (!(shouldRejectUpdate)) {
+                RobotContainer.m_swerveSubsystem.getSwerveDrive().addVisionMeasurement(
+                    limelightMeasurement.pose,
+                    limelightMeasurement.timestampSeconds,
+                    VecBuilder.fill(.5, .5, 9999999));  
+            }
+
+        }
+    }
+
+    public void updateOdometryWithMegaTag2() {
+        if (cameraSeesAprilTag()) {
+            LimelightHelpers.PoseEstimate limelightMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(camera);
+            
+            double rotationSpeed = Math.abs(RobotContainer.m_swerveSubsystem.getSwerveDrive().getRobotVelocity().omegaRadiansPerSecond);
+            boolean shouldRejectUpdate = rotationSpeed < 6.28319 && getAprilTagArea() > 50; //360 degrees
+    
+            if (!(shouldRejectUpdate)) {
+                RobotContainer.m_swerveSubsystem.getSwerveDrive().addVisionMeasurement(
+                    limelightMeasurement.pose,
+                    limelightMeasurement.timestampSeconds,
+                    VecBuilder.fill(.5, .5, 9999999));  
+            }
+
+        }
+    }
 
     @Override
     public void periodic() {
@@ -148,19 +180,6 @@ public class CameraInterface extends SubsystemBase {
         double robotYaw = RobotContainer.m_swerveSubsystem.getSwerveDrive().getYaw().getDegrees();  
 
         // LimelightHelpers.SetRobotOrientation(camera, robotYaw, 0.0, 0.0, 0.0, 0.0, 0.0);
-
-        // // Get the pose estimate
-        // LimelightHelpers.PoseEstimate limelightMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(camera);
-
-        // double rotationSpeed = Math.abs(RobotContainer.m_swerveSubsystem.getSwerveDrive().getRobotVelocity().omegaRadiansPerSecond);
-        // boolean shouldRejectUpdate = rotationSpeed < 6.28319 && getAprilTagArea() > 50; //360 degrees
-
-        // if (!(shouldRejectUpdate)) {
-        //     RobotContainer.m_swerveSubsystem.getSwerveDrive().addVisionMeasurement(
-        //         limelightMeasurement.pose,
-        //         limelightMeasurement.timestampSeconds,
-        //         VecBuilder.fill(.5, .5, 9999999));  
-        // }
 
     }
 }

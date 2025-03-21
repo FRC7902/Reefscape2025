@@ -69,7 +69,7 @@ public class AlignToReef extends Command {
 
     yController.reset(aprilTagDistance.getY());
     yController.setTolerance(VisionConstants.yControllerTolerance);
-    yController.setGoal(0);
+    yController.setGoal(0.0);
 
     m_autoAlignCam.turnLEDOn();
   }
@@ -121,7 +121,7 @@ public class AlignToReef extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return yController.atGoal();
+    return false;
   }
 
   private double getDriverControllerLeftY() {
