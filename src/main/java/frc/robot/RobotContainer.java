@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.SelectCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.CoralIndexerConstants;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.VisionConstants;
@@ -297,13 +298,11 @@ public class RobotContainer {
         m_driverController.povDown().whileTrue(new StrafeLeftCommand());
 
         
-        m_indexSubsystem
-                .setDefaultCommand(
-                        new IntakeCoralCommand(Constants.CoralIndexerConstants.kIntakePower)
-                                .andThen(new CorrectCoralPositionCommand().withTimeout(1))
-                                .andThen(new IntakeCoralCommand(
-                                        Constants.CoralIndexerConstants.kCorrectionPower)
-                                                .withTimeout(1)));
+        m_indexSubsystem.setDefaultCommand(
+                new AutomaticIntakeCoralCommand(CoralIndexerConstants.kIntakePower)
+                        .andThen(new CorrectCoralPositionCommand().withTimeout(1))
+                        .andThen(new AutomaticIntakeCoralCommand(
+                                Constants.CoralIndexerConstants.kCorrectionPower).withTimeout(1)));
 
 
         // Elevator coral positions
