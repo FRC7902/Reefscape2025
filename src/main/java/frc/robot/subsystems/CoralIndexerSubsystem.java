@@ -89,6 +89,10 @@ public class CoralIndexerSubsystem extends SubsystemBase {
         return isDeepBeamBroken();
     }
 
+    public boolean partiallyHasCoral() {
+        return isShallowBeamBroken() && !isDeepBeamBroken();
+    }
+
     @Override
     public void periodic() {
         // This code runs in both real and simulation modes.

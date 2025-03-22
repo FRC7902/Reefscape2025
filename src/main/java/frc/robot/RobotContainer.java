@@ -241,8 +241,12 @@ public class RobotContainer {
                 .whileTrue(Commands.parallel(new OuttakeAlgaeCommand(), new OuttakeCoralCommand()));
 
         // m_operatorController.back().whileTrue(new InitiateClimbCommand());
-        m_operatorController.back().onTrue(new SequentialCommandGroup(new SetElevatorPositionCommand(
-                ElevatorConstants.kElevatorCoralStationAndProcessorHeight), new InitiateClimbCommand().withTimeout(1), new MoveClimbDownCommand(m_climbSubsystem)));
+        m_operatorController.back()
+                .onTrue(new SequentialCommandGroup(
+                        new SetElevatorPositionCommand(
+                                ElevatorConstants.kElevatorCoralStationAndProcessorHeight),
+                        new InitiateClimbCommand().withTimeout(1),
+                        new MoveClimbDownCommand(m_climbSubsystem)));
         m_operatorController.start().whileTrue(m_swerveSubsystem.centerModulesCommand());
 
         // Raise elevator (by height of Algae diameter) while intaking algae
@@ -279,14 +283,23 @@ public class RobotContainer {
                                 Constants.CoralIndexerConstants.kCorrectionPower).withTimeout(1)));
 
         // Elevator coral positions
-        m_operatorController.x().onTrue(
-                new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel1Height));
         m_operatorController.a().onTrue(new SetElevatorPositionCommand(
                 ElevatorConstants.kElevatorCoralStationAndProcessorHeight));
-        m_operatorController.b().onTrue(
-                new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel2Height));
-        m_operatorController.y().onTrue(
-                new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel3Height));
+        m_operatorController.x()
+                .onTrue(new ConditionalCommand(new NullCommand(),
+                        new SetElevatorPositionCommand(
+                                ElevatorConstants.kElevatorCoralLevel1Height),
+                        m_indexSubsystem::partiallyHasCoral));
+        m_operatorController.b()
+                .onTrue(new ConditionalCommand(new NullCommand(),
+                        new SetElevatorPositionCommand(
+                                ElevatorConstants.kElevatorCoralLevel2Height),
+                        m_indexSubsystem::partiallyHasCoral));
+        m_operatorController.y()
+                .onTrue(new ConditionalCommand(new NullCommand(),
+                        new SetElevatorPositionCommand(
+                                ElevatorConstants.kElevatorCoralLevel3Height),
+                        m_indexSubsystem::partiallyHasCoral));
 
         // Elevator algae positions
         m_operatorController.povDown()
