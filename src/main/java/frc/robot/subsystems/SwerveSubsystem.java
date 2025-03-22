@@ -540,6 +540,9 @@ public class SwerveSubsystem extends SubsystemBase {
      */
     public void zeroGyro() {
         swerveDrive.zeroGyro();
+        //LimelightHelpers.SetRobotOrientation(VisionConstants.kCameraName, swerveDrive.getPose().getRotation().getDegrees(), 0.0, 0.0, 0.0, 0.0, 0.0);
+        //RobotContainer.m_cameraSubsystem.updateOdometryWithMegaTag1();
+        //swerveDrive.updateOdometry();
     }
 
     /**

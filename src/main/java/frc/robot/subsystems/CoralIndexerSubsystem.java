@@ -80,8 +80,8 @@ public class CoralIndexerSubsystem extends SubsystemBase {
      * @return true if the coral has broken the beam for a significant amount of time
      */
     public boolean hasCoral() {
-        //return m_debouncedBeamBreak.calculate(isBeamBroken());
-        return true; //to remove when testing is done PLEASEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+        return m_debouncedBeamBreak.calculate(isBeamBroken());
+        //return true; //to remove when testing is done PLEASEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
     }
 
     @Override

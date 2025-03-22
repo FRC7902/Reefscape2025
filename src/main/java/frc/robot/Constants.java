@@ -44,8 +44,9 @@ public final class Constants {
       public static final double kAprilTagOffset = 0;
 
       //Reef Offset
-      public static final double reefToAprilTagOffset = 0.168;
-      
+      public static double leftReefToAprilTagOffset = -0.165000;
+      public static double rightReefToAprilTagOffset = 0.165000;
+
 
       //PID Y Controller Constants
       public static final TrapezoidProfile.Constraints yConstraints = new TrapezoidProfile.Constraints(60, 40);
@@ -54,7 +55,7 @@ public final class Constants {
       public static double kIY = 0;
       public static double kDY = 0;
 
-      public static double kPY2 = 0.8;
+      public static double kPY2 = 5.0;
       public static double kIY2 = 0;
       public static double kDY2 = 0;
 

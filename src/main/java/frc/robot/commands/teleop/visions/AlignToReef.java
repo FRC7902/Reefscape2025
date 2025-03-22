@@ -49,11 +49,11 @@ public class AlignToReef extends Command {
     aprilTagDistance = aprilTagPose.minus(robotPose);
 
     if (triggerPressed == 0) {
-      aprilTagOffset = -VisionConstants.reefToAprilTagOffset;
+      aprilTagOffset = VisionConstants.rightReefToAprilTagOffset;
     }
 
     else if (triggerPressed == 1) {
-      aprilTagOffset = VisionConstants.reefToAprilTagOffset;
+      aprilTagOffset = VisionConstants.leftReefToAprilTagOffset;
     }
 
     // if (Math.abs(aprilTagDistance.getY()) < VisionConstants.kSecondPIDControllerStartingPoint) {
@@ -82,7 +82,7 @@ public class AlignToReef extends Command {
     robotPose = RobotContainer.m_swerveSubsystem.getPose();
     aprilTagDistance = aprilTagPose.minus(robotPose);
 
-    var ySpeed = yController.calculate(aprilTagDistance.getY());
+    var ySpeed = yController.calculate(aprilTagDistance.getY() + aprilTagOffset);
     if (yController.atGoal()) {
       System.out.println("Y Controller at Goal");
       ySpeed = 0;

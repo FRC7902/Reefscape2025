@@ -38,10 +38,16 @@ public class CameraInterface extends SubsystemBase {
 
         SmartDashboard.putNumber("Y Controller Tolerance", VisionConstants.yControllerTolerance);
 
-        LimelightHelpers.SetFiducialIDFiltersOverride(camera, VisionConstants.acceptedTagIDs); // Only track these tag IDs
+        SmartDashboard.putNumber("Left Reef offset", VisionConstants.leftReefToAprilTagOffset);
+        SmartDashboard.putNumber("Right Reef offset", VisionConstants.rightReefToAprilTagOffset);
+
+
+        //LimelightHelpers.SetFiducialIDFiltersOverride(camera, VisionConstants.acceptedTagIDs); // Only track these tag IDs
 
         LimelightHelpers.setLEDMode_PipelineControl(camera);
 
+       
+        /* 
         LimelightHelpers.setCameraPose_RobotSpace(
             camera, 
             VisionConstants.kFowardToCamera,    // Forward offset (meters)
@@ -51,8 +57,9 @@ public class CameraInterface extends SubsystemBase {
             0.0,   // Pitch (degrees)
             VisionConstants.kCameraRotation     // Yaw (degrees)
         );
+        */
 
-        LimelightHelpers.SetIMUMode(camera, 0);
+        LimelightHelpers.SetIMUMode(camera, 1);
         //LimelightHelpers.setStreamMode_Standard(camera);
         reefPoses = setReefPoses();
     }
@@ -131,7 +138,7 @@ public class CameraInterface extends SubsystemBase {
     }
 
     public void updateOdometryWithMegaTag1() {
-        if (true) {
+        if (cameraSeesAprilTag()) {
             LimelightHelpers.PoseEstimate limelightMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue(camera);
             
             double rotationSpeed = Math.abs(RobotContainer.m_swerveSubsystem.getSwerveDrive().getRobotVelocity().omegaRadiansPerSecond);
@@ -162,7 +169,6 @@ public class CameraInterface extends SubsystemBase {
                     limelightMeasurement.timestampSeconds);
                 RobotContainer.m_swerveSubsystem.getSwerveDrive().updateOdometry();
             }
-            System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
         }
 
     }
@@ -178,9 +184,11 @@ public class CameraInterface extends SubsystemBase {
         VisionConstants.kIY = SmartDashboard.getNumber("kIY Far", VisionConstants.kIY);
         VisionConstants.kDY = SmartDashboard.getNumber("kDY Far", VisionConstants.kDY);
 
-        VisionConstants.yControllerTolerance = SmartDashboard.getNumber("Y Controller Tolerance", VisionConstants.yControllerTolerance);
+        VisionConstants.leftReefToAprilTagOffset = SmartDashboard.getNumber("Left Reef offset", VisionConstants.leftReefToAprilTagOffset);
+        VisionConstants.rightReefToAprilTagOffset = SmartDashboard.getNumber("Right Reef offset", VisionConstants.rightReefToAprilTagOffset);
 
-        //double robotYaw = RobotContainer.m_swerveSubsystem.getSwerveDrive().getYaw().getDegrees();  
+
+        VisionConstants.yControllerTolerance = SmartDashboard.getNumber("Y Controller Tolerance", VisionConstants.yControllerTolerance);
 
         //double robotYaw = RobotContainer.m_swerveSubsystem.getSwerveDrive().getPose().getRotation().getDegrees();
 

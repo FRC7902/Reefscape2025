@@ -47,14 +47,8 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "ElevatorL2",
-      "waypointRelativePos": 0.49810066476732945,
-      "endWaypointRelativePos": null,
-      "command": null
-    },
-    {
-      "name": "coraloutakeon",
-      "waypointRelativePos": 1.0,
+      "name": "ZeroPosition",
+      "waypointRelativePos": 0.0,
       "endWaypointRelativePos": null,
       "command": null
     }
