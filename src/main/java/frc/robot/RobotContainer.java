@@ -303,9 +303,13 @@ public class RobotContainer {
 
         // Elevator algae positions
         m_operatorController.povDown()
-                .onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeLowHeight));
+                .onTrue(new ConditionalCommand(new NullCommand(),
+                        new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeLowHeight),
+                        m_indexSubsystem::partiallyHasCoral));
         m_operatorController.povUp()
-                .onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeHighHeight));
+                .onTrue(new ConditionalCommand(new NullCommand(),
+                        new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeHighHeight),
+                        m_indexSubsystem::partiallyHasCoral));
 
         // ======= Test bindings =======
 
