@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "S1L1"
+            "pathName": "1Left1"
           }
         },
         {
@@ -19,7 +19,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "New Path"
+            "pathName": "2Left2"
           }
         },
         {
@@ -31,7 +31,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Copy of New Path"
+            "pathName": "2left2"
           }
         }
       ]

@@ -7,49 +7,61 @@
         {
           "type": "path",
           "data": {
-            "pathName": "L2S1A"
+            "pathName": "1Left1"
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.5
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "coraloutakeoff"
+            "waitTime": 1.0
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "L2ACS"
+            "pathName": "1Left2"
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.7
+            "waitTime": 1.7
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "L2CSB"
+            "pathName": "1Left3"
           }
         },
         {
-          "type": "named",
+          "type": "wait",
           "data": {
-            "name": "coraloutakeoff"
+            "waitTime": 1.0
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "1Left4"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.7
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "1Left5"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "COMPETITION AUTOS ",
   "choreoAuto": false
 }
