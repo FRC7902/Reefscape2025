@@ -41,6 +41,6 @@ public class MoveClimbDownCommand extends Command {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return m_climbSubsystem.getClimbArmAngle() >= 319;
+        return m_climbSubsystem.getClimbArmAngle() >= 315;
     }
 }

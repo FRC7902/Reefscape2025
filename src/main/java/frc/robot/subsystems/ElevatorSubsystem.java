@@ -37,7 +37,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     /** Enum representing elevator positions */
     public enum ElevatorPosition {
-        CORAL_L1, CORAL_L2, CORAL_L3, CORAL_STATION_AND_PROCESSOR, ALGAE_HIGH, ALGAE_LOW
+        CORAL_L1, CORAL_L2, CORAL_L3, CORAL_STATION_AND_PROCESSOR, ALGAE_HIGH, ALGAE_LOW, UNKNOWN
     }
 
     /** TalonFX leader motor controller object */
@@ -323,7 +323,7 @@ public class ElevatorSubsystem extends SubsystemBase {
             return ElevatorPosition.ALGAE_LOW;
         } else {
             // Return null or a default value if no position matches
-            return ElevatorPosition.CORAL_STATION_AND_PROCESSOR;
+            return ElevatorPosition.UNKNOWN;
         }
     }
 

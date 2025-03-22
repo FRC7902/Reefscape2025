@@ -2,9 +2,12 @@
   "robotWidth": 0.864,
   "robotLength": 0.864,
   "holonomicMode": true,
-  "pathFolders": [],
+  "pathFolders": [
+    "With vision",
+    "No vision"
+  ],
   "autoFolders": [
-    "AB"
+    "COMPETITION AUTOS "
   ],
   "defaultMaxVel": 5.0,
   "defaultMaxAccel": 2.75,
@@ -14,7 +17,7 @@
   "robotMass": 70.307,
   "robotMOI": 6.883,
   "robotTrackwidth": 0.546,
-  "driveWheelRadius": 0.049,
+  "driveWheelRadius": 0.0494,
   "driveGearing": 6.86,
   "maxDriveSpeed": 4.0,
   "driveMotorType": "falcon500",

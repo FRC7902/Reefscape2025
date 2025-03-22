@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "V2FinalPathRight1"
+            "pathName": "S1L1"
           }
         },
         {
@@ -19,7 +19,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "V2FinalPathRight2"
+            "pathName": "New Path"
           }
         },
         {
@@ -31,13 +31,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "V2FinalPathRight3"
+            "pathName": "Copy of New Path"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "COMPETITION AUTOS ",
   "choreoAuto": false
 }
