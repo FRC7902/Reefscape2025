@@ -52,8 +52,8 @@ public class CameraInterface extends SubsystemBase {
             VisionConstants.kCameraRotation     // Yaw (degrees)
         );
 
-        LimelightHelpers.SetIMUMode(camera, 2);
-        LimelightHelpers.setStreamMode_Standard(camera);
+        LimelightHelpers.SetIMUMode(camera, 0);
+        //LimelightHelpers.setStreamMode_Standard(camera);
         reefPoses = setReefPoses();
     }
 
@@ -131,7 +131,7 @@ public class CameraInterface extends SubsystemBase {
     }
 
     public void updateOdometryWithMegaTag1() {
-        if (cameraSeesAprilTag()) {
+        if (true) {
             LimelightHelpers.PoseEstimate limelightMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue(camera);
             
             double rotationSpeed = Math.abs(RobotContainer.m_swerveSubsystem.getSwerveDrive().getRobotVelocity().omegaRadiansPerSecond);
@@ -160,8 +160,9 @@ public class CameraInterface extends SubsystemBase {
                     limelightMeasurement.timestampSeconds,
                     VecBuilder.fill(.5, .5, 9999999));  
             }
-
+            System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
         }
+
     }
 
     @Override
@@ -179,7 +180,10 @@ public class CameraInterface extends SubsystemBase {
 
         double robotYaw = RobotContainer.m_swerveSubsystem.getSwerveDrive().getYaw().getDegrees();  
 
-        // LimelightHelpers.SetRobotOrientation(camera, robotYaw, 0.0, 0.0, 0.0, 0.0, 0.0);
+        LimelightHelpers.SetRobotOrientation(camera, robotYaw, 0.0, 0.0, 0.0, 0.0, 0.0);
+
+        updateOdometryWithMegaTag2();
+
 
     }
-}
+}   

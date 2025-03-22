@@ -1,0 +1,23 @@
+{
+  "Connections": {
+    "open": true
+  },
+  "NetworkTables Settings": {
+    "mode": "Client (NT4)",
+    "serverTeam": "7902"
+  },
+  "Persistent Values": {
+    "open": false
+  },
+  "Server": {
+    "Subscribers": {
+      "open": true
+    },
+    "open": true
+  },
+  "transitory": {
+    "limelight": {
+      "open": true
+    }
+  }
+}

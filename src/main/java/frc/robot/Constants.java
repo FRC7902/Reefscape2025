@@ -30,13 +30,13 @@ public final class Constants {
       //x dist = 269.87 mm (forward back)
       // ground = 272.94 mm
 
-      public static final int[] acceptedTagIDs = new int[]{6, 7, 8, 9, 10, 11, 17, 18, 19, 20, 21, 22};
+      public static final int[] acceptedTagIDs = new int[]{2, 3, 6, 7, 8, 9, 10, 11, 17, 18, 19, 20, 21, 22};
 
       public static final double kGroundToCamera = 0.27294; // meters
       public static final double kFowardToCamera = 0.26987; // meters
       public static final double kSidewaysToCamera = 0.2998; // meters
-      public static final double kCameraRotation = 25; // degrees
-      public static final String kCameraName = "sigmalight";
+      public static final double kCameraRotation = 25.3; // degrees
+      public static final String kCameraName = "limelight";
 
       // //April Tag Offset
       // public static final double kGroundToAprilTagDistance = 0.171; //in meters
