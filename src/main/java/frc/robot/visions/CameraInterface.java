@@ -152,13 +152,15 @@ public class CameraInterface extends SubsystemBase {
             LimelightHelpers.PoseEstimate limelightMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(camera);
             
             double rotationSpeed = Math.abs(RobotContainer.m_swerveSubsystem.getSwerveDrive().getRobotVelocity().omegaRadiansPerSecond);
-            boolean shouldRejectUpdate = rotationSpeed < 6.28319 && getAprilTagArea() > 50; //360 degrees
+            boolean shouldRejectUpdate = rotationSpeed < 6.28319 && getAprilTagArea() > 50; //360 degrees   
     
+            RobotContainer.m_swerveSubsystem.getSwerveDrive().setVisionMeasurementStdDevs(VecBuilder.fill(.5, .5, 9999999));
+
             if (!(shouldRejectUpdate)) {
                 RobotContainer.m_swerveSubsystem.getSwerveDrive().addVisionMeasurement(
                     limelightMeasurement.pose,
-                    limelightMeasurement.timestampSeconds,
-                    VecBuilder.fill(.5, .5, 9999999));  
+                    limelightMeasurement.timestampSeconds);
+                RobotContainer.m_swerveSubsystem.getSwerveDrive().updateOdometry();
             }
             System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
         }
@@ -178,11 +180,10 @@ public class CameraInterface extends SubsystemBase {
 
         VisionConstants.yControllerTolerance = SmartDashboard.getNumber("Y Controller Tolerance", VisionConstants.yControllerTolerance);
 
-        double robotYaw = RobotContainer.m_swerveSubsystem.getSwerveDrive().getYaw().getDegrees();  
+        //double robotYaw = RobotContainer.m_swerveSubsystem.getSwerveDrive().getYaw().getDegrees();  
 
-        LimelightHelpers.SetRobotOrientation(camera, robotYaw, 0.0, 0.0, 0.0, 0.0, 0.0);
+        //double robotYaw = RobotContainer.m_swerveSubsystem.getSwerveDrive().getPose().getRotation().getDegrees();
 
-        updateOdometryWithMegaTag2();
 
 
     }

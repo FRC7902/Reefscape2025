@@ -49,6 +49,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.PathPlanner;
+import frc.robot.Constants.VisionConstants;
 import frc.robot.Robot;
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
@@ -61,6 +62,7 @@ import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.RobotContainer;
+import frc.robot.visions.LimelightHelpers;
 
 public class SwerveSubsystem extends SubsystemBase {
 
@@ -141,8 +143,9 @@ public class SwerveSubsystem extends SubsystemBase {
 
         // When vision is enabled we must manually update odometry in SwerveDrive
         // if (visionDriveTest) {
-        // swerveDrive.updateOdometry();
-        // vision.updatePoseEstimation(swerveDrive);
+        swerveDrive.updateOdometry();
+        LimelightHelpers.SetRobotOrientation(VisionConstants.kCameraName, swerveDrive.getPose().getRotation().getDegrees(), 0.0, 0.0, 0.0, 0.0, 0.0);
+        RobotContainer.m_cameraSubsystem.updateOdometryWithMegaTag2();
         // }
     }
 

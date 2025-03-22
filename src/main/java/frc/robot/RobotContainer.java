@@ -79,7 +79,7 @@ public class RobotContainer {
 
     private final SendableChooser<Command> autoChooser;
 
-    private static final CameraInterface m_cameraSubsystem = new CameraInterface(VisionConstants.kCameraName);
+    public static final CameraInterface m_cameraSubsystem = new CameraInterface(VisionConstants.kCameraName);
 
     //private final CameraInterface leftCamera = new CameraInterface("quandale", 0);
 
