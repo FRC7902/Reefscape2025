@@ -143,9 +143,10 @@ public class SwerveSubsystem extends SubsystemBase {
 
         // When vision is enabled we must manually update odometry in SwerveDrive
         // if (visionDriveTest) {
-        swerveDrive.updateOdometry();
         LimelightHelpers.SetRobotOrientation(VisionConstants.kCameraName, swerveDrive.getPose().getRotation().getDegrees(), 0.0, 0.0, 0.0, 0.0, 0.0);
         RobotContainer.m_cameraSubsystem.updateOdometryWithMegaTag2();
+        swerveDrive.updateOdometry();
+
         // }
     }
 

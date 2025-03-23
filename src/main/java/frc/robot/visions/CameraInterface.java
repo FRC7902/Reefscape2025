@@ -28,18 +28,21 @@ public class CameraInterface extends SubsystemBase {
     public CameraInterface(String cameraName) {
         camera = cameraName;
           
-        SmartDashboard.putNumber("kPY Close", VisionConstants.kPY2);
-        SmartDashboard.putNumber("kIY Close", VisionConstants.kIY2);
-        SmartDashboard.putNumber("kDY Close", VisionConstants.kDY2);
+        hawkTuah("kPY Close", VisionConstants.kPY2);
+        hawkTuah("kIY Close", VisionConstants.kIY2);
+        hawkTuah("kDY Close", VisionConstants.kDY2);
 
-        SmartDashboard.putNumber("kPY Far", VisionConstants.kPY);
-        SmartDashboard.putNumber("kIY Far", VisionConstants.kIY);
-        SmartDashboard.putNumber("kDY Far", VisionConstants.kDY);
+        hawkTuah("kPY Far", VisionConstants.kPY);
+        hawkTuah("kIY Far", VisionConstants.kIY);
+        hawkTuah("kDY Far", VisionConstants.kDY);
 
-        SmartDashboard.putNumber("Y Controller Tolerance", VisionConstants.yControllerTolerance);
+        hawkTuah("Y Controller Tolerance", VisionConstants.yControllerTolerance);
 
-        SmartDashboard.putNumber("Left Reef offset", VisionConstants.leftReefToAprilTagOffset);
-        SmartDashboard.putNumber("Right Reef offset", VisionConstants.rightReefToAprilTagOffset);
+        hawkTuah("Left Reef offset", VisionConstants.leftReefToAprilTagOffset);
+        hawkTuah("Right Reef offset", VisionConstants.rightReefToAprilTagOffset);
+
+        hawkTuah("Cam std devs", VisionConstants.kStdevs);
+
 
 
         //LimelightHelpers.SetFiducialIDFiltersOverride(camera, VisionConstants.acceptedTagIDs); // Only track these tag IDs
@@ -59,7 +62,7 @@ public class CameraInterface extends SubsystemBase {
         );
         */
 
-        LimelightHelpers.SetIMUMode(camera, 1);
+        LimelightHelpers.SetIMUMode(camera, VisionConstants.kLocalizationMode);
         //LimelightHelpers.setStreamMode_Standard(camera);
         reefPoses = setReefPoses();
     }
@@ -148,7 +151,7 @@ public class CameraInterface extends SubsystemBase {
                 RobotContainer.m_swerveSubsystem.getSwerveDrive().addVisionMeasurement(
                     limelightMeasurement.pose,
                     limelightMeasurement.timestampSeconds,
-                    VecBuilder.fill(.5, .5, 9999999));  
+                    VecBuilder.fill(VisionConstants.kStdevs, VisionConstants.kStdevs, 9999999));  
             }
 
         }
@@ -159,11 +162,10 @@ public class CameraInterface extends SubsystemBase {
             LimelightHelpers.PoseEstimate limelightMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(camera);
             
             double rotationSpeed = Math.abs(RobotContainer.m_swerveSubsystem.getSwerveDrive().getRobotVelocity().omegaRadiansPerSecond);
-            boolean shouldRejectUpdate = rotationSpeed < 6.28319 && getAprilTagArea() > 50; //360 degrees   
+            boolean shouldRejectUpdate = rotationSpeed < 6.28319 && limelightMeasurement.tagCount > 0; //360 degrees   
     
-            RobotContainer.m_swerveSubsystem.getSwerveDrive().setVisionMeasurementStdDevs(VecBuilder.fill(.5, .5, 9999999));
-
             if (!(shouldRejectUpdate)) {
+                RobotContainer.m_swerveSubsystem.getSwerveDrive().setVisionMeasurementStdDevs(VecBuilder.fill(VisionConstants.kStdevs, VisionConstants.kStdevs, 9999999));
                 RobotContainer.m_swerveSubsystem.getSwerveDrive().addVisionMeasurement(
                     limelightMeasurement.pose,
                     limelightMeasurement.timestampSeconds);
@@ -173,22 +175,31 @@ public class CameraInterface extends SubsystemBase {
 
     }
 
+    private void hawkTuah(String key, double value) {
+        SmartDashboard.putNumber(key, value);
+      }
+
+    private double skibidi(String key, double value) {
+        return SmartDashboard.getNumber(key, value);
+    }  
+
     @Override
     public void periodic() {
 
-        VisionConstants.kPY2 = SmartDashboard.getNumber("kPY Close", VisionConstants.kPY2);
-        VisionConstants.kIY2 = SmartDashboard.getNumber("kIY Close", VisionConstants.kIY2);
-        VisionConstants.kDY2 = SmartDashboard.getNumber("kDY Close", VisionConstants.kDY2);
+        VisionConstants.kPY2 = skibidi("kPY Close", VisionConstants.kPY2);
+        VisionConstants.kIY2 = skibidi("kIY Close", VisionConstants.kIY2);
+        VisionConstants.kDY2 = skibidi("kDY Close", VisionConstants.kDY2);
 
-        VisionConstants.kPY = SmartDashboard.getNumber("kPY Far", VisionConstants.kPY);
-        VisionConstants.kIY = SmartDashboard.getNumber("kIY Far", VisionConstants.kIY);
-        VisionConstants.kDY = SmartDashboard.getNumber("kDY Far", VisionConstants.kDY);
+        VisionConstants.kPY = skibidi("kPY Far", VisionConstants.kPY);
+        VisionConstants.kIY = skibidi("kIY Far", VisionConstants.kIY);
+        VisionConstants.kDY = skibidi("kDY Far", VisionConstants.kDY);
 
-        VisionConstants.leftReefToAprilTagOffset = SmartDashboard.getNumber("Left Reef offset", VisionConstants.leftReefToAprilTagOffset);
-        VisionConstants.rightReefToAprilTagOffset = SmartDashboard.getNumber("Right Reef offset", VisionConstants.rightReefToAprilTagOffset);
+        VisionConstants.leftReefToAprilTagOffset = skibidi("Left Reef offset", VisionConstants.leftReefToAprilTagOffset);
+        VisionConstants.rightReefToAprilTagOffset = skibidi("Right Reef offset", VisionConstants.rightReefToAprilTagOffset);
 
+        VisionConstants.kStdevs = skibidi("Cam std devs", VisionConstants.kStdevs);
 
-        VisionConstants.yControllerTolerance = SmartDashboard.getNumber("Y Controller Tolerance", VisionConstants.yControllerTolerance);
+        VisionConstants.yControllerTolerance = skibidi("Y C ontroller Tolerance", VisionConstants.yControllerTolerance);
 
         //double robotYaw = RobotContainer.m_swerveSubsystem.getSwerveDrive().getPose().getRotation().getDegrees();
 

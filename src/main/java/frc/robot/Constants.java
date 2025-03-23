@@ -61,6 +61,10 @@ public final class Constants {
 
       public static int kSecondPIDControllerStartingPoint = 13; //to change
 
+      public static double kStdevs = 0.7;
+
+      public static int kLocalizationMode = 1;
+
     }
     
     public static class PathPlanner {

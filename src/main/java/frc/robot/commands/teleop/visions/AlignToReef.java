@@ -84,16 +84,14 @@ public class AlignToReef extends Command {
 
     var ySpeed = yController.calculate(aprilTagDistance.getY() + aprilTagOffset);
     if (yController.atGoal()) {
-      System.out.println("Y Controller at Goal");
       ySpeed = 0;
     }
 
-    SmartDashboard.putNumber("Y Error", yController.getPositionError());
-    SmartDashboard.putNumber("April Tag Rotation", (aprilTagPose.getRotation().getDegrees()));
-    SmartDashboard.putNumber("April Tag Y STUFFERRR", aprilTagDistance.getY());
+    hawkTuah("Y Error", yController.getPositionError());
+    hawkTuah("April Tag Rotation", (aprilTagPose.getRotation().getDegrees()));
+    hawkTuah("April Tag Y STUFFERRR", aprilTagDistance.getY());
 
-     double multiplier = Math.round(aprilTagPose.getRotation().getRadians() / Math.abs(aprilTagPose.getRotation().getRadians()));
-
+    double multiplier = Math.round(aprilTagPose.getRotation().getRadians() / Math.abs(aprilTagPose.getRotation().getRadians()));
     double rotation;
 
     if (aprilTagPose.getRotation().getRadians() == 0) {
@@ -116,11 +114,14 @@ public class AlignToReef extends Command {
     m_autoAlignCam.turnLEDOff();
   }
 
-
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
     return false;
+  }
+
+  public void hawkTuah(String key, double value) {
+    SmartDashboard.putNumber(key, value);
   }
 
   private double getDriverControllerLeftY() {
