@@ -276,7 +276,7 @@ public class ElevatorSubsystem extends SubsystemBase {
      * Returns the current position of the elevator as an enum
      * <ul>
      * <li><strong>CORAL_L1</strong>: Represents the first level of the Coral height
-     * (kElevatorCoralLevel1Height)</li>
+     * (kElevatorCoralLevel1StartHeight)</li>
      * <li><strong>CORAL_L2</strong>: Represents the second level of the Coral height
      * (kElevatorCoralLevel2Height)</li>
      * <li><strong>CORAL_L3</strong>: Represents the third level of the Coral height
@@ -298,7 +298,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         double currentPosition = getPositionMeters();
 
         if (Math.abs(currentPosition
-                - ElevatorConstants.kElevatorCoralLevel1Height) < ElevatorConstants.kElevatorTargetError
+                - ElevatorConstants.kElevatorCoralLevel1StartHeight) < ElevatorConstants.kElevatorTargetError
                         * 2) {
             return ElevatorPosition.CORAL_L1;
         } else if (Math.abs(currentPosition

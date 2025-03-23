@@ -24,7 +24,7 @@ public class StrafeRightCommand extends Command {
   @Override
   public void execute() {
     // RobotContainer.m_swerveSubsystem.strafe(0.6, Math.PI * 2, 0.5);
-    RobotContainer.m_swerveSubsystem.strafe(-RobotContainer.m_driverController.getRightTriggerAxis(), 0.1);
+    RobotContainer.m_swerveSubsystem.strafe(-RobotContainer.m_driverController.getRightTriggerAxis(), 0.25);
 
   }
 
