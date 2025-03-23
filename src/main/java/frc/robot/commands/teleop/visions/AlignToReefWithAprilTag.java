@@ -81,7 +81,7 @@ public class AlignToReefWithAprilTag extends Command {
       ySpeed = 0;
     }
     
-    hawkTuah("Y Error", yController.getPositionError());
+    SmartDashboard.putNumber("Y Error", yController.getPositionError());
     RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(targetRotation, getDriverControllerLeftY(), ySpeed);
   }
     
@@ -102,7 +102,4 @@ public class AlignToReefWithAprilTag extends Command {
     return -RobotContainer.m_driverController.getLeftY();
   }
 
-  public void hawkTuah(String text, double key) {
-    SmartDashboard.putNumber(text, key);
-  }
 }

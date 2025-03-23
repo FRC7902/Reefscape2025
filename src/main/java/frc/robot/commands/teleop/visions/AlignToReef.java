@@ -87,11 +87,10 @@ public class AlignToReef extends Command {
       System.out.println("Y Controller at Goal");
       ySpeed = 0;
     }
-  
 
-    hawkTuah("Y Error", yController.getPositionError());
-    hawkTuah("April Tag Rotation", (aprilTagPose.getRotation().getDegrees()));
-    hawkTuah("April Tag Y STUFFERRR", aprilTagDistance.getY());
+    SmartDashboard.putNumber("Y Error", yController.getPositionError());
+    SmartDashboard.putNumber("April Tag Rotation", (aprilTagPose.getRotation().getDegrees()));
+    SmartDashboard.putNumber("April Tag Y STUFFERRR", aprilTagDistance.getY());
 
      double multiplier = Math.round(aprilTagPose.getRotation().getRadians() / Math.abs(aprilTagPose.getRotation().getRadians()));
 
@@ -106,7 +105,7 @@ public class AlignToReef extends Command {
     }
      //double rotation = aprilTagPose.getRotation().unaryMinus().getRadians();
 
-    // hawkTuah("target rotation for tag", Math.toDegrees(rotation));
+    //SmartDashboard.putNumber("target rotation for tag", Math.toDegrees(rotation));
 
     RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(rotation, getDriverControllerLeftY(), -ySpeed);
   }
@@ -128,7 +127,5 @@ public class AlignToReef extends Command {
     return -RobotContainer.m_driverController.getLeftY();
   }
 
-  public void hawkTuah(String text, double key) {
-    SmartDashboard.putNumber(text, key);
-  }
+
 }
