@@ -51,17 +51,18 @@ import frc.robot.commands.teleop.climb.ManualClimb;
 import swervelib.SwerveInputStream;
 import frc.robot.commands.teleop.visions.AlignToReef;
 
-
 /**
- * This class is where the bulk of the robot should be declared. Since Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
+ * This class is where the bulk of the robot should be declared. Since
+ * Command-based is a
+ * "declarative" paradigm, very little robot logic should actually be handled in
+ * the {@link Robot}
+ * periodic methods (other than the scheduler calls). Instead, the structure of
+ * the robot (including
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
     // The robot's subsystems and commands are defined here...
-    public static final AlgaeManipulatorSubsystem m_algaeElevatorManipulatorSubsystem =
-            new AlgaeManipulatorSubsystem();
+    public static final AlgaeManipulatorSubsystem m_algaeElevatorManipulatorSubsystem = new AlgaeManipulatorSubsystem();
     // The robot's subsystems and commands are defined here...
     public static final ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
     public static final ClimbSubsystem m_climbSubsystem = new ClimbSubsystem();
@@ -69,23 +70,24 @@ public class RobotContainer {
     public static final CoralIndexerSubsystem m_indexSubsystem = new CoralIndexerSubsystem();
 
     // Replace with CommandPS4Controller or CommandJoystick if needed
-    public static final CommandXboxController m_driverController =
-            new CommandXboxController(OperatorConstants.kDriverControllerPort);
-    public static final CommandXboxController m_operatorController =
-            new CommandXboxController(OperatorConstants.kOperatorControllerPort);
+    public static final CommandXboxController m_driverController = new CommandXboxController(
+            OperatorConstants.kDriverControllerPort);
+    public static final CommandXboxController m_operatorController = new CommandXboxController(
+            OperatorConstants.kOperatorControllerPort);
 
-    public static final SwerveSubsystem m_swerveSubsystem =
-            new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
+    public static final SwerveSubsystem m_swerveSubsystem = new SwerveSubsystem(
+            new File(Filesystem.getDeployDirectory(), "swerve"));
 
     private final SendableChooser<Command> autoChooser;
 
     public static final CameraInterface m_cameraSubsystem = new CameraInterface(VisionConstants.kCameraName);
 
-    //private final CameraInterface leftCamera = new CameraInterface("quandale", 0);
-
+    // private final CameraInterface leftCamera = new CameraInterface("quandale",
+    // 0);
 
     /**
-     * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular
+     * Converts driver input into a field-relative ChassisSpeeds that is controlled
+     * by angular
      * velocity.
      */
     public SwerveInputStream driveAngularVelocity = SwerveInputStream
@@ -96,17 +98,19 @@ public class RobotContainer {
             .allianceRelativeControl(true);
 
     /**
-     * Clone's the angular velocity input stream and converts it to a fieldRelative input stream.
+     * Clone's the angular velocity input stream and converts it to a fieldRelative
+     * input stream.
      */
     SwerveInputStream driveDirectAngle = driveAngularVelocity.copy()
             .withControllerHeadingAxis(m_driverController::getRightX, m_driverController::getRightY)
             .headingWhile(true);
 
     /**
-     * Clone's the angular velocity input stream and converts it to a robotRelative input stream.
+     * Clone's the angular velocity input stream and converts it to a robotRelative
+     * input stream.
      */
-    public SwerveInputStream driveRobotOriented =
-            driveAngularVelocity.copy().robotRelative(true).allianceRelativeControl(false);
+    public SwerveInputStream driveRobotOriented = driveAngularVelocity.copy().robotRelative(true)
+            .allianceRelativeControl(false);
 
     SwerveInputStream driveAngularVelocityKeyboard = SwerveInputStream
             .of(m_swerveSubsystem.getSwerveDrive(), () -> -m_driverController.getLeftY(),
@@ -143,13 +147,15 @@ public class RobotContainer {
          * NamedCommands.registerCommand("Intake Algae", new IntakeAlgaeCommand());
          * NamedCommands.registerCommand("Coral Intake", new
          * IntakeCoralCommand(Constants.CoralIndexerConstants.kIntakePower));
-         * NamedCommands.registerCommand("Coral Correcter", new CorrectCoralPositionCommand());
+         * NamedCommands.registerCommand("Coral Correcter", new
+         * CorrectCoralPositionCommand());
          * NamedCommands.registerCommand("Coral Outake", new OuttakeCoralCommand());
          * NamedCommands.registerCommand("Low Algae", new
          * SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeLowHeight));
          * NamedCommands.registerCommand("High Algae", new
          * SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeHighHeight));
-         * NamedCommands.registerCommand("Lowest Height", new SetElevatorPositionCommand(0));
+         * NamedCommands.registerCommand("Lowest Height", new
+         * SetElevatorPositionCommand(0));
          */
         NamedCommands.registerCommand("OutakeCoralV2",
                 new OuttakeCoralCommand(Constants.CoralIndexerConstants.kL1OuttakePower));
@@ -177,10 +183,9 @@ public class RobotContainer {
         new EventTrigger("highalgae")
                 .onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeHighHeight));
 
-
-
         // new EventTrigger("shoot note").and(new
-        // Trigger(exampleSubsystem::someCondition)).onTrue(Commands.print("shoot note");
+        // Trigger(exampleSubsystem::someCondition)).onTrue(Commands.print("shoot
+        // note");
 
         // Point Towards Zone Triggers
         // new PointTowardsZoneTrigger("Speaker").whileTrue(Commands.print("aiming at
@@ -198,49 +203,47 @@ public class RobotContainer {
                     Map.entry(ElevatorPosition.ALGAE_HIGH, new IntakeAlgaeCommand())),
             this::select);
 
-    private final Command m_onTrueSelectIntakeCommand =
-            new SelectCommand<>(
-                    Map.ofEntries(Map.entry(ElevatorPosition.CORAL_STATION_AND_PROCESSOR,
-                            new ManualIntakeCoralCommand(
-                                    Constants.CoralIndexerConstants.kIntakePower).withTimeout(5))),
-                    this::select);
+    private final Command m_onTrueSelectIntakeCommand = new SelectCommand<>(
+            Map.ofEntries(Map.entry(ElevatorPosition.CORAL_STATION_AND_PROCESSOR,
+                    new ManualIntakeCoralCommand(
+                            Constants.CoralIndexerConstants.kIntakePower).withTimeout(5))),
+            this::select);
 
-
-    private final Command m_selectOuttakeCommand =
-            new SelectCommand<>(Map.ofEntries(
-                    Map.entry(ElevatorPosition.CORAL_L1,
-                            new OuttakeCoralCommand(
-                                    Constants.CoralIndexerConstants.kL1OuttakePower)),
-                    Map.entry(ElevatorPosition.CORAL_L2, new OuttakeCoralCommand()),
-                    Map.entry(ElevatorPosition.CORAL_L3, new OuttakeCoralCommand()),
-                    Map.entry(ElevatorPosition.CORAL_STATION_AND_PROCESSOR,
-                            new OuttakeAlgaeCommand())),
-                    this::select);
+    private final Command m_selectOuttakeCommand = new SelectCommand<>(Map.ofEntries(
+            Map.entry(ElevatorPosition.CORAL_L1,
+                    new OuttakeCoralCommand(
+                            Constants.CoralIndexerConstants.kL1OuttakePower)),
+            Map.entry(ElevatorPosition.CORAL_L2, new OuttakeCoralCommand()),
+            Map.entry(ElevatorPosition.CORAL_L3, new OuttakeCoralCommand()),
+            Map.entry(ElevatorPosition.CORAL_STATION_AND_PROCESSOR,
+                    new OuttakeAlgaeCommand())),
+            this::select);
 
     /**
-     * Use this method to define your trigger->command mappings. Triggers can be created via the
-     * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary
+     * Use this method to define your trigger->command mappings. Triggers can be
+     * created via the
+     * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with
+     * an arbitrary
      * predicate, or via the named factories in
-     * {@link edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for
+     * {@link edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses
+     * for
      * {@link CommandXboxController
-     * Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller PS4} controllers or
-     * {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight joysticks}.
+     * Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller PS4}
+     * controllers or
+     * {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
+     * joysticks}.
      */
     private void configureBindings() {
         // Swerve drive controls
-        Command driveFieldOrientedDirectAngle =
-                m_swerveSubsystem.driveFieldOriented(driveDirectAngle);
-        Command driveFieldOrientedAnglularVelocity =
-                m_swerveSubsystem.driveFieldOriented(driveAngularVelocity);         
-        Command driveRobotOrientedAngularVelocity =
-                m_swerveSubsystem.driveFieldOriented(driveRobotOriented);
-        Command driveFieldOrientedDirectAngleKeyboard =
-                m_swerveSubsystem.driveFieldOriented(driveDirectAngleKeyboard);
-        Command driveFieldOrientedAnglularVelocityKeyboard =
-                m_swerveSubsystem.driveFieldOriented(driveAngularVelocityKeyboard);
+        Command driveFieldOrientedDirectAngle = m_swerveSubsystem.driveFieldOriented(driveDirectAngle);
+        Command driveFieldOrientedAnglularVelocity = m_swerveSubsystem.driveFieldOriented(driveAngularVelocity);
+        Command driveRobotOrientedAngularVelocity = m_swerveSubsystem.driveFieldOriented(driveRobotOriented);
+        Command driveFieldOrientedDirectAngleKeyboard = m_swerveSubsystem.driveFieldOriented(driveDirectAngleKeyboard);
+        Command driveFieldOrientedAnglularVelocityKeyboard = m_swerveSubsystem
+                .driveFieldOriented(driveAngularVelocityKeyboard);
 
         // Default to field-centric swerve drive
-        //m_swerveSubsystem.setDefaultCommand(driveFieldOrientedAnglularVelocity);
+        // m_swerveSubsystem.setDefaultCommand(driveFieldOrientedAnglularVelocity);
 
         m_swerveSubsystem.setDefaultCommand(driveFieldOrientedAnglularVelocity);
 
@@ -254,7 +257,8 @@ public class RobotContainer {
 
         // m_operatorController.back().whileTrue(new InitiateClimbCommand());
         m_operatorController.back().onTrue(new SequentialCommandGroup(new SetElevatorPositionCommand(
-                ElevatorConstants.kElevatorCoralStationAndProcessorHeight), new InitiateClimbCommand().withTimeout(1), new MoveClimbDownCommand(m_climbSubsystem)));
+                ElevatorConstants.kElevatorCoralStationAndProcessorHeight), new InitiateClimbCommand().withTimeout(1),
+                new MoveClimbDownCommand(m_climbSubsystem)));
         m_operatorController.start().whileTrue(m_swerveSubsystem.centerModulesCommand());
 
         // Raise elevator (by height of Algae diameter) while intaking algae
@@ -267,24 +271,25 @@ public class RobotContainer {
         m_driverController.rightBumper().whileTrue(m_selectOuttakeCommand);
 
         // Strafe controls
-        //m_driverController.leftTrigger(0.05).whileTrue(new SequentialCommandGroup(new CheckForAprilTag(0), new AlignToReef(this, 0)));
-        //m_driverController.rightTrigger(0.05).whileTrue(new SequentialCommandGroup(new CheckForAprilTag(1), new AlignToReef(this, 1)));
+        // m_driverController.leftTrigger(0.05).whileTrue(new SequentialCommandGroup(new
+        // CheckForAprilTag(0), new AlignToReef(this, 0)));
+        // m_driverController.rightTrigger(0.05).whileTrue(new
+        // SequentialCommandGroup(new CheckForAprilTag(1), new AlignToReef(this, 1)));
 
-        m_driverController.rightTrigger(0.05).whileTrue(new AlignToReef(m_cameraSubsystem, this, 1));
-        m_driverController.leftTrigger(0.05).whileTrue(new AlignToReef(m_cameraSubsystem, this, 0));
+        m_driverController.a().whileTrue(new AlignToReef(m_cameraSubsystem, this, 0));
+        m_driverController.b().whileTrue(new AlignToReef(m_cameraSubsystem, this, 1));
 
-/* 
-        // Climb controls
-        m_driverController.povUp()
-                .whileTrue(new ConditionalCommand(new ManualClimb(m_climbSubsystem, 12),
-                        new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
-        m_driverController.povDown()
-                .whileTrue(new ConditionalCommand(new ManualClimb(m_climbSubsystem, -12),
-                        new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
-       
-   */     
-        
-                        
+        /*
+         * // Climb controls
+         * m_driverController.povUp()
+         * .whileTrue(new ConditionalCommand(new ManualClimb(m_climbSubsystem, 12),
+         * new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
+         * m_driverController.povDown()
+         * .whileTrue(new ConditionalCommand(new ManualClimb(m_climbSubsystem, -12),
+         * new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
+         * 
+         */
+
         m_driverController.povLeft()
                 .onTrue(new ConditionalCommand(new MoveClimbUpCommand(m_climbSubsystem),
                         new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
@@ -292,18 +297,14 @@ public class RobotContainer {
                 .onTrue(new ConditionalCommand(new MoveClimbDownCommand(m_climbSubsystem),
                         new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
 
-        
-        
-        m_driverController.povUp().whileTrue(new StrafeRightCommand());
-        m_driverController.povDown().whileTrue(new StrafeLeftCommand());
+        m_driverController.leftTrigger(0.05).whileTrue(new StrafeLeftCommand());
+        m_driverController.rightTrigger(0.05).whileTrue(new StrafeRightCommand());
 
-        
         m_indexSubsystem.setDefaultCommand(
                 new AutomaticIntakeCoralCommand(CoralIndexerConstants.kIntakePower)
                         .andThen(new CorrectCoralPositionCommand().withTimeout(1))
                         .andThen(new AutomaticIntakeCoralCommand(
                                 Constants.CoralIndexerConstants.kCorrectionPower).withTimeout(1)));
-
 
         // Elevator coral positions
         m_operatorController.x().onTrue(
