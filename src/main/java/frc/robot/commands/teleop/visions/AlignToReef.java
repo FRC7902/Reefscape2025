@@ -8,6 +8,7 @@ package frc.robot.commands.teleop.visions;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
@@ -19,40 +20,30 @@ public class AlignToReef extends Command {
 
   private ProfiledPIDController yController;
 
-  private CameraInterface m_autoAlignCam;
-
-  private final RobotContainer m_RobotContainer;
-
-  private final int triggerPressed;
-
   private double aprilTagOffset;
 
   private Pose2d aprilTagPose;
   private Pose2d robotPose;
 
-  private Transform2d aprilTagDistance;
+  private Twist2d aprilTagDistance;
   
 
-  public AlignToReef(CameraInterface m_autoAlignCamera, RobotContainer m_RobotContainer, int triggerPressed) {
+  public AlignToReef() {
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(RobotContainer.m_swerveSubsystem);
-    this.m_autoAlignCam = m_autoAlignCamera;
-    this.m_RobotContainer = m_RobotContainer;
-    this.triggerPressed = triggerPressed;
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
     robotPose = RobotContainer.m_swerveSubsystem.getPose();
-    aprilTagPose = m_autoAlignCam.getNearestAprilTag(robotPose);
-    aprilTagDistance = aprilTagPose.minus(robotPose);
+    aprilTagPose = RobotContainer.m_cameraSubsystem.getNearestAprilTag(robotPose);
 
-    if (triggerPressed == 0) {
+    if (RobotContainer.m_driverController.rightTrigger(0.05).getAsBoolean()) {
       aprilTagOffset = VisionConstants.rightReefToAprilTagOffset;
     }
 
-    else if (triggerPressed == 1) {
+    else if (RobotContainer.m_driverController.leftTrigger(0.05).getAsBoolean()) {
       aprilTagOffset = VisionConstants.leftReefToAprilTagOffset;
     }
 
@@ -67,11 +58,11 @@ public class AlignToReef extends Command {
     yController = new ProfiledPIDController(VisionConstants.kPY2, VisionConstants.kIY2, VisionConstants.kDY2, VisionConstants.yConstraints); //to tune
 
 
-    yController.reset(aprilTagDistance.getY());
+    yController.reset(robotPose.getY());
     yController.setTolerance(VisionConstants.yControllerTolerance);
-    yController.setGoal(0.0);
+    yController.setGoal(aprilTagPose.getY() + aprilTagOffset);
 
-    m_autoAlignCam.turnLEDOn();
+    RobotContainer.m_cameraSubsystem.turnLEDOn();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -80,9 +71,8 @@ public class AlignToReef extends Command {
   public void execute() {  
 
     robotPose = RobotContainer.m_swerveSubsystem.getPose();
-    aprilTagDistance = aprilTagPose.minus(robotPose);
 
-    var ySpeed = yController.calculate(aprilTagDistance.getY() + aprilTagOffset);
+    var ySpeed = yController.calculate(robotPose.getY());
     if (yController.atGoal()) {
       System.out.println("Y Controller at Goal");
       ySpeed = 0;
@@ -91,9 +81,9 @@ public class AlignToReef extends Command {
 
     hawkTuah("Y Error", yController.getPositionError());
     hawkTuah("April Tag Rotation", (aprilTagPose.getRotation().getDegrees()));
-    hawkTuah("April Tag Y STUFFERRR", aprilTagDistance.getY());
+    hawkTuah("Distance to April Tag", (aprilTagPose.getY() - robotPose.getY()));
 
-     double multiplier = Math.round(aprilTagPose.getRotation().getRadians() / Math.abs(aprilTagPose.getRotation().getRadians()));
+    double multiplier = Math.round(aprilTagPose.getRotation().getRadians() / Math.abs(aprilTagPose.getRotation().getRadians()));
 
     double rotation;
 
@@ -108,13 +98,13 @@ public class AlignToReef extends Command {
 
     // hawkTuah("target rotation for tag", Math.toDegrees(rotation));
 
-    RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(rotation, getDriverControllerLeftY(), -ySpeed);
+    RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(rotation, getDriverControllerLeftY(), -ySpeed, false);
   }
     
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_autoAlignCam.turnLEDOff();
+    RobotContainer.m_cameraSubsystem.turnLEDOff();
   }
 
 

@@ -82,7 +82,7 @@ public class AlignToReefWithAprilTag extends Command {
     }
     
     hawkTuah("Y Error", yController.getPositionError());
-    RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(targetRotation, getDriverControllerLeftY(), ySpeed);
+    RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(targetRotation, getDriverControllerLeftY(), ySpeed, false);
   }
     
   // Called once the command ends or is interrupted.
