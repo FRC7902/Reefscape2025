@@ -120,7 +120,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         // Set motion magic
         m_motorConfig.MotionMagic.MotionMagicCruiseVelocity =
                 ElevatorConstants.kElevatorMaxVelocity;
-        m_motorConfig.MotionMagic.MotionMagicAcceleration = 160;
+        m_motorConfig.MotionMagic.MotionMagicAcceleration = ElevatorConstants.kElevatorMaxAcceleration;
         // m_motorConfig.MotionMagic.MotionMagicJerk = 1600; // Target jerk of 1600
 
         // Set safety limits
