@@ -1,0 +1,42 @@
+[
+  {
+    "name": "/FMSInfo/FMSControlData",
+    "type": "int",
+    "value": 40,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/LiveWindow/.status/LW Enabled",
+    "type": "boolean",
+    "value": false,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/SmartDashboard/Field/.name",
+    "type": "string",
+    "value": "Field",
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/SmartDashboard/Auto Chooser/default",
+    "type": "string",
+    "value": "DEFAULT",
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/SmartDashboard/Auto Chooser/active",
+    "type": "string",
+    "value": "DEFAULT",
+    "properties": {
+      "persistent": true
+    }
+  }
+]

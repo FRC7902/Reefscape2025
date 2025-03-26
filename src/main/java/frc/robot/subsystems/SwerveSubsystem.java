@@ -751,14 +751,17 @@ public class SwerveSubsystem extends SubsystemBase {
     public void alignRobotToAprilTag(double radiansHeading, double xTranslation, double yTranslation, boolean isFieldRelative) {
         SwerveController controller = swerveDrive.getSwerveController();
 
-        /*
-         * swerveDrive.drive(ChassisSpeeds.fromRobotRelativeSpeeds(xTranslation,
-         * yTranslation,
-         * -controller.headingCalculate(swerveDrive.getOdometryHeading().unaryMinus().
-         * getRadians(), new Rotation2d(radiansHeading).getRadians()),
-         * swerveDrive.getPose().getRotation()));
-         * 
-         */
+
+        
+        //  swerveDrive.drive(ChassisSpeeds.fromFieldRelativeSpeeds(xTranslation,
+        //  yTranslation,
+        //  -controller.headingCalculate(swerveDrive.getOdometryHeading().unaryMinus().
+        //  getRadians(), new Rotation2d(radiansHeading).getRadians()),
+        //  swerveDrive.getPose().getRotation()));
+         
+         
+
+        
         swerveDrive.drive(new Translation2d(xTranslation, yTranslation),
                 controller.headingCalculate(swerveDrive.getOdometryHeading().getRadians(), radiansHeading),
                 isFieldRelative, false);

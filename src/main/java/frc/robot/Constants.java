@@ -56,7 +56,7 @@ public final class Constants {
         public static double kIY = 0;
         public static double kDY = 0;
 
-        public static double kPY2 = 6.0;
+        public static double kPY2 = 9.0;
         public static double kIY2 = 0;
         public static double kDY2 = 0.5;
 

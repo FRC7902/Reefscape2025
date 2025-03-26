@@ -277,8 +277,8 @@ public class RobotContainer {
         // m_driverController.rightTrigger(0.05).whileTrue(new
         // SequentialCommandGroup(new CheckForAprilTag(1), new AlignToReef(this, 1)));
 
-        m_driverController.a().whileTrue(new AlignToReef());
-        m_driverController.b().whileTrue(new AlignToReef());
+        m_driverController.a().whileTrue(new AlignToReef(0));
+        m_driverController.b().whileTrue(new AlignToReef(1));
 
         // Climb controls
         m_driverController.povUp()
@@ -294,8 +294,6 @@ public class RobotContainer {
         m_driverController.povRight()
                 .onTrue(new ConditionalCommand(new MoveClimbDownCommand(m_climbSubsystem),
                         new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
-
-        m_driverController.leftTrigger(0.05).or(m_driverController.leftTrigger(0.05)).whileTrue(new AlignToReef());
 
         m_indexSubsystem.setDefaultCommand(
                 new AutomaticIntakeCoralCommand(CoralIndexerConstants.kIntakePower)

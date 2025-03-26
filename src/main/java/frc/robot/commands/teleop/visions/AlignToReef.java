@@ -9,6 +9,9 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Twist2d;
+import edu.wpi.first.units.DistanceUnit;
+import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
@@ -25,25 +28,34 @@ public class AlignToReef extends Command {
   private Pose2d aprilTagPose;
   private Pose2d robotPose;
 
-  private Twist2d aprilTagDistance;
+  //private Pose2d aprilTagDistance;
+
+  private Transform2d aprilTagDistance;
+
+  private final int triggerPressed;
   
 
-  public AlignToReef() {
+  public AlignToReef(int triggerPressed) {
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(RobotContainer.m_swerveSubsystem);
+    this.triggerPressed = triggerPressed;
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    robotPose = RobotContainer.m_swerveSubsystem.getPose();
+    robotPose = RobotContainer.m_swerveSubsystem.getSwerveDrive().getPose();
     aprilTagPose = RobotContainer.m_cameraSubsystem.getNearestAprilTag(robotPose);
 
-    if (RobotContainer.m_driverController.rightTrigger(0.05).getAsBoolean()) {
+    //aprilTagDistance = robotPose.log(aprilTagPose);
+
+    aprilTagDistance = aprilTagPose.minus(robotPose);
+
+    if (triggerPressed == 0) {
       aprilTagOffset = VisionConstants.rightReefToAprilTagOffset;
     }
 
-    else if (RobotContainer.m_driverController.leftTrigger(0.05).getAsBoolean()) {
+    else if (triggerPressed == 1) {
       aprilTagOffset = VisionConstants.leftReefToAprilTagOffset;
     }
 
@@ -58,9 +70,9 @@ public class AlignToReef extends Command {
     yController = new ProfiledPIDController(VisionConstants.kPY2, VisionConstants.kIY2, VisionConstants.kDY2, VisionConstants.yConstraints); //to tune
 
 
-    yController.reset(robotPose.getY());
+    yController.reset(aprilTagDistance.getMeasureY().in(Units.Meters) + aprilTagOffset);
     yController.setTolerance(VisionConstants.yControllerTolerance);
-    yController.setGoal(aprilTagPose.getY() + aprilTagOffset);
+    yController.setGoal(0);
 
     RobotContainer.m_cameraSubsystem.turnLEDOn();
   }
@@ -71,8 +83,9 @@ public class AlignToReef extends Command {
   public void execute() {  
 
     robotPose = RobotContainer.m_swerveSubsystem.getPose();
+    aprilTagDistance = aprilTagPose.minus(robotPose);
 
-    var ySpeed = yController.calculate(robotPose.getY());
+    var ySpeed = yController.calculate(aprilTagDistance.getMeasureY().in(Units.Meters) + aprilTagOffset);
     if (yController.atGoal()) {
       System.out.println("Y Controller at Goal");
       ySpeed = 0;
@@ -81,7 +94,8 @@ public class AlignToReef extends Command {
 
     hawkTuah("Y Error", yController.getPositionError());
     hawkTuah("April Tag Rotation", (aprilTagPose.getRotation().getDegrees()));
-    hawkTuah("Distance to April Tag", (aprilTagPose.getY() - robotPose.getY()));
+    hawkTuah("Distance to April Tag", (aprilTagDistance.getMeasureY().in(Units.Meters) + aprilTagOffset));
+    hawkTuah("robot y position", robotPose.getMeasureY().in(Units.Meters));
 
     double multiplier = Math.round(aprilTagPose.getRotation().getRadians() / Math.abs(aprilTagPose.getRotation().getRadians()));
 
