@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.5690442225392291,
-        "y": 7.326533523537803
+        "x": 3.692,
+        "y": 5.086
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.8833103869039607,
-        "y": 6.6016745134495745
+        "x": 3.4695715974442933,
+        "y": 5.228526061056068
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 3.2111982881597716,
-        "y": 3.881455064194008
+        "x": 1.57,
+        "y": 7.3
       },
       "prevControl": {
-        "x": 2.769077069469769,
-        "y": 4.73375062486034
+        "x": 1.7549018164526966,
+        "y": 7.097169999311278
       },
       "nextControl": null,
       "isLocked": false,
@@ -29,25 +29,33 @@
     }
   ],
   "rotationTargets": [],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0.8019943019943031,
+      "maxWaypointRelativePos": 1.0,
+      "constraints": {
+        "maxVelocity": 1.0,
+        "maxAcceleration": 1.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "ElevatorL2",
-      "waypointRelativePos": 0.5012406947890796,
-      "endWaypointRelativePos": null,
-      "command": null
-    },
-    {
-      "name": "coraloutakeon",
-      "waypointRelativePos": 1.0,
+      "name": "ZeroPosition",
+      "waypointRelativePos": 0.0,
       "endWaypointRelativePos": null,
       "command": null
     }
   ],
   "globalConstraints": {
     "maxVelocity": 5.0,
-    "maxAcceleration": 2.75,
+    "maxAcceleration": 3.5,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -55,13 +63,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -54.0
   },
   "reversed": false,
   "folder": "No vision",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -53.13010235415599
+    "rotation": -59.99999999999999
   },
   "useDefaultConstraints": true
 }

@@ -81,6 +81,7 @@ public class CoralIndexerSubsystem extends SubsystemBase {
      */
     public boolean hasCoral() {
         return m_debouncedBeamBreak.calculate(isBeamBroken());
+        //return true; //to remove when testing is done PLEASEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
     }
 
     @Override
@@ -88,7 +89,7 @@ public class CoralIndexerSubsystem extends SubsystemBase {
         // This code runs in both real and simulation modes.
         // SmartDashboard.putNumber("Index Speed", m_indexSpeed);
         // SmartDashboard.putNumber("Motor Velocity (Encoder)", m_encoder.getVelocity());
-        SmartDashboard.putBoolean("Beam Sensor Broken", isBeamBroken());
+        //SmartDashboard.putBoolean("Beam Sensor Broken", isBeamBroken()); commented out for testing
 
         // m_debouncedBeamBreak.calculate(m_beamSensor.get());
 
@@ -98,7 +99,7 @@ public class CoralIndexerSubsystem extends SubsystemBase {
 
     @Override
     public void simulationPeriodic() {
-        SmartDashboard.putNumber("Encoder Reading", m_encoder.getPosition());
+        //SmartDashboard.putNumber("Encoder Reading", m_encoder.getPosition()); commented out for testing
 
         // SmartDashboard.putBoolean("Index Stopped", m_indexMotor.getAppliedOutput() == 0);
 
