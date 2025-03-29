@@ -124,7 +124,7 @@ public final class Constants {
         public static final int kMotorCANId = 30;
         public static final int kMotorCurrentLimit = 60;
 
-        public static final int kbeamBreakPortId = -1;
+        public static final int kbeamBreakPortId = 30;
 
         public static final int kIntakeVoltage = 12;
         public static final int kOuttakeVoltage = -12;
