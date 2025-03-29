@@ -38,6 +38,7 @@ import frc.robot.commands.teleop.coral_indexer.AutomaticIntakeCoralCommand;
 import frc.robot.commands.teleop.coral_indexer.CorrectCoralPositionCommand;
 import frc.robot.commands.teleop.coral_indexer.ManualIntakeCoralCommand;
 import frc.robot.commands.teleop.coral_indexer.OuttakeCoralCommand;
+import frc.robot.commands.teleop.coral_indexer.WaitForCoral;
 import frc.robot.commands.teleop.elevator.SetElevatorPositionCommand;
 import frc.robot.subsystems.AlgaeManipulatorSubsystem;
 import frc.robot.subsystems.ClimbSubsystem;
@@ -155,9 +156,9 @@ public class RobotContainer {
          * NamedCommands.registerCommand("Lowest Height", new
          * SetElevatorPositionCommand(0));
          */
-        NamedCommands.registerCommand("OutakeCoralV2",
-                new OuttakeCoralCommand(Constants.CoralIndexerConstants.kL1OuttakePower));
-        NamedCommands.registerCommand("StopCoralOutake", new OuttakeCoralCommand(0));
+        //NamedCommands.registerCommand("OutakeCoralV2",new OuttakeCoralCommand(Constants.CoralIndexerConstants.kL1OuttakePower));
+        //NamedCommands.registerCommand("StopCoralOutake", new OuttakeCoralCommand(0));
+        NamedCommands.registerCommand("WaitForCoral", new WaitForCoral());
 
         // preloads the path
 

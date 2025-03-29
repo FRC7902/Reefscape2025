@@ -164,7 +164,7 @@ public final class Constants {
         // Elevator Dimensions
         public static final double kElevatorHeightMeters = 0.0;
         public static final double kElevatorMinHeightMeters = 0.0;
-        public static final double kElevatorMaxHeightMeters = 0.88;
+        public static final double kElevatorMaxHeightMeters = 0.90;
 
         // Motion Constraints
         public static final double kElevatorMaxVelocity = 1.5 / ElevatorConstants.kElevatorMetersPerMotorRotation;
@@ -191,7 +191,7 @@ public final class Constants {
         public static final double kElevatorCoralLevel3Height = 0.548;
 
         public static final double kElevatorAlgaeLowHeight = 0.604;
-        public static final double kElevatorAlgaeHighHeight = 0.88;
+        public static final double kElevatorAlgaeHighHeight = 0.90;
         // ==============================
 
         // ===== Control Parameters =====

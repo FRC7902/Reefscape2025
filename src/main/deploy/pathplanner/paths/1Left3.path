@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.3670468026620366,
-        "y": 6.454732711226852
+        "x": 2.688890597574944,
+        "y": 6.409220865232846
       },
       "isLocked": false,
       "linkedName": null
@@ -20,8 +20,8 @@
         "y": 5.229764344262294
       },
       "prevControl": {
-        "x": 5.2086357060185176,
-        "y": 6.854670500578703
+        "x": 5.286577868852459,
+        "y": 5.7811987704918035
       },
       "nextControl": null,
       "isLocked": false,
@@ -47,7 +47,7 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "ElevatorL2",
+      "name": "ElevatorL2WithWait",
       "waypointRelativePos": 0.7545109211775872,
       "endWaypointRelativePos": null,
       "command": null
@@ -61,7 +61,7 @@
   ],
   "globalConstraints": {
     "maxVelocity": 5.0,
-    "maxAcceleration": 3.8,
+    "maxAcceleration": 3.7,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
