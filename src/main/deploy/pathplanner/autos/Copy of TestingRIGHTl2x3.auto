@@ -1,0 +1,55 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Right1"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Right2"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.7
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Right3"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Right4"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "COMPETITION AUTOS ",
+  "choreoAuto": false
+}

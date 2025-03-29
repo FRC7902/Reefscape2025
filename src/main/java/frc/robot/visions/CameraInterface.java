@@ -41,6 +41,8 @@ public class CameraInterface extends SubsystemBase {
         SmartDashboard.putNumber("Left Reef offset", VisionConstants.leftReefToAprilTagOffset);
         SmartDashboard.putNumber("Right Reef offset", VisionConstants.rightReefToAprilTagOffset);
 
+        SmartDashboard.putNumber("April tag limit", VisionConstants.kLocalizationDisLim);
+
 
         //LimelightHelpers.SetFiducialIDFiltersOverride(camera, VisionConstants.acceptedTagIDs); // Only track these tag IDs
 
@@ -137,6 +139,15 @@ public class CameraInterface extends SubsystemBase {
         LimelightHelpers.setLEDMode_ForceBlink(camera);
     }
 
+    public boolean tagIsSigma(LimelightHelpers.PoseEstimate limelightMeasurement) {
+        double rotationSpeed = Math.abs(RobotContainer.m_swerveSubsystem.getSwerveDrive().getRobotVelocity().omegaRadiansPerSecond);
+        double estimatedDistance = limelightMeasurement.avgTagDist;
+
+        if (rotationSpeed >= Math.PI) return false;
+        else if (estimatedDistance >= VisionConstants.kLocalizationDisLim) return false;
+        else return true;
+    }
+
     public void updateOdometryWithMegaTag1() {
         if (cameraSeesAprilTag()) {
             LimelightHelpers.PoseEstimate limelightMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue(camera);
@@ -144,7 +155,7 @@ public class CameraInterface extends SubsystemBase {
             double rotationSpeed = Math.abs(RobotContainer.m_swerveSubsystem.getSwerveDrive().getRobotVelocity().omegaRadiansPerSecond);
             boolean shouldRejectUpdate = rotationSpeed < 6.28319 && getAprilTagArea() > 50; //360 degrees
     
-            if (!(shouldRejectUpdate)) {
+            if (tagIsSigma(limelightMeasurement)) {
                 RobotContainer.m_swerveSubsystem.getSwerveDrive().addVisionMeasurement(
                     limelightMeasurement.pose,
                     limelightMeasurement.timestampSeconds,
@@ -163,7 +174,7 @@ public class CameraInterface extends SubsystemBase {
     
             RobotContainer.m_swerveSubsystem.getSwerveDrive().setVisionMeasurementStdDevs(VecBuilder.fill(.5, .5, 9999999));
 
-            if (!(shouldRejectUpdate)) {
+            if (tagIsSigma(limelightMeasurement)) {
                 RobotContainer.m_swerveSubsystem.getSwerveDrive().addVisionMeasurement(
                     limelightMeasurement.pose,
                     limelightMeasurement.timestampSeconds);
@@ -189,6 +200,9 @@ public class CameraInterface extends SubsystemBase {
 
 
         VisionConstants.yControllerTolerance = SmartDashboard.getNumber("Y Controller Tolerance", VisionConstants.yControllerTolerance);
+
+
+        VisionConstants.kLocalizationDisLim = SmartDashboard.getNumber("April tag limit", VisionConstants.kLocalizationDisLim);
 
         //double robotYaw = RobotContainer.m_swerveSubsystem.getSwerveDrive().getPose().getRotation().getDegrees();
 

@@ -40,6 +40,8 @@ public final class Constants {
         public static final double kCameraRotation = 25.3; // degrees
         public static final String kCameraName = "limelight";
 
+        public static double kLocalizationDisLim = 8;
+
         // //April Tag Offset
         // public static final double kGroundToAprilTagDistance = 0.171; //in meters
         // public static final double kAprilTagAreaLimit = 4.5;
@@ -124,7 +126,7 @@ public final class Constants {
         public static final int kMotorCANId = 30;
         public static final int kMotorCurrentLimit = 60;
 
-        public static final int kbeamBreakPortId = 8;
+        public static final int kbeamBreakPortId = 5;
 
         public static final int kIntakeVoltage = 12;
         public static final int kOuttakeVoltage = -12;
@@ -142,7 +144,7 @@ public final class Constants {
         public static double kS = 1;
         public static double kV = 1;
 
-        public static final int kBeamSensorPort = 9;
+        public static final int kBeamSensorPort = 8;
 
     }
 
