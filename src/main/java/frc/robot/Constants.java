@@ -23,6 +23,7 @@ public final class Constants {
 
     public static class DriveConstants {
         public static final double MAX_SPEED = Units.feetToMeters(15);
+        public static final double kdistanceThreshold = 1.0;    // TODO: tune distance drive away to bring down
     }
 
     public static class VisionConstants {

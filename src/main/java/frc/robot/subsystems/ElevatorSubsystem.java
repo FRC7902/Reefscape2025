@@ -181,6 +181,10 @@ public class ElevatorSubsystem extends SubsystemBase {
         return m_leaderMotor.getPosition().getValueAsDouble();
     }
 
+    public double getSetpoint() {
+        return m_setpoint;
+    }
+
     /**
      * Gets the current position of the elevator in meters
      * 

@@ -48,6 +48,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.PathPlanner;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.Robot;
@@ -70,6 +71,10 @@ public class SwerveSubsystem extends SubsystemBase {
      * Swerve drive object.
      */
     private final SwerveDrive swerveDrive;
+
+    private boolean m_isElevatorUp = false;
+    private double m_initialX = 0;
+    private double m_initialY = 0;
 
     /** Creates a new SwerveSubsystem. */
     public SwerveSubsystem(File directory) {
@@ -147,7 +152,26 @@ public class SwerveSubsystem extends SubsystemBase {
         LimelightHelpers.SetRobotOrientation(VisionConstants.kCameraName,
                 swerveDrive.getPose().getRotation().getDegrees(), 0.0, 0.0, 0.0, 0.0, 0.0);
         RobotContainer.m_cameraSubsystem.updateOdometryWithMegaTag2();
-        // }
+        
+        if (RobotContainer.m_elevatorSubsystem.getSetpoint() > ElevatorConstants.kElevatorMinHeightMeters && !m_isElevatorUp) {
+            m_isElevatorUp = true;
+            m_initialX = getPose().getX();
+            m_initialY = getPose().getY();
+        }
+
+        if (m_isElevatorUp) {
+            double currentX = getPose().getX();
+            double currentY = getPose().getY();
+            double distance = Math.sqrt(Math.pow(currentX - m_initialX, 2) + Math.pow(currentY - m_initialY, 2));
+
+            if (distance >= DriveConstants.kdistanceThreshold) {
+                // Zero elevator
+                // may want to lower speed
+                RobotContainer.m_elevatorSubsystem.setPosition(ElevatorConstants.kElevatorMinHeightMeters);
+                m_isElevatorUp = false;
+            }
+        }
+
     }
 
     @Override
