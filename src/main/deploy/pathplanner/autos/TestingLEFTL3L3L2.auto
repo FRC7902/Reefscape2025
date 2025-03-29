@@ -7,7 +7,31 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Right1"
+            "pathName": "Left1"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.7
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Left2"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.25
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Left3"
           }
         },
         {
@@ -19,19 +43,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Right2"
+            "pathName": "Left4"
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 1.7
+            "waitTime": 0.25
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Right3"
+            "pathName": "Left5"
           }
         },
         {
@@ -43,19 +67,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Right4"
+            "pathName": "Left6"
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 1.7
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Right5"
+            "waitTime": 0.25
           }
         }
       ]
