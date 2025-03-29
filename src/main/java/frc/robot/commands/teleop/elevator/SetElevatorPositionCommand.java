@@ -14,30 +14,41 @@ import frc.robot.RobotContainer;
  */
 public class SetElevatorPositionCommand extends Command {
     private double m_targetHeight;
+    private boolean m_waitForCoral = false;
 
     /** Creates a new ElevatorSetpoint. */
     public SetElevatorPositionCommand(double targetHeight) {
         m_targetHeight = targetHeight;
+
+        addRequirements(RobotContainer.m_elevatorSubsystem);
+    }
+
+    public SetElevatorPositionCommand(double targetHeight, boolean waitForCoral) {
+        m_targetHeight = targetHeight;
+        m_waitForCoral = waitForCoral;
+
         addRequirements(RobotContainer.m_elevatorSubsystem);
     }
 
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        RobotContainer.m_elevatorSubsystem.setPosition(m_targetHeight);
+        // RobotContainer.m_elevatorSubsystem.setPosition(m_targetHeight);
     }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        RobotContainer.m_elevatorSubsystem.setPosition(m_targetHeight);
+        if (!m_waitForCoral) {
+            RobotContainer.m_elevatorSubsystem.setPosition(m_targetHeight);
+        } else if (RobotContainer.m_indexSubsystem.hasCoral()) {
+            RobotContainer.m_elevatorSubsystem.setPosition(m_targetHeight);
+        }
     }
 
     // Called once the command ends or is interrupted.
     @Override
-    public void end(boolean interrupted) {
-        // RobotContainer.m_elevatorSubsystem.stop();
-    }
+    public void end(boolean interrupted) {}
 
     // Returns true when the command should end.
     @Override
