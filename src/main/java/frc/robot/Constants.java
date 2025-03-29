@@ -40,6 +40,8 @@ public final class Constants {
         public static final double kCameraRotation = 25.3; // degrees
         public static final String kCameraName = "limelight";
 
+        public static double kLocalizationDisLim = 8;
+
         // //April Tag Offset
         // public static final double kGroundToAprilTagDistance = 0.171; //in meters
         // public static final double kAprilTagAreaLimit = 4.5;
