@@ -6,10 +6,8 @@ package frc.robot;
 
 import java.io.File;
 import java.util.Map;
-import java.util.concurrent.locks.Condition;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.events.EventTrigger;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -33,11 +31,12 @@ import frc.robot.commands.teleop.algae_manipulator.IntakeAlgaeCommand;
 import frc.robot.commands.teleop.algae_manipulator.OuttakeAlgaeCommand;
 import frc.robot.commands.teleop.climb.InitiateClimbCommand;
 import frc.robot.commands.teleop.climb.LockFunnelCommand;
+import frc.robot.commands.teleop.climb.ManualClimb;
 import frc.robot.commands.teleop.climb.MoveClimbDownCommand;
 import frc.robot.commands.teleop.climb.MoveClimbUpCommand;
+import frc.robot.commands.teleop.coral_indexer.AutomaticIntakeCoralCommand;
 import frc.robot.commands.teleop.coral_indexer.CorrectCoralPositionCommand;
 import frc.robot.commands.teleop.coral_indexer.ManualIntakeCoralCommand;
-import frc.robot.commands.teleop.coral_indexer.AutomaticIntakeCoralCommand;
 import frc.robot.commands.teleop.coral_indexer.OuttakeCoralCommand;
 import frc.robot.commands.teleop.elevator.SetElevatorPositionCommand;
 import frc.robot.subsystems.AlgaeManipulatorSubsystem;
@@ -47,7 +46,6 @@ import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem.ElevatorPosition;
 import frc.robot.visions.CameraInterface;
 import frc.robot.subsystems.SwerveSubsystem;
-import frc.robot.commands.teleop.climb.ManualClimb;
 import swervelib.SwerveInputStream;
 import frc.robot.commands.teleop.visions.AlignToReef;
 
@@ -172,16 +170,28 @@ public class RobotContainer {
                 new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel2Height));
         new EventTrigger("ElevatorL3").onTrue(
                 new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel3Height));
+        new EventTrigger("lowalgae")
+                .onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeLowHeight));
+        new EventTrigger("highalgae")
+                .onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeHighHeight));
+
+        new EventTrigger("ElevatorL1WithWait").onTrue(
+                new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel1StartHeight, true));
+        new EventTrigger("ElevatorL2WithWait").onTrue(
+                new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel2Height, true));
+        new EventTrigger("ElevatorL3WithWait").onTrue(
+                new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel3Height, true));
+        new EventTrigger("lowalgaeWithWait").onTrue(
+                new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeLowHeight, true));
+        new EventTrigger("highalgaeWithWait").onTrue(
+                new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeHighHeight, true));
+
         new EventTrigger("intakealgaeon").onTrue(new IntakeAlgaeCommand().withTimeout(1.5));
         // new EventTrigger("intakealgaeoff").toggleOnFalse(new IntakeAlgaeCommand());
         new EventTrigger("coraloutakeon")
                 .onTrue(new OuttakeCoralCommand(Constants.CoralIndexerConstants.kL1OuttakePower)
                         .withTimeout(3));
         // new EventTrigger("coraloutakeoff").toggleOnFalse(new OuttakeCoralCommand());
-        new EventTrigger("lowalgae")
-                .onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeLowHeight));
-        new EventTrigger("highalgae")
-                .onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeHighHeight));
 
         // new EventTrigger("shoot note").and(new
         // Trigger(exampleSubsystem::someCondition)).onTrue(Commands.print("shoot
@@ -257,9 +267,12 @@ public class RobotContainer {
                 .whileTrue(Commands.parallel(new OuttakeAlgaeCommand(), new OuttakeCoralCommand()));
 
         // m_operatorController.back().whileTrue(new InitiateClimbCommand());
-        m_operatorController.back().onTrue(new SequentialCommandGroup(new SetElevatorPositionCommand(
-                ElevatorConstants.kElevatorCoralStationAndProcessorHeight), new InitiateClimbCommand().withTimeout(1),
-                new MoveClimbDownCommand(m_climbSubsystem)));
+        m_operatorController.back()
+                .onTrue(new SequentialCommandGroup(
+                        new SetElevatorPositionCommand(
+                                ElevatorConstants.kElevatorCoralStationAndProcessorHeight),
+                        new InitiateClimbCommand().withTimeout(1),
+                        new MoveClimbDownCommand(m_climbSubsystem)));
         m_operatorController.start().whileTrue(m_swerveSubsystem.centerModulesCommand());
 
         // Raise elevator (by height of Algae diameter) while intaking algae
