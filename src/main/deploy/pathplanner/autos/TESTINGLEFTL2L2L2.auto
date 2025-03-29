@@ -7,7 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Right1"
+            "pathName": "1Left1"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.25
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "1Left2"
           }
         },
         {
@@ -19,19 +31,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Right2"
+            "pathName": "1Left3"
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 1.7
+            "waitTime": 0.25
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Right3"
+            "pathName": "1Left4"
           }
         },
         {
@@ -43,7 +55,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Right4"
+            "pathName": "1Left5"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.25
           }
         }
       ]

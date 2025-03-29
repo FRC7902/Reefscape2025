@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.575435198392117,
-        "y": 7.543363102956431
+        "x": 7.069933752111487,
+        "y": 5.9092695906355575
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.898866478770244,
-        "y": 6.795502143093492
+        "x": 6.008401784415809,
+        "y": 5.4572083707070185
       },
       "isLocked": false,
       "linkedName": null
@@ -20,8 +20,8 @@
         "y": 5.073924180327869
       },
       "prevControl": {
-        "x": 5.619253245456578,
-        "y": 5.418782542455244
+        "x": 5.567241593752934,
+        "y": 5.189696889189974
       },
       "nextControl": null,
       "isLocked": false,
@@ -32,11 +32,11 @@
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 0.8020550271739129,
+      "minWaypointRelativePos": 0.747972571331521,
       "maxWaypointRelativePos": 1.0,
       "constraints": {
-        "maxVelocity": 1.5,
-        "maxAcceleration": 3.0,
+        "maxVelocity": 2.0,
+        "maxAcceleration": 1.5,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 720.0,
         "nominalVoltage": 12.0,
@@ -54,14 +54,14 @@
     },
     {
       "name": "coraloutakeon",
-      "waypointRelativePos": 1.0,
+      "waypointRelativePos": 0.9461722995923914,
       "endWaypointRelativePos": null,
       "command": null
     }
   ],
   "globalConstraints": {
     "maxVelocity": 5.0,
-    "maxAcceleration": 3.5,
+    "maxAcceleration": 3.8,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -75,7 +75,7 @@
   "folder": "No vision",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -90.0
+    "rotation": -119.99999999999999
   },
   "useDefaultConstraints": true
 }

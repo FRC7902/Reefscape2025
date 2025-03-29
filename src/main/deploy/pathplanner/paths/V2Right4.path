@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.692,
-        "y": 5.086
+        "x": 1.603,
+        "y": 0.693
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.4695715974442933,
-        "y": 5.228526061056068
+        "x": 1.7718276832070956,
+        "y": 0.9921204478646501
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 1.57,
-        "y": 7.3
+        "x": 3.950322129129605,
+        "y": 2.833274598951715
       },
       "prevControl": {
-        "x": 1.7549018164526966,
-        "y": 7.097169999311278
+        "x": 4.078809006844878,
+        "y": 2.6188191904049023
       },
       "nextControl": null,
       "isLocked": false,
@@ -32,7 +32,7 @@
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 0.8019943019943031,
+      "minWaypointRelativePos": 0.7487686820652173,
       "maxWaypointRelativePos": 1.0,
       "constraints": {
         "maxVelocity": 1.0,
@@ -47,8 +47,14 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "ZeroPosition",
-      "waypointRelativePos": 0.0,
+      "name": "ElevatorL3",
+      "waypointRelativePos": 0.4991791635618479,
+      "endWaypointRelativePos": null,
+      "command": null
+    },
+    {
+      "name": "coraloutakeon",
+      "waypointRelativePos": 1.0,
       "endWaypointRelativePos": null,
       "command": null
     }
@@ -63,13 +69,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -54.0
+    "rotation": 59.99999999999999
   },
   "reversed": false,
   "folder": "No vision",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -59.99999999999999
+    "rotation": 54.0
   },
   "useDefaultConstraints": true
 }

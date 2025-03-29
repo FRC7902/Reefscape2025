@@ -7,73 +7,55 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Left1"
+            "pathName": "Right1"
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.7
+            "waitTime": 0.25
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Left2"
+            "pathName": "Right2"
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.7
+            "waitTime": 1.0
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Left3"
+            "pathName": "Right3"
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 1.7
+            "waitTime": 0.25
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Left4"
+            "pathName": "Right4"
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.7
+            "waitTime": 1.0
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Left5"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 1.7
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Left6"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.7
+            "pathName": "Right5"
           }
         }
       ]
