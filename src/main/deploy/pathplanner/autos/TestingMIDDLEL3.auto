@@ -23,15 +23,33 @@
           }
         },
         {
+          "type": "wait",
+          "data": {
+            "waitTime": 2.0
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "Middle3"
           }
         },
         {
+          "type": "wait",
+          "data": {
+            "waitTime": 2.0
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "Middle4"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 2.0
           }
         },
         {
