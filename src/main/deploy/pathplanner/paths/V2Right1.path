@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 3.811532118055555,
-        "y": 2.8770713975697744
+        "x": 3.8720286885245896,
+        "y": 2.940112704918032
       },
       "prevControl": {
-        "x": 3.6442622950819668,
-        "y": 2.208862704918032
+        "x": 3.7047588655510015,
+        "y": 2.2719040122662895
       },
       "nextControl": null,
       "isLocked": false,
@@ -48,7 +48,13 @@
   "eventMarkers": [
     {
       "name": "lowalgae",
-      "waypointRelativePos": 0.47150997150997254,
+      "waypointRelativePos": 0.340310600945309,
+      "endWaypointRelativePos": null,
+      "command": null
+    },
+    {
+      "name": "intakealgaeon",
+      "waypointRelativePos": 1.0,
       "endWaypointRelativePos": null,
       "command": null
     }

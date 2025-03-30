@@ -11,8 +11,8 @@ import frc.robot.RobotContainer;
 public class WaitForCoral extends Command {
   /** Creates a new WaitForCoral. */
   public WaitForCoral() {
-    // Use addRequirements() here to declare subsystem dependencies.
-  }
+    addRequirements(RobotContainer.m_indexSubsystem);
+    }
 
   // Called when the command is initially scheduled.
   @Override
