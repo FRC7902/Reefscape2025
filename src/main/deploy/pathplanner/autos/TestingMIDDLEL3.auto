@@ -7,61 +7,37 @@
         {
           "type": "path",
           "data": {
-            "pathName": "1Left1"
+            "pathName": "Middle1"
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.5
+            "waitTime": 2.0
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "1Left2"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "WaitForCoral"
+            "pathName": "Middle2"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "1Left3"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.5
+            "pathName": "Middle3"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "1Left4"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "WaitForCoral"
+            "pathName": "Middle4"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "1Left5"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.5
+            "pathName": "Middle5"
           }
         }
       ]

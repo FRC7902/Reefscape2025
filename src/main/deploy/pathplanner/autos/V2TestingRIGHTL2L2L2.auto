@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Left1"
+            "pathName": "1Right1"
           }
         },
         {
@@ -19,31 +19,61 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Left2"
+            "pathName": "1Right2"
           }
         },
         {
-          "type": "wait",
+          "type": "named",
           "data": {
-            "waitTime": 0.3
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Left3"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 1.5
+            "name": "WaitForCoral"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Left4"
+            "pathName": "1Right3"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "1Right4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "WaitForCoral"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "1Right6"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "1Right7"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
           }
         }
       ]
