@@ -319,14 +319,31 @@ public class RobotContainer {
                                 Constants.CoralIndexerConstants.kCorrectionPower).withTimeout(1)));
 
         // Elevator coral positions
-        m_operatorController.x().onTrue(
-                new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel1StartHeight));
-        m_operatorController.a().onTrue(new SetElevatorPositionCommand(
-                ElevatorConstants.kElevatorCoralStationAndProcessorHeight));
-        m_operatorController.b().onTrue(
-                new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel2Height));
-        m_operatorController.y().onTrue(
-                new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel3Height));
+        m_operatorController.x().onTrue(new ConditionalCommand(
+                new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel1StartHeight),
+                new NullCommand(),
+                m_indexSubsystem::hasCoral));
+        m_operatorController.a().onTrue(new ConditionalCommand(
+                new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel2Height),
+                new NullCommand(),
+                m_indexSubsystem::hasCoral));
+        m_operatorController.b().onTrue(new ConditionalCommand(
+                new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel3Height),
+                new NullCommand(),
+                m_indexSubsystem::hasCoral));
+        m_operatorController.y().onTrue(new ConditionalCommand(
+                new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel3Height),
+                new NullCommand(),
+                m_indexSubsystem::hasCoral));
+
+        // m_operatorController.x().onTrue(
+        //         new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel1StartHeight));
+        // m_operatorController.a().onTrue(new SetElevatorPositionCommand(
+        //         ElevatorConstants.kElevatorCoralStationAndProcessorHeight));
+        // m_operatorController.b().onTrue(
+        //         new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel2Height));
+        // m_operatorController.y().onTrue(
+        //         new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel3Height));
 
         // Elevator algae positions
         m_operatorController.povDown()
