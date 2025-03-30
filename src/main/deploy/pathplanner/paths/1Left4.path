@@ -48,7 +48,7 @@
   "eventMarkers": [
     {
       "name": "ZeroPosition",
-      "waypointRelativePos": 0,
+      "waypointRelativePos": 0.2133693450371297,
       "endWaypointRelativePos": null,
       "command": null
     }

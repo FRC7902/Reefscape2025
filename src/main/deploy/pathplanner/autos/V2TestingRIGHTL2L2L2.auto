@@ -23,9 +23,9 @@
           }
         },
         {
-          "type": "named",
+          "type": "wait",
           "data": {
-            "name": "WaitForCoral"
+            "waitTime": 0.6
           }
         },
         {
@@ -47,27 +47,15 @@
           }
         },
         {
-          "type": "named",
+          "type": "wait",
           "data": {
-            "name": "WaitForCoral"
+            "waitTime": 0.6
           }
         },
         {
           "type": "path",
           "data": {
             "pathName": "1Right6"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.5
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "1Right7"
           }
         },
         {

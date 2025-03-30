@@ -23,9 +23,9 @@
           }
         },
         {
-          "type": "named",
+          "type": "wait",
           "data": {
-            "name": "WaitForCoral"
+            "waitTime": 0.6
           }
         },
         {
@@ -47,9 +47,9 @@
           }
         },
         {
-          "type": "named",
+          "type": "wait",
           "data": {
-            "name": "WaitForCoral"
+            "waitTime": 0.6
           }
         },
         {

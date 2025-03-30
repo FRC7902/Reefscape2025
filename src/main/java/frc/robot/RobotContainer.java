@@ -130,7 +130,10 @@ public class RobotContainer {
      */
     public RobotContainer() {
         // Configure the trigger bindings
+
         configureBindings();
+
+        NamedCommands.registerCommand("WaitForCoral", new WaitForCoral());
 
         // Build an auto chooser. This will use Commands.none() as the default option.
         autoChooser = AutoBuilder.buildAutoChooser("DEFAULT");
@@ -158,7 +161,6 @@ public class RobotContainer {
          */
         //NamedCommands.registerCommand("OutakeCoralV2",new OuttakeCoralCommand(Constants.CoralIndexerConstants.kL1OuttakePower));
         //NamedCommands.registerCommand("StopCoralOutake", new OuttakeCoralCommand(0));
-        NamedCommands.registerCommand("WaitForCoral", new WaitForCoral());
 
         // preloads the path
 
@@ -190,8 +192,8 @@ public class RobotContainer {
         new EventTrigger("intakealgaeon").onTrue(new IntakeAlgaeCommand().withTimeout(1.5));
         // new EventTrigger("intakealgaeoff").toggleOnFalse(new IntakeAlgaeCommand());
         new EventTrigger("coraloutakeon")
-                .onTrue(new OuttakeCoralCommand(Constants.CoralIndexerConstants.kL1OuttakePower)
-                        .withTimeout(3));
+                .onTrue(new OuttakeCoralCommand(1)
+                        .until(()->!m_indexSubsystem.isDeepBeamBroken()));
         // new EventTrigger("coraloutakeoff").toggleOnFalse(new OuttakeCoralCommand());
 
         // new EventTrigger("shoot note").and(new

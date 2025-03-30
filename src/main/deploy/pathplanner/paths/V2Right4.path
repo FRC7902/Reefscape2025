@@ -54,7 +54,7 @@
     },
     {
       "name": "coraloutakeon",
-      "waypointRelativePos": 0.99,
+      "waypointRelativePos": 1.0,
       "endWaypointRelativePos": null,
       "command": null
     }
