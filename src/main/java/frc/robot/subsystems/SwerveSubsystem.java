@@ -72,7 +72,7 @@ public class SwerveSubsystem extends SubsystemBase {
      */
     private final SwerveDrive swerveDrive;
 
-    private boolean m_isElevatorUp = false;
+    private boolean m_isCoralShooted = false;
     private double m_initialX = 0;
     private double m_initialY = 0;
 
@@ -153,13 +153,16 @@ public class SwerveSubsystem extends SubsystemBase {
                 swerveDrive.getPose().getRotation().getDegrees(), 0.0, 0.0, 0.0, 0.0, 0.0);
         RobotContainer.m_cameraSubsystem.updateOdometryWithMegaTag2();
         
-        if (RobotContainer.m_elevatorSubsystem.getSetpoint() > ElevatorConstants.kElevatorMinHeightMeters && !m_isElevatorUp) {
-            m_isElevatorUp = true;
+        // Get staring position after shooting coral
+        if (!RobotContainer.m_indexSubsystem.hasCoral() && RobotContainer.m_elevatorSubsystem.getSetpoint()!= 0 && !m_isCoralShooted) {
+            m_isCoralShooted = true;
             m_initialX = getPose().getX();
             m_initialY = getPose().getY();
         }
 
-        if (m_isElevatorUp) {
+        // Get distance after shooting coral
+        // Zero elevator after movin certain distance
+        if (m_isCoralShooted) {
             double currentX = getPose().getX();
             double currentY = getPose().getY();
             double distance = Math.sqrt(Math.pow(currentX - m_initialX, 2) + Math.pow(currentY - m_initialY, 2));
@@ -168,7 +171,7 @@ public class SwerveSubsystem extends SubsystemBase {
                 // Zero elevator
                 // may want to lower speed
                 RobotContainer.m_elevatorSubsystem.setPosition(ElevatorConstants.kElevatorMinHeightMeters);
-                m_isElevatorUp = false;
+                m_isCoralShooted = false;
             }
         }
 
