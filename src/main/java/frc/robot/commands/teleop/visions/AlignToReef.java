@@ -89,7 +89,6 @@ public class AlignToReef extends Command {
 
     var ySpeed = yController.calculate(aprilTagDistance.getY() + aprilTagOffset);
     if (yController.atGoal()) {
-      System.out.println("Y Controller at Goal");
       ySpeed = 0;
     }
   
