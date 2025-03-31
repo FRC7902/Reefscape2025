@@ -41,7 +41,6 @@ public class AlignToReef extends Command {
     this.m_autoAlignCam = m_autoAlignCamera;
     this.reefSide = reefSide;
   }
-
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
@@ -99,9 +98,8 @@ public class AlignToReef extends Command {
 
     double rotation;
 
-    double rotationDifference = Math.abs(aprilTagDistance.getRotation().getRadians());
 
-    boolean hasLargeRotationDifference = Math.abs(aprilTagDistance.getRotation().getRadians()) > Math.toRadians(3);   
+
 
     if (aprilTagPose.getRotation().getRadians() == 0) {
       rotation = Math.PI;
@@ -114,15 +112,18 @@ public class AlignToReef extends Command {
 
     // hawkTuah("target rotation for tag", Math.toDegrees(rotation));
 
-    RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(rotation, getDriverControllerLeftY(), -ySpeed);
+    double rotationDifference = Math.abs(robotPose.getRotation().getRadians() - rotation);
 
+    boolean hasLargeRotationDifference = rotationDifference > Math.toRadians(17);   
 
-    // if (hasLargeRotationDifference) {
-    //   RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(rotation, getDriverControllerLeftY(), 0);
-    // }
-    // else {
-    //   RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(rotation, getDriverControllerLeftY(), -ySpeed);
-    // }
+    System.out.println(rotationDifference);
+
+    if (hasLargeRotationDifference) {
+      RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(rotation, 0, 0);
+    }
+    else if (!hasLargeRotationDifference) {
+      RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(rotation, getDriverControllerLeftY(), -ySpeed);
+    }
   }
     
   // Called once the command ends or is interrupted.
