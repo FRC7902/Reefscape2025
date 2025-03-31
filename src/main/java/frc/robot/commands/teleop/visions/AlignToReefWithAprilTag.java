@@ -70,7 +70,7 @@ public class AlignToReefWithAprilTag extends Command {
 
     yController = new ProfiledPIDController(VisionConstants.kPY2, VisionConstants.kIY2, VisionConstants.kDY2, VisionConstants.yConstraints); //to tune
 
-    yController.reset(currentRobotPose.getY() + aprilTagDistanceToRobot + aprilTagOffset);
+    yController.reset(currentRobotPose.getY() + aprilTagDistanceToRobot);
     yController.setTolerance(VisionConstants.yControllerTolerance);
     yController.setGoal(aprilTagPose.getY() + aprilTagOffset);
   }
@@ -82,7 +82,7 @@ public class AlignToReefWithAprilTag extends Command {
 
     currentRobotPose = RobotContainer.m_swerveSubsystem.getPose();
 
-    var ySpeed = yController.calculate(currentRobotPose.getY() + aprilTagDistanceToRobot + aprilTagOffset);
+    var ySpeed = yController.calculate(currentRobotPose.getY() + aprilTagDistanceToRobot);
     if (yController.atGoal()) {
       ySpeed = 0;
     }
