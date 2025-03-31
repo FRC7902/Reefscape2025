@@ -46,6 +46,7 @@ import frc.robot.subsystems.CoralIndexerSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem.ElevatorPosition;
 import frc.robot.visions.CameraInterface;
+import frc.robot.visions.ReefSide;
 import frc.robot.subsystems.SwerveSubsystem;
 import swervelib.SwerveInputStream;
 import frc.robot.commands.teleop.visions.AlignToReef;
@@ -179,8 +180,8 @@ public class RobotContainer {
                 .onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeHighHeight));
 
 
-        new EventTrigger("autoalignleft").whileTrue(new AlignToReef(m_cameraSubsystem, this, 0).withTimeout(2));
-        new EventTrigger("autoalignright").whileTrue(new AlignToReef(m_cameraSubsystem, this, 1).withTimeout(2));
+        new EventTrigger("autoalignleft").whileTrue(new AlignToReef(m_cameraSubsystem, ReefSide.LEFT).withTimeout(2));
+        new EventTrigger("autoalignright").whileTrue(new AlignToReef(m_cameraSubsystem, ReefSide.RIGHT).withTimeout(2));
 
         new EventTrigger("ElevatorL1WithWait").onTrue(
                 new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel1StartHeight, true));
@@ -299,8 +300,8 @@ public class RobotContainer {
         // m_driverController.rightTrigger(0.05).whileTrue(new
         // SequentialCommandGroup(new CheckForAprilTag(1), new AlignToReef(this, 1)));
 
-        m_driverController.a().whileTrue(new AlignToReef(m_cameraSubsystem, this, 0)); //left
-        m_driverController.b().whileTrue(new AlignToReef(m_cameraSubsystem, this, 1)); //right
+        m_driverController.a().whileTrue(new AlignToReef(m_cameraSubsystem, ReefSide.LEFT)); //left
+        m_driverController.b().whileTrue(new AlignToReef(m_cameraSubsystem, ReefSide.RIGHT)); //right
 
         // Climb controls
         m_driverController.povUp()

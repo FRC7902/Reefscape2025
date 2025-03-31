@@ -95,7 +95,7 @@ public class CoralIndexerSubsystem extends SubsystemBase {
         // SmartDashboard.putNumber("Motor Velocity (Encoder)", m_encoder.getVelocity());
         SmartDashboard.putBoolean("Shallow Beam Sensor Broken", isShallowBeamBroken());
         SmartDashboard.putBoolean("Deep Beam Sensor Broken", isDeepBeamBroken());
-        SmartDashboard.putNumber("Indexer current (A)", m_indexMotor.getOutputCurrent());
+        //SmartDashboard.putNumber("Indexer current (A)", m_indexMotor.getOutputCurrent());
     }
 
     @Override

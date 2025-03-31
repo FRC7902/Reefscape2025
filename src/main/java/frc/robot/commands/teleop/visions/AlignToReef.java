@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.visions.CameraInterface;
+import frc.robot.visions.ReefSide;
 import swervelib.SwerveController;
 
 public class AlignToReef extends Command {
@@ -22,9 +23,7 @@ public class AlignToReef extends Command {
 
   private CameraInterface m_autoAlignCam;
 
-  private final RobotContainer m_RobotContainer;
-
-  private final int triggerPressed;
+  private final ReefSide reefSide;
 
   private double aprilTagOffset;
 
@@ -36,12 +35,11 @@ public class AlignToReef extends Command {
   private SwerveController yawController;
   
 
-  public AlignToReef(CameraInterface m_autoAlignCamera, RobotContainer m_RobotContainer, int triggerPressed) {
+  public AlignToReef(CameraInterface m_autoAlignCamera, ReefSide reefSide) {
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(RobotContainer.m_swerveSubsystem);
     this.m_autoAlignCam = m_autoAlignCamera;
-    this.m_RobotContainer = m_RobotContainer;
-    this.triggerPressed = triggerPressed;
+    this.reefSide = reefSide;
   }
 
   // Called when the command is initially scheduled.
@@ -51,11 +49,11 @@ public class AlignToReef extends Command {
     aprilTagPose = m_autoAlignCam.getNearestAprilTag(robotPose);
     aprilTagDistance = aprilTagPose.minus(robotPose);
 
-    if (triggerPressed == 0) {
+    if (reefSide == ReefSide.RIGHT) {
       aprilTagOffset = VisionConstants.rightReefToAprilTagOffset;
     }
 
-    else if (triggerPressed == 1) {
+    else if (reefSide == ReefSide.LEFT) {
       aprilTagOffset = VisionConstants.leftReefToAprilTagOffset;
     }
 
