@@ -40,7 +40,9 @@ public final class Constants {
         public static final double kCameraRotation = 25.3; // degrees
         public static final String kCameraName = "limelight";
 
-        public static double kLocalizationDisLim = 8;
+        public static double kLocalizationDisLim = 2;
+
+        public static double kStdDevs = 0.800000;
 
         // //April Tag Offset
         // public static final double kGroundToAprilTagDistance = 0.171; //in meters
@@ -53,7 +55,7 @@ public final class Constants {
 
         // PID Y Controller Constants
         public static final TrapezoidProfile.Constraints yConstraints = new TrapezoidProfile.Constraints(60, 40);
-        public static double yControllerTolerance = 0.0;
+        public static double yControllerTolerance = 0;
         public static double kPY = 0.07;
         public static double kIY = 0;
         public static double kDY = 0;

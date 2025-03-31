@@ -43,6 +43,9 @@ public class CameraInterface extends SubsystemBase {
 
         SmartDashboard.putNumber("April tag limit", VisionConstants.kLocalizationDisLim);
 
+        SmartDashboard.putNumber("STD DEVS", VisionConstants.kStdDevs);
+
+
 
         //LimelightHelpers.SetFiducialIDFiltersOverride(camera, VisionConstants.acceptedTagIDs); // Only track these tag IDs
 
@@ -141,10 +144,14 @@ public class CameraInterface extends SubsystemBase {
 
     public boolean tagIsSigma(LimelightHelpers.PoseEstimate limelightMeasurement) {
         double rotationSpeed = Math.abs(RobotContainer.m_swerveSubsystem.getSwerveDrive().getRobotVelocity().omegaRadiansPerSecond);
+        double xSpeed = Math.abs(RobotContainer.m_swerveSubsystem.getSwerveDrive().getRobotVelocity().vxMetersPerSecond);
+        double ySpeed = Math.abs(RobotContainer.m_swerveSubsystem.getSwerveDrive().getRobotVelocity().vyMetersPerSecond);
+
         double estimatedDistance = limelightMeasurement.avgTagDist;
 
-        if (rotationSpeed >= Math.PI) return false;
+        if (rotationSpeed >= Math.PI / 2) return false;
         else if (estimatedDistance >= VisionConstants.kLocalizationDisLim) return false;
+        else if (xSpeed > 0.5 || ySpeed > 0.5) return false;
         else return true;
     }
 
@@ -172,7 +179,10 @@ public class CameraInterface extends SubsystemBase {
             double rotationSpeed = Math.abs(RobotContainer.m_swerveSubsystem.getSwerveDrive().getRobotVelocity().omegaRadiansPerSecond);
             boolean shouldRejectUpdate = rotationSpeed < 6.28319 && getAprilTagArea() > 50; //360 degrees   
     
-            RobotContainer.m_swerveSubsystem.getSwerveDrive().setVisionMeasurementStdDevs(VecBuilder.fill(.5, .5, 9999999));
+            RobotContainer.m_swerveSubsystem.getSwerveDrive().setVisionMeasurementStdDevs(VecBuilder.fill(VisionConstants.kStdDevs, VisionConstants.kStdDevs, 9999999));
+
+            Pose2d cameraPose = limelightMeasurement.pose;
+
 
             if (tagIsSigma(limelightMeasurement)) {
                 RobotContainer.m_swerveSubsystem.getSwerveDrive().addVisionMeasurement(
@@ -203,6 +213,9 @@ public class CameraInterface extends SubsystemBase {
 
 
         VisionConstants.kLocalizationDisLim = SmartDashboard.getNumber("April tag limit", VisionConstants.kLocalizationDisLim);
+
+
+        VisionConstants.kStdDevs = SmartDashboard.getNumber("STD DEVS", VisionConstants.kStdDevs);
 
         //double robotYaw = RobotContainer.m_swerveSubsystem.getSwerveDrive().getPose().getRotation().getDegrees();
 

@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 6.1017418032786885,
+        "x": 5.802049180327868,
         "y": 0.5
       },
       "prevControl": {
-        "x": 6.241266522355442,
-        "y": 0.7227769945508579
+        "x": 5.941573899404622,
+        "y": 0.7227769945508591
       },
       "nextControl": null,
       "isLocked": false,
@@ -47,13 +47,13 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "highalgae",
+      "name": "ZeroPosition",
       "waypointRelativePos": 0.0,
       "endWaypointRelativePos": null,
       "command": null
     },
     {
-      "name": "",
+      "name": "outtakealgaeon",
       "waypointRelativePos": 1.0,
       "endWaypointRelativePos": null,
       "command": null

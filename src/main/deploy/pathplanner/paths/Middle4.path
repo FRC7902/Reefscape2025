@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 6.15,
+        "x": 5.754,
         "y": 0.5
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.836651169162252,
-        "y": 1.290824492076443
+        "x": 4.440651169162251,
+        "y": 1.2908244920764451
       },
       "isLocked": false,
       "linkedName": null
@@ -48,12 +48,12 @@
   "eventMarkers": [
     {
       "name": "highalgae",
-      "waypointRelativePos": 0.0,
+      "waypointRelativePos": 0.610161443494777,
       "endWaypointRelativePos": null,
       "command": null
     },
     {
-      "name": "",
+      "name": "intakealgaeon",
       "waypointRelativePos": 1.0,
       "endWaypointRelativePos": null,
       "command": null

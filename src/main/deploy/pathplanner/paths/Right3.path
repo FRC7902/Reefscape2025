@@ -20,8 +20,8 @@
         "y": 2.820235655737705
       },
       "prevControl": {
-        "x": 5.478381147540984,
-        "y": 2.1369364754098363
+        "x": 5.358504098360656,
+        "y": 2.1609118852459015
       },
       "nextControl": null,
       "isLocked": false,
@@ -54,7 +54,7 @@
     },
     {
       "name": "coraloutakeon",
-      "waypointRelativePos": 0.98,
+      "waypointRelativePos": 1.0,
       "endWaypointRelativePos": null,
       "command": null
     }

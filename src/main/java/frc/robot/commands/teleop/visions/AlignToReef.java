@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.visions.CameraInterface;
+import swervelib.SwerveController;
 
 public class AlignToReef extends Command {
   /** Creates a new AlignToReefCommand. */
@@ -31,6 +32,8 @@ public class AlignToReef extends Command {
   private Pose2d robotPose;
 
   private Transform2d aprilTagDistance;
+
+  private SwerveController yawController;
   
 
   public AlignToReef(CameraInterface m_autoAlignCamera, RobotContainer m_RobotContainer, int triggerPressed) {
@@ -64,9 +67,11 @@ public class AlignToReef extends Command {
     //   yController = new ProfiledPIDController(VisionConstants.kPY, VisionConstants.kIY, VisionConstants.kDY, VisionConstants.yConstraints); //to tune
     // }
 
+    yawController = RobotContainer.m_swerveSubsystem.getSwerveDrive().getSwerveController();
+
     yController = new ProfiledPIDController(VisionConstants.kPY2, VisionConstants.kIY2, VisionConstants.kDY2, VisionConstants.yConstraints); //to tune
 
-
+    
     yController.reset(aprilTagDistance.getY());
     yController.setTolerance(VisionConstants.yControllerTolerance);
     yController.setGoal(0.0);
@@ -97,6 +102,10 @@ public class AlignToReef extends Command {
 
     double rotation;
 
+    double rotationDifference = Math.abs(aprilTagDistance.getRotation().getRadians());
+
+    boolean hasLargeRotationDifference = Math.abs(aprilTagDistance.getRotation().getRadians()) > Math.toRadians(3);   
+
     if (aprilTagPose.getRotation().getRadians() == 0) {
       rotation = Math.PI;
     }
@@ -109,6 +118,14 @@ public class AlignToReef extends Command {
     // hawkTuah("target rotation for tag", Math.toDegrees(rotation));
 
     RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(rotation, getDriverControllerLeftY(), -ySpeed);
+
+
+    // if (hasLargeRotationDifference) {
+    //   RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(rotation, getDriverControllerLeftY(), 0);
+    // }
+    // else {
+    //   RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(rotation, getDriverControllerLeftY(), -ySpeed);
+    // }
   }
     
   // Called once the command ends or is interrupted.
