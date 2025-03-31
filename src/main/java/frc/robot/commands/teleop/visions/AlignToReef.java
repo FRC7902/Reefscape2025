@@ -19,20 +19,16 @@ import swervelib.SwerveController;
 public class AlignToReef extends Command {
   /** Creates a new AlignToReefCommand. */
 
-  private ProfiledPIDController yController;
-
+  private ProfiledPIDController strafeController;
   private CameraInterface m_autoAlignCam;
 
   private final ReefSide reefSide;
-
-  private double aprilTagOffset;
+  private double reefToAprilTagOffset;
 
   private Pose2d aprilTagPose;
-  private Pose2d robotPose;
+  private Pose2d currentRobotPose;
 
-  private Transform2d aprilTagDistance;
-
-  private SwerveController yawController;
+  private Transform2d aprilTagDistanceToRobot;
   
 
   public AlignToReef(CameraInterface m_autoAlignCamera, ReefSide reefSide) {
@@ -44,16 +40,21 @@ public class AlignToReef extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    robotPose = RobotContainer.m_swerveSubsystem.getPose();
-    aprilTagPose = m_autoAlignCam.getNearestAprilTag(robotPose);
-    aprilTagDistance = aprilTagPose.minus(robotPose);
 
+    //gets the pose of the robot and the nearest april tag
+    currentRobotPose = RobotContainer.m_swerveSubsystem.getPose();
+    aprilTagPose = m_autoAlignCam.getNearestAprilTag(currentRobotPose);
+    
+    //finds the distance between the april tag and the robot
+    aprilTagDistanceToRobot = aprilTagPose.minus(currentRobotPose);
+
+    //determines which side the robot should strafe to based on the auto align button the driver pressed (left or right)
     if (reefSide == ReefSide.RIGHT) {
-      aprilTagOffset = VisionConstants.rightReefToAprilTagOffset;
+      reefToAprilTagOffset = VisionConstants.rightReefToAprilTagOffset;
     }
 
     else if (reefSide == ReefSide.LEFT) {
-      aprilTagOffset = VisionConstants.leftReefToAprilTagOffset;
+      reefToAprilTagOffset = VisionConstants.leftReefToAprilTagOffset;
     }
 
     // if (Math.abs(aprilTagDistance.getY()) < VisionConstants.kSecondPIDControllerStartingPoint) {
@@ -64,16 +65,17 @@ public class AlignToReef extends Command {
     //   yController = new ProfiledPIDController(VisionConstants.kPY, VisionConstants.kIY, VisionConstants.kDY, VisionConstants.yConstraints); //to tune
     // }
 
-    yawController = RobotContainer.m_swerveSubsystem.getSwerveDrive().getSwerveController();
+    //pid controller used to control strafe for auto algin
+    strafeController = new ProfiledPIDController(VisionConstants.kPY2, VisionConstants.kIY2, VisionConstants.kDY2, VisionConstants.yConstraints); //to tune
 
-    yController = new ProfiledPIDController(VisionConstants.kPY2, VisionConstants.kIY2, VisionConstants.kDY2, VisionConstants.yConstraints); //to tune
+    //sets the start point of the pid controller to be the current distance between the tag and the robot
+    strafeController.reset(aprilTagDistanceToRobot.getY());
 
+    //adds tolerance to the y controller as having an error of 0 is quite difficult (although in this case, a tolerance of 0 will only yield correct results for auto align)
+    strafeController.setTolerance(VisionConstants.yControllerTolerance);
     
-    yController.reset(aprilTagDistance.getY());
-    yController.setTolerance(VisionConstants.yControllerTolerance);
-    yController.setGoal(0.0);
-
-    m_autoAlignCam.turnLEDOn();
+    //goal should be 0, which means there is no distance difference between the april tag (plus the reef offset) and the robot, meaning the robot is aligned 
+    strafeController.setGoal(0.0);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -81,55 +83,46 @@ public class AlignToReef extends Command {
   @Override 
   public void execute() {  
 
-    robotPose = RobotContainer.m_swerveSubsystem.getPose();
-    aprilTagDistance = aprilTagPose.minus(robotPose);
+    //updates robot pose and distance to april tag
+    currentRobotPose = RobotContainer.m_swerveSubsystem.getPose();
+    aprilTagDistanceToRobot = aprilTagPose.minus(currentRobotPose);
 
-    var ySpeed = yController.calculate(aprilTagDistance.getY() + aprilTagOffset);
-    if (yController.atGoal()) {
+    //calculates the speed needed to get to the setpoint
+    //if it is at the setpoint (meaning 0 distance difference between the april tag and the robot), set the speed to 0 so the robot stops auto aligning
+    var ySpeed = strafeController.calculate(aprilTagDistanceToRobot.getY() + reefToAprilTagOffset);
+    if (strafeController.atGoal()) {
       ySpeed = 0;
     }
-  
 
-    hawkTuah("Y Error", yController.getPositionError());
-    hawkTuah("April Tag Rotation", (aprilTagPose.getRotation().getDegrees()));
-    hawkTuah("April Tag Y STUFFERRR", aprilTagDistance.getY());
+    //prints out the strafe error when auto aligning
+    // hawkTuah("Auto-align Error", strafeController.getPositionError());
+    // hawkTuah("April Tag Rotation", (aprilTagPose.getRotation().getDegrees()));
 
-     double multiplier = Math.round(aprilTagPose.getRotation().getRadians() / Math.abs(aprilTagPose.getRotation().getRadians()));
-
-    double rotation;
-
-
-
+    double multiplier = Math.round(aprilTagPose.getRotation().getRadians() / Math.abs(aprilTagPose.getRotation().getRadians()));
+    double aprilTagRotation;
 
     if (aprilTagPose.getRotation().getRadians() == 0) {
-      rotation = Math.PI;
+      aprilTagRotation = Math.PI;
     }
     
     else {
-      rotation = aprilTagPose.getRotation().getRadians() - (Math.PI * multiplier);
+      aprilTagRotation = aprilTagPose.getRotation().getRadians() - (Math.PI * multiplier);
     }
-     //double rotation = aprilTagPose.getRotation().unaryMinus().getRadians();
 
-    // hawkTuah("target rotation for tag", Math.toDegrees(rotation));
-
-    double rotationDifference = Math.abs(robotPose.getRotation().getRadians() - rotation);
-
+    double rotationDifference = Math.abs(currentRobotPose.getRotation().getRadians() - aprilTagRotation);
     boolean hasLargeRotationDifference = rotationDifference > Math.toRadians(17);   
 
-    System.out.println(rotationDifference);
-
     if (hasLargeRotationDifference) {
-      RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(rotation, 0, 0);
+      RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(aprilTagRotation, 0, 0);
     }
     else if (!hasLargeRotationDifference) {
-      RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(rotation, getDriverControllerLeftY(), -ySpeed);
+      RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(aprilTagRotation, getDriverControllerLeftY(), -ySpeed);
     }
   }
     
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_autoAlignCam.turnLEDOff();
   }
 
 
