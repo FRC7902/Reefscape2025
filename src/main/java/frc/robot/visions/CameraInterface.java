@@ -6,6 +6,7 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
@@ -112,6 +113,10 @@ public class CameraInterface extends SubsystemBase {
         return LimelightHelpers.getTA(camera);
     }
 
+    public Pose3d getCameraOffsetToRobot() {
+        return LimelightHelpers.getCameraPose3d_RobotSpace(camera);
+    }
+
     public boolean cameraSeesAprilTag() {
         return LimelightHelpers.getTV(camera);
     }
@@ -127,8 +132,31 @@ public class CameraInterface extends SubsystemBase {
         return aprilTagPoseAmbiguity;
     }
 
-    public void setLimelightIMU() {
-        LimelightHelpers.SetIMUMode(camera, 0);
+
+    public int getAprilTagID() {
+        int aprilTagID = -1;
+        if (cameraSeesAprilTag()) {
+            RawFiducial[] fiducials = LimelightHelpers.getRawFiducials(camera);
+            for (RawFiducial fidicual : fiducials) {
+                aprilTagID = fidicual.id;
+            }
+        }
+        return aprilTagID;
+    }
+
+    public double getAprilTagDistanceToRobot() {
+        double aprilTagDistance = -1;
+        if (cameraSeesAprilTag()) {
+            RawFiducial[] fiducials = LimelightHelpers.getRawFiducials(camera);
+            for (RawFiducial fidicual : fiducials) {
+                aprilTagDistance = fidicual.distToRobot;
+            }
+        }
+        return aprilTagDistance;
+    }
+
+    public void setLimelightIMU(int mode) {
+        LimelightHelpers.SetIMUMode(camera, mode);
     }
 
     public void turnLEDOn() {
@@ -155,6 +183,27 @@ public class CameraInterface extends SubsystemBase {
         else if (xSpeed > 0.5 || ySpeed > 0.5) return false;
         else return true;
     }
+
+    public boolean cameraSeesCorrectTag() {
+       
+        if (!cameraSeesAprilTag()) return false;
+
+
+        Pose2d aprilTagPose = aprilTagFieldLayout.getTagPose(getAprilTagID()).get().toPose2d();
+        double aprilTagRotation;
+        double multiplier = Math.round(aprilTagPose.getRotation().getRadians() / Math.abs(aprilTagPose.getRotation().getRadians()));
+
+        if (aprilTagPose.getRotation().getRadians() == 0) {
+            aprilTagRotation = Math.PI;
+        }
+          
+        else {
+            aprilTagRotation = aprilTagPose.getRotation().getRadians() - (Math.PI * multiplier);
+        }   
+
+        double rotationDifference = Math.abs(RobotContainer.m_swerveSubsystem.getPose().getRotation().getRadians() - aprilTagRotation);
+        return rotationDifference <= Math.toRadians(25);
+     }
 
     public void updateOdometryWithMegaTag1() {
         if (cameraSeesAprilTag()) {
