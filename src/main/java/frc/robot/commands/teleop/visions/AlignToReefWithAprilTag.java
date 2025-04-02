@@ -7,10 +7,8 @@ package frc.robot.commands.teleop.visions;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.visions.CameraInterface;
@@ -70,9 +68,9 @@ public class AlignToReefWithAprilTag extends Command {
 
     yController = new ProfiledPIDController(VisionConstants.kPY2, VisionConstants.kIY2, VisionConstants.kDY2, VisionConstants.yConstraints); //to tune
 
-    yController.reset(currentRobotPose.getY() + aprilTagDistanceToRobot);
+    yController.reset(currentRobotPose.getY());
     yController.setTolerance(VisionConstants.yControllerTolerance);
-    yController.setGoal(aprilTagPose.getY() + aprilTagOffset);
+    yController.setGoal(currentRobotPose.getY() + aprilTagDistanceToRobot + aprilTagOffset);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -82,7 +80,11 @@ public class AlignToReefWithAprilTag extends Command {
 
     currentRobotPose = RobotContainer.m_swerveSubsystem.getPose();
 
-    var ySpeed = yController.calculate(currentRobotPose.getY() + aprilTagDistanceToRobot);
+    if (tagIsValid()) {
+      updateDistanceFromTagToRobot(m_autoAlignCam.getAprilTagDistanceToRobot());
+    }
+
+    var ySpeed = yController.calculate(currentRobotPose.getY());
     if (yController.atGoal()) {
       ySpeed = 0;
     }
@@ -129,4 +131,22 @@ public class AlignToReefWithAprilTag extends Command {
   public void hawkTuah(String text, double key) {
     SmartDashboard.putNumber(text, key);
   }
+
+  public void updateDistanceFromTagToRobot(double newDistanceToTag) {
+    yController.setGoal(currentRobotPose.getY() + newDistanceToTag);
+  }
+
+  public boolean tagIsValid() {
+
+    if (!m_autoAlignCam.cameraSeesAprilTag()) {
+      return false;
+    }
+    else if (m_autoAlignCam.getAprilTagID() != fidicualID) {
+      return false;
+    }
+    else {
+      return true;
+    }
+  }
+
 }
