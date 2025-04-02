@@ -104,7 +104,7 @@ public class AlignToReefWithAprilTag extends Command {
     if (hasLargeRotationDifference) {
       RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(aprilTagRotation, 0, 0);
     }
-    else if (!hasLargeRotationDifference) {
+    else {
       RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(aprilTagRotation, getDriverControllerLeftY(), -ySpeed);
     }
   }
@@ -112,7 +112,6 @@ public class AlignToReefWithAprilTag extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_autoAlignCam.turnLEDOff();
   }
 
 
