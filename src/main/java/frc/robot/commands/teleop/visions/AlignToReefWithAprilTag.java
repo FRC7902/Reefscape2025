@@ -17,14 +17,12 @@ import frc.robot.visions.ReefSide;
 public class AlignToReefWithAprilTag extends Command {
   /** Creates a new AlignToReefCommand. */
 
-  private ProfiledPIDController yController;
-
-  private CameraInterface m_autoAlignCam;
-
+  private final CameraInterface m_autoAlignCam;
   private final ReefSide triggerPressed;
 
-  private double aprilTagOffset = 0;
+  private ProfiledPIDController yController;
 
+  private double aprilTagOffset = 0;
   private double aprilTagDistanceToRobot = 0;
 
   private int fidicualID = 0;
@@ -56,7 +54,7 @@ public class AlignToReefWithAprilTag extends Command {
       aprilTagOffset = VisionConstants.leftReefToAprilTagOffset;
     }
 
-    aprilTagDistanceToRobot = m_autoAlignCam.getAprilTagDistanceToRobot();
+    aprilTagDistanceToRobot = m_autoAlignCam.getDistanceToAprilTag();
 
     // if (Math.abs(m_autoAlignCam.getHorizontalDisToTag()) < VisionConstants.kSecondPIDControllerStartingPoint) {
     //   yController = new ProfiledPIDController(VisionConstants.kPY2, VisionConstants.kIY2, VisionConstants.kDY2, VisionConstants.yConstraints); //to tune
@@ -81,7 +79,7 @@ public class AlignToReefWithAprilTag extends Command {
     currentRobotPose = RobotContainer.m_swerveSubsystem.getPose();
 
     if (tagIsValid()) {
-      updateDistanceFromTagToRobot(m_autoAlignCam.getAprilTagDistanceToRobot());
+      updateDistanceFromTagToRobot(m_autoAlignCam.getDistanceToAprilTag());
     }
 
     var ySpeed = yController.calculate(currentRobotPose.getY());
@@ -133,20 +131,12 @@ public class AlignToReefWithAprilTag extends Command {
   }
 
   public void updateDistanceFromTagToRobot(double newDistanceToTag) {
-    yController.setGoal(currentRobotPose.getY() + newDistanceToTag);
+    yController.setGoal(currentRobotPose.getY() + newDistanceToTag + aprilTagOffset);
   }
 
   public boolean tagIsValid() {
-
-    if (!m_autoAlignCam.cameraSeesAprilTag()) {
-      return false;
-    }
-    else if (m_autoAlignCam.getAprilTagID() != fidicualID) {
-      return false;
-    }
-    else {
-      return true;
-    }
+    int newFidicualID = m_autoAlignCam.getAprilTagID();
+    return (newFidicualID == fidicualID) && (m_autoAlignCam.cameraSeesAprilTag());
   }
 
 }

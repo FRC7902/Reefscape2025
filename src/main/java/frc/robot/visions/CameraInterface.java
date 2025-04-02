@@ -18,6 +18,10 @@ public class CameraInterface extends SubsystemBase {
     private final String camera;
     private final AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
     private final List<Pose2d> reefPoses;
+
+    private int fidicualID = 0;
+    private double distanceToAprilTag = 0;
+    private double tagAmbiguity = 0;
     
 
      /**
@@ -121,38 +125,27 @@ public class CameraInterface extends SubsystemBase {
         return LimelightHelpers.getTV(camera);
     }
 
-    public double getAprilTagPoseAmbiguity() {
-        double aprilTagPoseAmbiguity = -1;
+    public void updateAprilTagInformation() {
         if (cameraSeesAprilTag()) {
             RawFiducial[] fiducials = LimelightHelpers.getRawFiducials(camera);
             for (RawFiducial fidicual : fiducials) {
-                aprilTagPoseAmbiguity = fidicual.ambiguity;
+                fidicualID = fidicual.id;
+                distanceToAprilTag = fidicual.distToRobot;
+                tagAmbiguity = fidicual.ambiguity;
             }
         }
-        return aprilTagPoseAmbiguity;
     }
-
 
     public int getAprilTagID() {
-        int aprilTagID = -1;
-        if (cameraSeesAprilTag()) {
-            RawFiducial[] fiducials = LimelightHelpers.getRawFiducials(camera);
-            for (RawFiducial fidicual : fiducials) {
-                aprilTagID = fidicual.id;
-            }
-        }
-        return aprilTagID;
+        return fidicualID;
     }
 
-    public double getAprilTagDistanceToRobot() {
-        double aprilTagDistance = -1;
-        if (cameraSeesAprilTag()) {
-            RawFiducial[] fiducials = LimelightHelpers.getRawFiducials(camera);
-            for (RawFiducial fidicual : fiducials) {
-                aprilTagDistance = fidicual.distToRobot;
-            }
-        }
-        return aprilTagDistance;
+    public double getTagAmbiguity() {
+        return tagAmbiguity;
+    }
+
+    public double getDistanceToAprilTag() {
+        return distanceToAprilTag;
     }
 
     public void setLimelightIMU(int mode) {
@@ -266,6 +259,8 @@ public class CameraInterface extends SubsystemBase {
 
 
         VisionConstants.kStdDevs = SmartDashboard.getNumber("STD DEVS", VisionConstants.kStdDevs);
+
+        updateAprilTagInformation();
 
         //double robotYaw = RobotContainer.m_swerveSubsystem.getSwerveDrive().getPose().getRotation().getDegrees();
 
