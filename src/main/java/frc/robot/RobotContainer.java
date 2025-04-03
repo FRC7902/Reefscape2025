@@ -160,8 +160,9 @@ public class RobotContainer {
          * NamedCommands.registerCommand("Lowest Height", new
          * SetElevatorPositionCommand(0));
          */
-        //NamedCommands.registerCommand("OutakeCoralV2",new OuttakeCoralCommand(Constants.CoralIndexerConstants.kL1OuttakePower));
-        //NamedCommands.registerCommand("StopCoralOutake", new OuttakeCoralCommand(0));
+        // NamedCommands.registerCommand("OutakeCoralV2",new
+        // OuttakeCoralCommand(Constants.CoralIndexerConstants.kL1OuttakePower));
+        // NamedCommands.registerCommand("StopCoralOutake", new OuttakeCoralCommand(0));
 
         // preloads the path
 
@@ -178,7 +179,6 @@ public class RobotContainer {
                 .onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeLowHeight));
         new EventTrigger("highalgae")
                 .onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeHighHeight));
-
 
         new EventTrigger("autoalignleft").whileTrue(new AlignToReef(m_cameraSubsystem, ReefSide.LEFT).withTimeout(2));
         new EventTrigger("autoalignright").whileTrue(new AlignToReef(m_cameraSubsystem, ReefSide.RIGHT).withTimeout(2));
@@ -200,7 +200,7 @@ public class RobotContainer {
         // new EventTrigger("intakealgaeoff").toggleOnFalse(new IntakeAlgaeCommand());
         new EventTrigger("coraloutakeon")
                 .onTrue(new OuttakeCoralCommand(1)
-                        .until(()->!m_indexSubsystem.isDeepBeamBroken()));
+                        .until(() -> !m_indexSubsystem.isDeepBeamBroken()));
         // new EventTrigger("coraloutakeoff").toggleOnFalse(new OuttakeCoralCommand());
 
         // new EventTrigger("shoot note").and(new
@@ -300,8 +300,8 @@ public class RobotContainer {
         // m_driverController.rightTrigger(0.05).whileTrue(new
         // SequentialCommandGroup(new CheckForAprilTag(1), new AlignToReef(this, 1)));
 
-        m_driverController.a().whileTrue(new AlignToReef(m_cameraSubsystem, ReefSide.LEFT)); //left
-        m_driverController.b().whileTrue(new AlignToReef(m_cameraSubsystem, ReefSide.RIGHT)); //right
+        m_driverController.a().whileTrue(new AlignToReef(m_cameraSubsystem, ReefSide.LEFT)); // left
+        m_driverController.b().whileTrue(new AlignToReef(m_cameraSubsystem, ReefSide.RIGHT)); // right
 
         // Climb controls
         m_driverController.povUp()
@@ -322,10 +322,7 @@ public class RobotContainer {
         m_driverController.rightTrigger(0.05).whileTrue(new StrafeRightCommand());
 
         m_indexSubsystem.setDefaultCommand(
-                new AutomaticIntakeCoralCommand(CoralIndexerConstants.kIntakePower)
-                        .andThen(new CorrectCoralPositionCommand().withTimeout(1))
-                        .andThen(new AutomaticIntakeCoralCommand(
-                                Constants.CoralIndexerConstants.kCorrectionPower).withTimeout(1)));
+                new AutomaticIntakeCoralCommand(CoralIndexerConstants.kIntakePower));
 
         // Elevator coral positions
         m_operatorController.x().onTrue(

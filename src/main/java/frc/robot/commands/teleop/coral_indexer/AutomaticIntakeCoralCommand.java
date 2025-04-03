@@ -32,7 +32,11 @@ public class AutomaticIntakeCoralCommand extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        if (!RobotContainer.m_indexSubsystem.isShallowBeamBroken()
+
+        if (RobotContainer.m_climbSubsystem.isFunnelUnlocked()) {
+            RobotContainer.m_operatorController.setRumble(GenericHID.RumbleType.kBothRumble, 0);
+            RobotContainer.m_indexSubsystem.setPower(0);
+        } else if (!RobotContainer.m_indexSubsystem.isShallowBeamBroken()
                 && !RobotContainer.m_indexSubsystem.isDeepBeamBroken()) {
             RobotContainer.m_operatorController.setRumble(GenericHID.RumbleType.kBothRumble, 0);
             RobotContainer.m_indexSubsystem.setPower(m_power);
@@ -46,7 +50,7 @@ public class AutomaticIntakeCoralCommand extends Command {
             RobotContainer.m_indexSubsystem.setPower(-m_power * 0.25);
         } else if (RobotContainer.m_indexSubsystem.isShallowBeamBroken()
                 && RobotContainer.m_indexSubsystem.isDeepBeamBroken()) {
-            RobotContainer.m_operatorController.setRumble(GenericHID.RumbleType.kBothRumble, 0.05 );
+            RobotContainer.m_operatorController.setRumble(GenericHID.RumbleType.kBothRumble, 0.05);
             RobotContainer.m_indexSubsystem.stop();
         }
     }
