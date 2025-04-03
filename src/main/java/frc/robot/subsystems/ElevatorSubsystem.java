@@ -41,49 +41,34 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     /** TalonFX leader motor controller object */
-    private final TalonFX m_leaderMotor = new TalonFX(ElevatorConstants.kElevatorLeaderCAN);
+    private final TalonFX m_leaderMotor;
 
     /** TalonFX follower motor controller object */
-    private final TalonFX m_followerMotor = new TalonFX(ElevatorConstants.kElevatorFollowerCAN);
+    private final TalonFX m_followerMotor;
 
     /** Configuration object for the TalonFX motor */
-    private final TalonFXConfiguration m_motorConfig = new TalonFXConfiguration();
+    private final TalonFXConfiguration m_motorConfig;
 
     /** Voltage control request object for the TalonFX motor controller */
-    private final VoltageOut m_voltReq = new VoltageOut(0.0);
+    private final VoltageOut m_voltReq;
 
     /** Motion magic voltage control request object for the TalonFX motor controller */
-    private MotionMagicVoltage m_request = new MotionMagicVoltage(0).withSlot(0);
+    private MotionMagicVoltage m_request;
 
     /** Object of the Phoenix Orchestra */
-    private Orchestra m_orchestra = new Orchestra();
-
+    private Orchestra m_orchestra;
     /** Object of a simulated elevator */
-    private final ElevatorSim m_elevatorSim = new ElevatorSim(DCMotor.getFalcon500(2),
-            ElevatorConstants.kElevatorGearing, ElevatorConstants.kElevatorCarriageMass,
-            ElevatorConstants.kElevatorDrumRadius, ElevatorConstants.kElevatorMinHeightMeters,
-            ElevatorConstants.kElevatorMaxHeightMeters, true,
-            ElevatorConstants.kElevatorHeightMeters, 0.01, // add some noise
-            0);
+    private final ElevatorSim m_elevatorSim;
 
     /** Mechanism2d object of an elevator */
-    private final Mechanism2d m_mech2d =
-            new Mechanism2d(Units.inchesToMeters(10), Units.inchesToMeters(50));
+    private final Mechanism2d m_mech2d;
     /** MechanismRoot2d object of an elevator */
-    private final MechanismRoot2d m_mech2dRoot =
-            m_mech2d.getRoot("Elevator Root", Units.inchesToMeters(5), Units.inchesToMeters(0.5));
+    private final MechanismRoot2d m_mech2dRoot;
     /** MechanismLigament2d object of an elevator */
-    private final MechanismLigament2d m_elevatorMech2d =
-            m_mech2dRoot.append(new MechanismLigament2d("Elevator",
-                    m_elevatorSim.getPositionMeters(), 90, 7, new Color8Bit(Color.kAntiqueWhite)));
+    private MechanismLigament2d m_elevatorMech2d;
 
     /** Object of a system identification routine */
-    private final SysIdRoutine m_sysIdRoutine = new SysIdRoutine(
-            new SysIdRoutine.Config(null, Volts.of(4), null,
-                    (state) -> SignalLogger.writeString("state", state.toString())),
-            new SysIdRoutine.Mechanism(
-                    (volts) -> m_leaderMotor.setControl(m_voltReq.withOutput(volts.in(Volts))),
-                    null, this));
+    private final SysIdRoutine m_sysIdRoutine;
 
     /** Target setpoint for the elevator in meters */
     private double m_setpoint;
@@ -100,6 +85,50 @@ public class ElevatorSubsystem extends SubsystemBase {
             //SmartDashboard.putData("Elevator Sim", m_mech2d); commented out for testing
             m_elevatorMech2d.setColor(new Color8Bit(Color.kAntiqueWhite));
         }
+
+        m_leaderMotor = new TalonFX(ElevatorConstants.kElevatorLeaderCAN);
+
+        /** TalonFX follower motor controller object */
+        m_followerMotor = new TalonFX(ElevatorConstants.kElevatorFollowerCAN);
+    
+        /** Configuration object for the TalonFX motor */
+        m_motorConfig = new TalonFXConfiguration();
+    
+        /** Voltage control request object for the TalonFX motor controller */
+        m_voltReq = new VoltageOut(0.0);
+    
+        /** Motion magic voltage control request object for the TalonFX motor controller */
+        m_request = new MotionMagicVoltage(0).withSlot(0);
+    
+        /** Object of the Phoenix Orchestra */
+        m_orchestra = new Orchestra();
+    
+        /** Object of a simulated elevator */
+        m_elevatorSim = new ElevatorSim(DCMotor.getFalcon500(2),
+                ElevatorConstants.kElevatorGearing, ElevatorConstants.kElevatorCarriageMass,
+                ElevatorConstants.kElevatorDrumRadius, ElevatorConstants.kElevatorMinHeightMeters,
+                ElevatorConstants.kElevatorMaxHeightMeters, true,
+                ElevatorConstants.kElevatorHeightMeters, 0.01, // add some noise
+                0);
+    
+        /** Mechanism2d object of an elevator */
+        m_mech2d =
+                new Mechanism2d(Units.inchesToMeters(10), Units.inchesToMeters(50));
+        /** MechanismRoot2d object of an elevator */
+        m_mech2dRoot =
+                m_mech2d.getRoot("Elevator Root", Units.inchesToMeters(5), Units.inchesToMeters(0.5));
+        /** MechanismLigament2d object of an elevator */
+        m_elevatorMech2d =
+                m_mech2dRoot.append(new MechanismLigament2d("Elevator",
+                        m_elevatorSim.getPositionMeters(), 90, 7, new Color8Bit(Color.kAntiqueWhite)));
+    
+        /** Object of a system identification routine */
+        m_sysIdRoutine = new SysIdRoutine(
+                new SysIdRoutine.Config(null, Volts.of(4), null,
+                        (state) -> SignalLogger.writeString("state", state.toString())),
+                new SysIdRoutine.Mechanism(
+                        (volts) -> m_leaderMotor.setControl(m_voltReq.withOutput(volts.in(Volts))),
+                        null, this));
 
         // Set motor configuration
         m_motorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;

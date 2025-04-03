@@ -4,12 +4,12 @@
     {
       "anchor": {
         "x": 5.790061475409836,
-        "y": 4.247
+        "y": 4.22
       },
       "prevControl": null,
       "nextControl": {
         "x": 6.425409836065573,
-        "y": 4.126895491803278
+        "y": 4.099895491803278
       },
       "isLocked": false,
       "linkedName": null
@@ -54,7 +54,7 @@
     },
     {
       "name": "outtakealgaeon",
-      "waypointRelativePos": 1.0,
+      "waypointRelativePos": 0.97,
       "endWaypointRelativePos": null,
       "command": null
     }

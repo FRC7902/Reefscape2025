@@ -14,11 +14,9 @@ import frc.robot.Constants;
 import frc.robot.Constants.CoralIndexerConstants;
 
 public class CoralIndexerSubsystem extends SubsystemBase {
-    public SparkMax m_indexMotor = new SparkMax(Constants.CoralIndexerConstants.kIndexMotorCAN,
-            SparkMax.MotorType.kBrushless);
-    public SparkMaxConfig m_indexMotorConfig = new SparkMaxConfig();
-    public SimpleMotorFeedforward m_feedforward = new SimpleMotorFeedforward(
-            Constants.CoralIndexerConstants.kS, Constants.CoralIndexerConstants.kV);
+    public SparkMax m_indexMotor;
+    public SparkMaxConfig m_indexMotorConfig;
+    public SimpleMotorFeedforward m_feedforward;
 
     private RelativeEncoder m_encoder;
 
@@ -33,6 +31,11 @@ public class CoralIndexerSubsystem extends SubsystemBase {
     private double m_simMotorVelocity = 0;
 
     public CoralIndexerSubsystem() {
+        m_indexMotor = new SparkMax(Constants.CoralIndexerConstants.kIndexMotorCAN,
+            SparkMax.MotorType.kBrushless);
+        m_indexMotorConfig = new SparkMaxConfig();
+        m_feedforward = new SimpleMotorFeedforward(
+            Constants.CoralIndexerConstants.kS, Constants.CoralIndexerConstants.kV);
         m_indexMotorConfig.smartCurrentLimit(30).openLoopRampRate(CoralIndexerConstants.kRampRate)
                 .idleMode(IdleMode.kBrake);
 

@@ -17,14 +17,15 @@ import frc.robot.Constants.AlgaeManipulatorConstants;
 
 public class AlgaeManipulatorSubsystem extends SubsystemBase {
 
-    private SparkMax m_motor =
-            new SparkMax(AlgaeManipulatorConstants.kMotorCANId, MotorType.kBrushless);
-    private SparkMaxConfig m_motorConfig = new SparkMaxConfig();
-
-    private DigitalInput m_beamBreak = new DigitalInput(AlgaeManipulatorConstants.kbeamBreakPortId);
+    private SparkMax m_motor;
+    private SparkMaxConfig m_motorConfig;
+    private DigitalInput m_beamBreak;
 
     /** Creates a new AlgaeElevatorManipulatorSubsystem. */
     public AlgaeManipulatorSubsystem() {
+        m_motorConfig = new SparkMaxConfig();
+        m_motor = new SparkMax(AlgaeManipulatorConstants.kMotorCANId, MotorType.kBrushless);
+        m_beamBreak = new DigitalInput(AlgaeManipulatorConstants.kbeamBreakPortId);
         configure();
     }
 

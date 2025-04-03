@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.4311701933411465,
-        "y": 4.05
+        "x": 5.540063385467689,
+        "y": 4.049022746052336
       },
       "isLocked": false,
       "linkedName": null
@@ -17,11 +17,11 @@
     {
       "anchor": {
         "x": 5.790061475409836,
-        "y": 4.246772540983606
+        "y": 4.22
       },
       "prevControl": {
-        "x": 6.055240062141666,
-        "y": 4.246772540983606
+        "x": 6.066169051348998,
+        "y": 4.242660431105794
       },
       "nextControl": null,
       "isLocked": false,
@@ -54,7 +54,7 @@
     },
     {
       "name": "coraloutakeon",
-      "waypointRelativePos": 1.0,
+      "waypointRelativePos": 0.98,
       "endWaypointRelativePos": null,
       "command": null
     }

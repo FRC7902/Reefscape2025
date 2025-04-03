@@ -28,42 +28,30 @@ import frc.robot.Robot;
 public class ClimbSubsystem extends SubsystemBase {
 
     // object creation of motors
-    private final SparkMax m_climbLeaderMotor = new SparkMax(ClimbConstants.kClimbLeaderMotorCANID,
-            MotorType.kBrushless);
-    private final SparkMax m_climbFollowerMotor = new SparkMax(ClimbConstants.kClimbFollowerMotorCANID,
-            MotorType.kBrushless);
+    private final SparkMax m_climbLeaderMotor;
+    private final SparkMax m_climbFollowerMotor;
 
-    private final RelativeEncoder m_climbLeaderEncoder = m_climbLeaderMotor.getEncoder();
+    private final RelativeEncoder m_climbLeaderEncoder;
 
-    private final Servo m_leftServo = new Servo(ClimbConstants.kLeftServoID);
-    private final Servo m_rightServo = new Servo(ClimbConstants.kRightServoID);
+    private final Servo m_leftServo;
+    private final Servo m_rightServo;
 
     // object creation of simulation placeholder motor
-    private final DCMotor motorSim = DCMotor.getNeo550(2);
+    private final DCMotor motorSim;
 
     // object creation of simulation SPARK MAX
-    private final SparkMaxSim s_climbLeaderMotor = new SparkMaxSim(m_climbLeaderMotor, motorSim);
+    private final SparkMaxSim s_climbLeaderMotor;
 
     // object creation of motor configuration (used to configure tbe motors)
-    private final SparkMaxConfig m_climbLeaderMotorConfig = new SparkMaxConfig();
-    private final SparkMaxConfig m_climbFollowerMotorConfig = new SparkMaxConfig();
+    private final SparkMaxConfig m_climbLeaderMotorConfig;
+    private final SparkMaxConfig m_climbFollowerMotorConfig;
 
     // Object creation of absolute encoder. The REV Through bore encoder is used for
     // climb
     // The DutyCycleEncoder is used as the REV Through bore encoder is an absolute
     // encoder that uses PWM via one of the DI (Digital IO) pins on the RIO
-    private final DutyCycleEncoder m_absoluteEncoder = new DutyCycleEncoder(ClimbConstants.kRevThroughBoreIO); // need
-                                                                                                               // to
-                                                                                                               // find
-                                                                                                               // exact
-                                                                                                               // angle
-                                                                                                               // where
-                                                                                                               // climb
-                                                                                                               // is 90
-                                                                                                               // degrees
-                                                                                                               // to the
-                                                                                                               // horizontal
-    private final DutyCycleEncoderSim s_absoluteEncoder = new DutyCycleEncoderSim(m_absoluteEncoder);
+    private final DutyCycleEncoder m_absoluteEncoder;
+    private final DutyCycleEncoderSim s_absoluteEncoder;
 
     private boolean isFunnelUnlocked;
 
@@ -72,7 +60,48 @@ public class ClimbSubsystem extends SubsystemBase {
     private int setupClimb = 0;
 
     // to be updated
-    private final ElevatorSim m_climbSim = new ElevatorSim(
+    private final ElevatorSim m_climbSim;
+
+    public ClimbSubsystem() {
+
+        m_climbLeaderMotor = new SparkMax(ClimbConstants.kClimbLeaderMotorCANID,
+        MotorType.kBrushless);
+        m_climbFollowerMotor = new SparkMax(ClimbConstants.kClimbFollowerMotorCANID,
+                MotorType.kBrushless);
+
+        m_climbLeaderEncoder = m_climbLeaderMotor.getEncoder();
+
+        m_leftServo = new Servo(ClimbConstants.kLeftServoID);
+        m_rightServo = new Servo(ClimbConstants.kRightServoID);
+
+        // object creation of simulation placeholder motor
+        motorSim = DCMotor.getNeo550(2);
+
+        // object creation of simulation SPARK MAX
+        s_climbLeaderMotor = new SparkMaxSim(m_climbLeaderMotor, motorSim);
+
+        // object creation of motor configuration (used to configure tbe motors)
+        m_climbLeaderMotorConfig = new SparkMaxConfig();
+        m_climbFollowerMotorConfig = new SparkMaxConfig();
+
+        // Object creation of absolute encoder. The REV Through bore encoder is used for
+        // climb
+        // The DutyCycleEncoder is used as the REV Through bore encoder is an absolute
+        // encoder that uses PWM via one of the DI (Digital IO) pins on the RIO
+        m_absoluteEncoder = new DutyCycleEncoder(ClimbConstants.kRevThroughBoreIO); // need
+                                                                                                                // to
+                                                                                                                // find
+                                                                                                                // exact
+                                                                                                                // angle
+                                                                                                                // where
+                                                                                                                // climb
+                                                                                                                // is 90
+                                                                                                                // degrees
+                                                                                                                // to the
+                                                                                                                // horizontal
+        s_absoluteEncoder = new DutyCycleEncoderSim(m_absoluteEncoder);
+
+        m_climbSim = new ElevatorSim(
             motorSim,
             5,
             70,
@@ -83,8 +112,6 @@ public class ClimbSubsystem extends SubsystemBase {
             0.0,
             0.01,
             0);
-
-    public ClimbSubsystem() {
         // clears any previous faults on motors
         // do this so that any errors from previous usage are cleared
         // if any errors persist, then we know there's an issue with the motors
