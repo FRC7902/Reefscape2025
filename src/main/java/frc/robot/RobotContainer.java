@@ -32,7 +32,7 @@ import frc.robot.commands.teleop.algae_manipulator.OuttakeAlgaeCommand;
 import frc.robot.commands.teleop.climb.InitiateClimbCommand;
 import frc.robot.commands.teleop.climb.LockFunnelCommand;
 import frc.robot.commands.teleop.climb.ManualClimb;
-import frc.robot.commands.teleop.climb.MoveClimbDownCommand;
+import frc.robot.commands.teleop.climb.MoveClimbAttackAngleCommand;
 import frc.robot.commands.teleop.climb.MoveClimbUpCommand;
 import frc.robot.commands.teleop.coral_indexer.AutomaticIntakeCoralCommand;
 import frc.robot.commands.teleop.coral_indexer.CorrectCoralPositionCommand;
@@ -282,7 +282,7 @@ public class RobotContainer {
                         new SetElevatorPositionCommand(
                                 ElevatorConstants.kElevatorCoralStationAndProcessorHeight),
                         new InitiateClimbCommand().withTimeout(1),
-                        new MoveClimbDownCommand(m_climbSubsystem)));
+                        new MoveClimbAttackAngleCommand(m_climbSubsystem)));
         m_operatorController.start().whileTrue(m_swerveSubsystem.centerModulesCommand());
 
         // Raise elevator (by height of Algae diameter) while intaking algae
@@ -315,7 +315,7 @@ public class RobotContainer {
                 .onTrue(new ConditionalCommand(new MoveClimbUpCommand(m_climbSubsystem),
                         new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
         m_driverController.povRight()
-                .onTrue(new ConditionalCommand(new MoveClimbDownCommand(m_climbSubsystem),
+                .onTrue(new ConditionalCommand(new MoveClimbAttackAngleCommand(m_climbSubsystem),
                         new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
 
         m_driverController.leftTrigger(0.05).whileTrue(new StrafeLeftCommand());

@@ -246,7 +246,7 @@ public class ClimbSubsystem extends SubsystemBase {
         //determines if robot is being simulated. if so, will not display the metrics below
         if (!(Robot.isSimulation())) {
             //Displays live motor and limit switch metrics on SmartDashboard
-            //SmartDashboard.putNumber("Climb Arm Angle", getClimbArmAngle()); commented out for testing
+            SmartDashboard.putNumber("Climb Arm Angle", getClimbArmAngle());
             //SmartDashboard.putNumber("Climb Motor Speed", m_climbLeaderMotor.get()); commented out for testing
             // SmartDashboard.putNumber("Climb Motor (" + ClimbConstants.kClimbLeaderMotorCANID + ") Current", m_climbLeaderMotor.getOutputCurrent());
             // SmartDashboard.putNumber("Climb Motor (" + ClimbConstants.kClimbFollowerMotorCANID + ") Current", m_climbLeaderMotor.getOutputCurrent());

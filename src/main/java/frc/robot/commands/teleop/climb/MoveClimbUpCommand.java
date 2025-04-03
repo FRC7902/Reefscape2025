@@ -5,10 +5,8 @@
 package frc.robot.commands.teleop.climb;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.Constants.ClimbConstants;
-import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.RobotContainer;
+import frc.robot.subsystems.ClimbSubsystem;
 
 public class MoveClimbUpCommand extends Command {
 
@@ -42,6 +40,6 @@ public class MoveClimbUpCommand extends Command {
     @Override
     public boolean isFinished() {
      //   return m_climbSubsystem.isAtTargetAngle(m_climbSubsystem.getClimbArmAngle(), ClimbConstants.kClimbForwardLimit, 1);
-        return m_climbSubsystem.getClimbArmAngle() <= 162;
+        return m_climbSubsystem.getClimbArmAngle() <= 167;
     }
 }

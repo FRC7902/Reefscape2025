@@ -5,16 +5,14 @@
 package frc.robot.commands.teleop.climb;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.Constants.ClimbConstants;
-import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.RobotContainer;
+import frc.robot.subsystems.ClimbSubsystem;
 
-public class MoveClimbDownCommand extends Command {
+public class MoveClimbAttackAngleCommand extends Command {
 
     private ClimbSubsystem m_climbSubsystem;
     
-    public MoveClimbDownCommand(ClimbSubsystem m_climbSubsystem) {
+    public MoveClimbAttackAngleCommand(ClimbSubsystem m_climbSubsystem) {
         addRequirements(RobotContainer.m_climbSubsystem);
         this.m_climbSubsystem = m_climbSubsystem;
     }
@@ -41,6 +39,6 @@ public class MoveClimbDownCommand extends Command {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return m_climbSubsystem.getClimbArmAngle() >= 315;
+        return m_climbSubsystem.getClimbArmAngle() >= 320;
     }
 }
