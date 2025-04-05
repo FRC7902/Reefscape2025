@@ -112,12 +112,14 @@ public class AlignToReef extends Command {
     double rotationDifference = Math.abs(currentRobotPose.getRotation().getRadians() - aprilTagRotation);
     boolean hasLargeRotationDifference = rotationDifference > Math.toRadians(17);   
 
-    if (hasLargeRotationDifference) {
-      RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(aprilTagRotation, 0, 0);
-    }
-    else if (!hasLargeRotationDifference) {
-      RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(aprilTagRotation, getDriverControllerLeftY(), -ySpeed);
-    }
+    // if (hasLargeRotationDifference) {
+    //   RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(aprilTagRotation, 0, 0);
+    // }
+    // else if (!hasLargeRotationDifference) {
+    //   RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(aprilTagRotation, getDriverControllerLeftY(), -ySpeed);
+    // }
+    RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(aprilTagRotation, getDriverControllerLeftY(), -ySpeed);
+
   }
     
   // Called once the command ends or is interrupted.

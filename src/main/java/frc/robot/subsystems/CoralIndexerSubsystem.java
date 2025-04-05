@@ -36,7 +36,7 @@ public class CoralIndexerSubsystem extends SubsystemBase {
         m_indexMotorConfig = new SparkMaxConfig();
         m_feedforward = new SimpleMotorFeedforward(
             Constants.CoralIndexerConstants.kS, Constants.CoralIndexerConstants.kV);
-        m_indexMotorConfig.smartCurrentLimit(30).openLoopRampRate(CoralIndexerConstants.kRampRate)
+        m_indexMotorConfig.smartCurrentLimit(30, 40).openLoopRampRate(CoralIndexerConstants.kRampRate)
                 .idleMode(IdleMode.kBrake);
 
         m_indexMotor.configure(m_indexMotorConfig, ResetMode.kNoResetSafeParameters,

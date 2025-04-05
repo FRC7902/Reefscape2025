@@ -181,9 +181,9 @@ public class RobotContainer {
                                 .onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeHighHeight));
 
                 new EventTrigger("autoalignleft")
-                                .whileTrue(new AlignToReef(m_cameraSubsystem, ReefSide.LEFT).withTimeout(2));
-                new EventTrigger("autoalignright")
                                 .whileTrue(new AlignToReef(m_cameraSubsystem, ReefSide.RIGHT).withTimeout(2));
+                new EventTrigger("autoalignright")
+                                .whileTrue(new AlignToReef(m_cameraSubsystem, ReefSide.LEFT).withTimeout(2));
 
                 new EventTrigger("ElevatorL1WithWait").onTrue(
                                 new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel1StartHeight,
@@ -282,13 +282,13 @@ public class RobotContainer {
                                 .whileTrue(Commands.parallel(new OuttakeAlgaeCommand(), new OuttakeCoralCommand()));
 
                 // m_operatorController.back().whileTrue(new InitiateClimbCommand());
-                m_operatorController.back()
+                m_operatorController.start()
                                 .onTrue(new SequentialCommandGroup(
                                                 new SetElevatorPositionCommand(
                                                                 ElevatorConstants.kElevatorCoralStationAndProcessorHeight),
                                                 new InitiateClimbCommand().withTimeout(1),
                                                 new MoveClimbAttackAngleCommand(m_climbSubsystem)));
-                m_operatorController.start().whileTrue(m_swerveSubsystem.centerModulesCommand());
+                m_operatorController.back().whileTrue(m_swerveSubsystem.centerModulesCommand());
 
                 // Raise elevator (by height of Algae diameter) while intaking algae
                 // m_driverController.leftBumper().whileTrue(m_whileTrueSelectIntakeCommand);
@@ -306,8 +306,8 @@ public class RobotContainer {
                 // m_driverController.rightTrigger(0.05).whileTrue(new
                 // SequentialCommandGroup(new CheckForAprilTag(1), new AlignToReef(this, 1)));
 
-                m_driverController.a().whileTrue(new AlignToReef(m_cameraSubsystem, ReefSide.LEFT)); // left
-                m_driverController.b().whileTrue(new AlignToReef(m_cameraSubsystem, ReefSide.RIGHT)); // right
+                m_driverController.a().whileTrue(new AlignToReef(m_cameraSubsystem, ReefSide.RIGHT)); // left
+                m_driverController.b().whileTrue(new AlignToReef(m_cameraSubsystem, ReefSide.LEFT)); // right
 
                 // Climb controls
                 m_driverController.povUp()
