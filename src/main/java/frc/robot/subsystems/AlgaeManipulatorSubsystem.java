@@ -17,14 +17,15 @@ import frc.robot.Constants.AlgaeManipulatorConstants;
 
 public class AlgaeManipulatorSubsystem extends SubsystemBase {
 
-    private SparkMax m_motor =
-            new SparkMax(AlgaeManipulatorConstants.kMotorCANId, MotorType.kBrushless);
-    private SparkMaxConfig m_motorConfig = new SparkMaxConfig();
-
-    private DigitalInput m_beamBreak = new DigitalInput(AlgaeManipulatorConstants.kbeamBreakPortId);
+    private SparkMax m_motor;
+    private SparkMaxConfig m_motorConfig;
+    private DigitalInput m_beamBreak;
 
     /** Creates a new AlgaeElevatorManipulatorSubsystem. */
     public AlgaeManipulatorSubsystem() {
+        m_motorConfig = new SparkMaxConfig();
+        m_motor = new SparkMax(AlgaeManipulatorConstants.kMotorCANId, MotorType.kBrushless);
+        m_beamBreak = new DigitalInput(AlgaeManipulatorConstants.kbeamBreakPortId);
         configure();
     }
 
@@ -55,6 +56,6 @@ public class AlgaeManipulatorSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         // This method will be called once per scheduler run
-        SmartDashboard.putBoolean("hasAlgae", hasAlgae());
+        //SmartDashboard.putBoolean("hasAlgae", hasAlgae()); commented out for testing
     }
 }

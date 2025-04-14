@@ -1,23 +1,38 @@
 {
-    "NetworkTables": {
-        "types": {
-            "/FMSInfo": "FMSInfo",
-            "/SmartDashboard/Elevator Sim": "Mechanism2d"
+  "NetworkTables": {
+    "transitory": {
+      "limelight": {
+        "open": true
+      },
+      "limelight-birds": {
+        "double[]##v_/limelight-birds/fiducial_id_filters_set": {
+          "open": true
         },
-        "windows": {
-            "/SmartDashboard/Elevator Sim": {
-                "window": {
-                    "visible": true
-                }
-            }
-        }
+        "open": true
+      }
     },
-    "NetworkTables Info": {
-        "visible": true
-    },
-    "NetworkTables Settings": {
-        "dsClient": false,
-        "mode": "Client (NT4)",
-        "serverTeam": "localhost"
+    "types": {
+      "/FMSInfo": "FMSInfo",
+      "/SmartDashboard/Alerts": "Alerts",
+      "/SmartDashboard/Auto Chooser": "String Chooser",
+      "/SmartDashboard/Encoders": "Alerts",
+      "/SmartDashboard/Field": "Field2d",
+      "/SmartDashboard/IMU": "Alerts",
+      "/SmartDashboard/JSON": "Alerts",
+      "/SmartDashboard/Motors": "Alerts",
+      "/SmartDashboard/PathPlanner": "Alerts",
+      "/SmartDashboard/Swerve Drive": "Alerts"
     }
+  },
+  "NetworkTables Info": {
+    "Connections": {
+      "open": true
+    },
+    "visible": true
+  },
+  "NetworkTables Settings": {
+    "mode": "Client (NT4)",
+    "serverTeam": "7902",
+    "visible": false
+  }
 }
