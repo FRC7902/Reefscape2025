@@ -24,6 +24,7 @@ public final class Constants {
     public static class DriveConstants {
         public static final double MAX_SPEED = Units.feetToMeters(15);
         public static final double kSlowDriveSpeedMultiplier = 0.5;
+        public static final double kAutoAlignForwardBackwardSpeedMultiplier = 1.5;
     }
 
     public static class VisionConstants {
