@@ -243,6 +243,15 @@ public class ElevatorSubsystem extends SubsystemBase {
         return Math.abs(getPositionMeters() - m_setpoint) < ElevatorConstants.kElevatorTargetError;
     }
 
+    /**
+     * Returns whether the elevator is at the coral L1 height
+     * 
+     * @return Whether the elevator is at the coral L1c height
+     */    
+    public boolean elevatorAtL1Height() {
+        return getElevatorEnumPosition() == ElevatorPosition.CORAL_L1;
+    }
+
     /** Stop the motors */
     public void stop() {
         m_leaderMotor.stopMotor();

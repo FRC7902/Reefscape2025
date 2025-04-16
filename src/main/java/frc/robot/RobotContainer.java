@@ -49,6 +49,8 @@ import frc.robot.visions.CameraInterface;
 import frc.robot.visions.ReefSide;
 import frc.robot.subsystems.SwerveSubsystem;
 import swervelib.SwerveInputStream;
+import frc.robot.commands.teleop.visions.AlignToL1;
+import frc.robot.commands.teleop.visions.AlignToProcessor;
 import frc.robot.commands.teleop.visions.AlignToReef;
 
 /**
@@ -310,10 +312,15 @@ public class RobotContainer {
                 m_driverController.a().whileTrue(new AlignToReef(m_cameraSubsystem, ReefSide.RIGHT)); // left
                 m_driverController.b().whileTrue(new AlignToReef(m_cameraSubsystem, ReefSide.LEFT)); // right
 
+                m_driverController.x().whileTrue(new AlignToL1(m_cameraSubsystem, ReefSide.LEFT)); // left
+                m_driverController.y().whileTrue(new AlignToL1(m_cameraSubsystem, ReefSide.RIGHT)); // right
+
+                m_driverController.povUp().whileTrue(new AlignToProcessor(m_cameraSubsystem));
+
                 // Climb controls
-                m_driverController.povUp()
-                                .whileTrue(new ConditionalCommand(new ManualClimb(m_climbSubsystem, 12),
-                                                new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
+                // m_driverController.povUp()
+                //                 .whileTrue(new ConditionalCommand(new ManualClimb(m_climbSubsystem, 12),
+                //                                 new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
                 m_driverController.povDown()
                                 .whileTrue(new ConditionalCommand(new ManualClimb(m_climbSubsystem, -12),
                                                 new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
