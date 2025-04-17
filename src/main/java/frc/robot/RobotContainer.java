@@ -287,7 +287,7 @@ public class RobotContainer {
         m_operatorController.start()
                 .onTrue(new SequentialCommandGroup(
                         new SetElevatorPositionCommand(
-                                ElevatorConstants.kElevatorCoralStationAndProcessorHeight),
+                                ElevatorConstants.kElevatorCoralStationAndProcessorHeight).withTimeout(3),
                         new InstantCommand(() -> {
                             driveAngularVelocity.scaleTranslation(DriveConstants.kSlowDriveSpeedMultiplier);
                         }),
