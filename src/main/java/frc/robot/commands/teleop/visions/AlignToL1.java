@@ -47,7 +47,7 @@ public class AlignToL1 extends Command {
 
   public AlignToL1(CameraInterface m_autoAlignCamera, ReefSide l1Side) {
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(RobotContainer.m_swerveSubsystem);
+    addRequirements();
     this.m_autoAlignCam = m_autoAlignCamera;
     this.l1Side = l1Side;
   }
@@ -82,7 +82,7 @@ public class AlignToL1 extends Command {
       targetRotation = targetRotation.rotateBy(new Rotation2d(Math.toRadians(60)));
     }
 
-    constraints = new PathConstraints(100, 300, 400, 500);
+    constraints = new PathConstraints(8, 10, 8, 10);
 
     targetPose = new Pose2d(aprilTagPose.getX(), aprilTagPose.getY(), new Rotation2d(Math.toRadians(targetRotation.getDegrees())));
 
@@ -93,12 +93,15 @@ public class AlignToL1 extends Command {
   @Override 
   public void execute() {  
     alignCommand = AutoBuilder.pathfindToPose(targetPose, constraints);
+    alignCommand.addRequirements(RobotContainer.m_swerveSubsystem);
     alignCommand.schedule();
   }
     
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    alignCommand.cancel();
+    alignCommand.end(true);
   }
 
 

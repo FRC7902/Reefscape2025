@@ -113,10 +113,10 @@ public class AlignToReef extends Command {
     boolean hasLargeRotationDifference = rotationDifference > Math.toRadians(17);   
 
     if (hasLargeRotationDifference) {
-      RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(aprilTagRotation, 0, 0);
+      RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(aprilTagRotation, 0, 0, false);
     }
     else if (!hasLargeRotationDifference) {
-      RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(aprilTagRotation, getDriverControllerLeftY(), -ySpeed);
+      RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(aprilTagRotation, getDriverControllerLeftY(), -ySpeed, false);
     }
     // RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(aprilTagRotation, getDriverControllerLeftY(), -ySpeed);
 
@@ -135,7 +135,7 @@ public class AlignToReef extends Command {
   }
 
   private double getDriverControllerLeftY() {
-    return -RobotContainer.m_driverController.getLeftY();
+    return -RobotContainer.m_driverController.getLeftY() * VisionConstants.kAutoAlignSpeedMultiplier;
   }
 
   public void hawkTuah(String text, double key) {

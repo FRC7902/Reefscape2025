@@ -748,7 +748,7 @@ public class SwerveSubsystem extends SubsystemBase {
                 && swerveDrive.getRobotVelocity().omegaRadiansPerSecond < 0.1);
     }
 
-    public void alignRobotToAprilTag(double radiansHeading, double xTranslation, double yTranslation) {
+    public void alignRobotToAprilTag(double radiansHeading, double xTranslation, double yTranslation, boolean isFieldRelative) {
         SwerveController controller = swerveDrive.getSwerveController();
 
         /*
@@ -761,7 +761,7 @@ public class SwerveSubsystem extends SubsystemBase {
          */
         swerveDrive.drive(new Translation2d(xTranslation, yTranslation),
                 controller.headingCalculate(swerveDrive.getOdometryHeading().getRadians(), radiansHeading),
-                false, false);
+                isFieldRelative, false);
 
         SmartDashboard.putNumber("Odom Heading (rad)", swerveDrive.getOdometryHeading().unaryMinus().getRadians());
         SmartDashboard.putNumber("Target Heading (rad)", radiansHeading);

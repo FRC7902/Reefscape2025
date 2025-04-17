@@ -66,6 +66,8 @@ public final class Constants {
 
         public static int kSecondPIDControllerStartingPoint = 13; // to change
 
+        public static double kAutoAlignSpeedMultiplier = 2;
+
     }
 
     public static class PathPlanner {

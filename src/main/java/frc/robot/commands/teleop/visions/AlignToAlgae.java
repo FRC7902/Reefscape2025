@@ -103,7 +103,7 @@ public class AlignToAlgae extends Command {
     // else if (!hasLargeRotationDifference) {
     //   RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(aprilTagRotation, getDriverControllerLeftY(), -ySpeed);
     // }
-    RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(aprilTagRotation, getDriverControllerLeftY(), -ySpeed);
+    RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(aprilTagRotation, getDriverControllerLeftY(), -ySpeed, false);
 
   }
     
@@ -120,7 +120,7 @@ public class AlignToAlgae extends Command {
   }
 
   private double getDriverControllerLeftY() {
-    return -RobotContainer.m_driverController.getLeftY();
+    return -RobotContainer.m_driverController.getLeftY() * VisionConstants.kAutoAlignSpeedMultiplier;
   }
 
   public void hawkTuah(String text, double key) {

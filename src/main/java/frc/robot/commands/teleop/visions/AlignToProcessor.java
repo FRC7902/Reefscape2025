@@ -9,6 +9,7 @@ import java.util.Optional;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -32,7 +33,8 @@ public class AlignToProcessor extends Command {
   private Optional<Alliance> alliance;
 
   private Transform2d processorDistanceToRobot;
-  
+
+  private double multiplier;
 
   public AlignToProcessor(CameraInterface m_autoAlignCamera) {
     // Use addRequirements() here to declare subsystem dependencies.
@@ -46,14 +48,15 @@ public class AlignToProcessor extends Command {
     //gets the pose of the robot and the nearest april tag
     currentRobotPose = RobotContainer.m_swerveSubsystem.getPose();
     alliance = DriverStation.getAlliance();
-    currentRobotPose = RobotContainer.m_swerveSubsystem.getPose();
     
     if (alliance.get() == Alliance.Red) {
       processorPose = m_autoAlignCam.getAprilTagFieldLayout().getTagPose(3).get().toPose2d();
+      multiplier = 1.0;
     }
 
     else if (alliance.get() == Alliance.Blue) {
       processorPose = m_autoAlignCam.getAprilTagFieldLayout().getTagPose(16).get().toPose2d();
+      multiplier = -1.0;
     }
     
     //finds the distance between the april tag and the robot
@@ -72,7 +75,7 @@ public class AlignToProcessor extends Command {
     strafeController = new ProfiledPIDController(VisionConstants.kPY2, VisionConstants.kIY2, VisionConstants.kDY2, VisionConstants.yConstraints); //to tune
 
     //sets the start point of the pid controller to be the current distance between the tag and the robot
-    strafeController.reset(processorDistanceToRobot.getX());
+    strafeController.reset(processorDistanceToRobot.getY());
 
     //adds tolerance to the y controller as having an error of 0 is quite difficult (although in this case, a tolerance of 0 will only yield correct results for auto align)
     strafeController.setTolerance(VisionConstants.yControllerTolerance);
@@ -92,7 +95,7 @@ public class AlignToProcessor extends Command {
 
     //calculates the speed needed to get to the setpoint
     //if it is at the setpoint (meaning 0 distance difference between the april tag and the robot), set the speed to 0 so the robot stops auto aligning
-    var ySpeed = strafeController.calculate(processorDistanceToRobot.getX());
+    var ySpeed = strafeController.calculate(processorDistanceToRobot.getY());
     if (strafeController.atGoal()) {
       ySpeed = 0;
     }
@@ -100,16 +103,20 @@ public class AlignToProcessor extends Command {
     //prints out the strafe error when auto aligning
     hawkTuah("Auto-align Error", strafeController.getPositionError());
     hawkTuah("April Tag Rotation", (processorPose.getRotation().getDegrees()));
+    hawkTuah("tagdis", processorPose.minus(currentRobotPose).getY());
 
 
-    double rotationDifference = Math.abs(currentRobotPose.getRotation().getRadians() - processorPose.getRotation().getRadians());
+    double rotation = processorPose.getRotation().rotateBy(new Rotation2d(Math.PI)).getRadians();
+
+
+    double rotationDifference = Math.abs(currentRobotPose.getRotation().getRadians() - rotation);
     boolean hasLargeRotationDifference = rotationDifference > Math.toRadians(17);   
 
     if (hasLargeRotationDifference) {
-      RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(processorPose.getRotation().getRadians(), 0, 0);
+      RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(rotation, 0, 0, true);
     }
     else if (!hasLargeRotationDifference) {
-      RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(processorPose.getRotation().getRadians(), getDriverControllerLeftX(), ySpeed);
+      RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(rotation, ySpeed * multiplier, getDriverControllerLeftX(), true);
     }
     // RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(aprilTagRotation, getDriverControllerLeftY(), -ySpeed);
 
@@ -132,7 +139,7 @@ public class AlignToProcessor extends Command {
   }
 
   private double getDriverControllerLeftX() {
-    return -RobotContainer.m_driverController.getLeftX();
+    return RobotContainer.m_driverController.getLeftX() * VisionConstants.kAutoAlignSpeedMultiplier;
   }
 
   public void hawkTuah(String text, double key) {
