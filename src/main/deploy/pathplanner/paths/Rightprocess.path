@@ -60,6 +60,12 @@
       "waypointRelativePos": 0.24577987846049296,
       "endWaypointRelativePos": null,
       "command": null
+    },
+    {
+      "name": "outtakealgaeon",
+      "waypointRelativePos": 1.0,
+      "endWaypointRelativePos": null,
+      "command": null
     }
   ],
   "globalConstraints": {
