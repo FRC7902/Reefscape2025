@@ -16,12 +16,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.CoralIndexerConstants;
+import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.VisionConstants;
@@ -287,6 +289,9 @@ public class RobotContainer {
                 .onTrue(new SequentialCommandGroup(
                         new SetElevatorPositionCommand(
                                 ElevatorConstants.kElevatorCoralStationAndProcessorHeight),
+                        new InstantCommand(() -> {
+                            driveAngularVelocity.scaleTranslation(DriveConstants.kSlowDriveSpeedMultiplier);
+                        }),
                         new InitiateClimbCommand().withTimeout(1),
                         new MoveClimbAttackAngleCommand(m_climbSubsystem)));
         m_operatorController.back().whileTrue(m_swerveSubsystem.centerModulesCommand());
