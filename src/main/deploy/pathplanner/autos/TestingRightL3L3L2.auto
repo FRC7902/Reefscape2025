@@ -1,0 +1,85 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Copy of V2Right1"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.45
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Copy of V2Right2"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.4
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Copy of V2Right3"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.95
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Copy of V2Right4"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.4
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Copy of V2Right5"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.95
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Copy of V2Right6"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.45
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "COMPETITION AUTOS ",
+  "choreoAuto": false
+}
