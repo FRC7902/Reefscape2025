@@ -126,7 +126,8 @@ public final class Constants {
 
     public static class AlgaeManipulatorConstants {
         public static final int kMotorCANId = 30;
-        public static final int kMotorCurrentLimit = 60;
+        public static final int kMotorSupplyCurrentLimit = 60;
+        public static final int kMotorStatorCurrentLimit = 120;
 
         public static final int kbeamBreakPortId = 30;
 

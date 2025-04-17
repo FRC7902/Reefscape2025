@@ -7,6 +7,11 @@ package frc.robot.subsystems;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.VoltageOut;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
@@ -14,25 +19,36 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.AlgaeManipulatorConstants;
+import frc.robot.Constants.ElevatorConstants;
 
 public class AlgaeManipulatorSubsystem extends SubsystemBase {
 
-    private SparkMax m_motor;
-    private SparkMaxConfig m_motorConfig;
+    private TalonFX m_motor;
+    private final TalonFXConfiguration m_motorConfig;
+
+
     private DigitalInput m_beamBreak;
 
     /** Creates a new AlgaeElevatorManipulatorSubsystem. */
     public AlgaeManipulatorSubsystem() {
-        m_motorConfig = new SparkMaxConfig();
-        m_motor = new SparkMax(AlgaeManipulatorConstants.kMotorCANId, MotorType.kBrushless);
+        m_motorConfig = new TalonFXConfiguration();
+        m_motor = new TalonFX(AlgaeManipulatorConstants.kMotorCANId);
         m_beamBreak = new DigitalInput(AlgaeManipulatorConstants.kbeamBreakPortId);
         configure();
     }
 
     private void configure() {
-        m_motorConfig.smartCurrentLimit(AlgaeManipulatorConstants.kMotorCurrentLimit);
-        m_motor.configure(m_motorConfig, ResetMode.kResetSafeParameters,
-                PersistMode.kPersistParameters);
+        m_motorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+        m_motorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+        m_motorConfig.CurrentLimits.StatorCurrentLimit =
+                AlgaeManipulatorConstants.kMotorStatorCurrentLimit;
+
+        // Set current limits
+        m_motorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+        m_motorConfig.CurrentLimits.SupplyCurrentLimit =
+                AlgaeManipulatorConstants.kMotorSupplyCurrentLimit;
+
+        m_motor.getConfigurator().apply(m_motorConfig);
     }
 
     public void setIntakeVoltage(double voltage) {
@@ -56,6 +72,6 @@ public class AlgaeManipulatorSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         // This method will be called once per scheduler run
-        //SmartDashboard.putBoolean("hasAlgae", hasAlgae()); commented out for testing
+        // SmartDashboard.putBoolean("hasAlgae", hasAlgae()); commented out for testing
     }
 }
