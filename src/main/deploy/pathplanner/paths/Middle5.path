@@ -49,7 +49,7 @@
     },
     {
       "name": "outtakealgaeon",
-      "waypointRelativePos": 1.0,
+      "waypointRelativePos": 0.96,
       "endWaypointRelativePos": null,
       "command": null
     }
