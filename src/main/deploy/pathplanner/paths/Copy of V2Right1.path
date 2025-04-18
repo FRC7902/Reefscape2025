@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 3.8720286885245896,
-        "y": 2.940112704918032
+        "x": 3.8600409836065577,
+        "y": 2.9281249999999988
       },
       "prevControl": {
-        "x": 3.7047588655510015,
-        "y": 2.2719040122662895
+        "x": 3.6927711606329696,
+        "y": 2.259916307348256
       },
       "nextControl": null,
       "isLocked": false,
@@ -32,7 +32,7 @@
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 0.845679012345677,
+      "minWaypointRelativePos": 0.75,
       "maxWaypointRelativePos": 1.0,
       "constraints": {
         "maxVelocity": 2.0,
@@ -48,13 +48,13 @@
   "eventMarkers": [
     {
       "name": "lowalgae",
-      "waypointRelativePos": 0.340310600945309,
+      "waypointRelativePos": 0.3727897838899795,
       "endWaypointRelativePos": null,
       "command": null
     },
     {
       "name": "intakealgaeon",
-      "waypointRelativePos": 0.8048615800135056,
+      "waypointRelativePos": 0.936640471512769,
       "endWaypointRelativePos": null,
       "command": null
     }
