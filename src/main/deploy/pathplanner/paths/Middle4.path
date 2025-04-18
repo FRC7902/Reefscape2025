@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.79702868852459,
-        "y": 1.0820184426229513
+        "x": 5.826024590163935,
+        "y": 1.8372438524590167
       },
       "isLocked": false,
       "linkedName": null
@@ -20,19 +20,28 @@
         "y": 2.9281249999999988
       },
       "prevControl": {
-        "x": 5.5383196721311485,
-        "y": 2.2448258196721316
+        "x": 5.38247950819672,
+        "y": 2.436629098360655
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": null
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.13006396588487246,
+      "rotationDegrees": -90.0
+    },
+    {
+      "waypointRelativePos": 0.46908315565031805,
+      "rotationDegrees": 119.99999999999999
+    }
+  ],
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 0.4126305792972477,
+      "minWaypointRelativePos": 0.8507765023632623,
       "maxWaypointRelativePos": 1.0,
       "constraints": {
         "maxVelocity": 2.0,
@@ -48,13 +57,13 @@
   "eventMarkers": [
     {
       "name": "highalgae",
-      "waypointRelativePos": 0.610161443494777,
+      "waypointRelativePos": 0.318703578663067,
       "endWaypointRelativePos": null,
       "command": null
     },
     {
       "name": "intakealgaeon",
-      "waypointRelativePos": 0.98,
+      "waypointRelativePos": 0.96,
       "endWaypointRelativePos": null,
       "command": null
     }

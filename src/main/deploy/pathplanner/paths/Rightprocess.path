@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.130737704918032,
-        "y": 2.9281249999999988
+        "x": 3.95,
+        "y": 2.833
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.957889344262295,
-        "y": 1.7413422131147547
+        "x": 3.7096292947808456,
+        "y": 1.9971059631483157
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 5.802049180327868,
+        "x": 5.79,
         "y": 0.5
       },
       "prevControl": {
-        "x": 5.814036885245901,
-        "y": 1.0220799180327877
+        "x": 5.703565337297992,
+        "y": 1.2157362164195293
       },
       "nextControl": null,
       "isLocked": false,
@@ -30,26 +30,40 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.08102345415777973,
-      "rotationDegrees": 119.99999999999999
+      "waypointRelativePos": 0.27931769722814453,
+      "rotationDegrees": 59.99999999999999
     },
     {
-      "waypointRelativePos": 0.40724946695096187,
+      "waypointRelativePos": 0.5458422174840065,
       "rotationDegrees": -90.0
     }
   ],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0.9045584045584041,
+      "maxWaypointRelativePos": 1.0,
+      "constraints": {
+        "maxVelocity": 3.0,
+        "maxAcceleration": 1.5,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
   "pointTowardsZones": [],
   "eventMarkers": [
     {
       "name": "ZeroPosition",
-      "waypointRelativePos": 0.0,
+      "waypointRelativePos": 0.24577987846049296,
       "endWaypointRelativePos": null,
       "command": null
     },
     {
       "name": "outtakealgaeon",
-      "waypointRelativePos": 0.96,
+      "waypointRelativePos": 1.0,
       "endWaypointRelativePos": null,
       "command": null
     }
@@ -70,7 +84,7 @@
   "folder": "No vision",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 119.99999999999999
+    "rotation": 59.99999999999999
   },
   "useDefaultConstraints": true
 }
