@@ -232,7 +232,7 @@ public class RobotContainer {
     private final Command m_onTrueSelectIntakeCommand = new SelectCommand<>(
             Map.ofEntries(Map.entry(ElevatorPosition.CORAL_STATION_AND_PROCESSOR,
                     new ManualIntakeCoralCommand(
-                            Constants.CoralIndexerConstants.kIntakePower * CoralIndexerConstants.SPEED_MULTIPLIER).withTimeout(5))),
+                            Constants.CoralIndexerConstants.kIntakePower * CoralIndexerConstants.CORAL_INDEXER_SPEED_MULTIPLIER).withTimeout(5))),
             this::select);
 
     private final Command m_selectOuttakeCommand = new SelectCommand<>(Map.ofEntries(
@@ -334,7 +334,7 @@ public class RobotContainer {
         m_driverController.rightTrigger(0.05).whileTrue(new StrafeRightCommand());
 
         m_indexSubsystem.setDefaultCommand(
-                new AutomaticIntakeCoralCommand(CoralIndexerConstants.kIntakePower * CoralIndexerConstants.SPEED_MULTIPLIER));
+                new AutomaticIntakeCoralCommand(CoralIndexerConstants.kIntakePower * CoralIndexerConstants.CORAL_INDEXER_SPEED_MULTIPLIER));
 
         // Elevator coral positions
         m_driverController.x().onTrue(new ConditionalCommand(
