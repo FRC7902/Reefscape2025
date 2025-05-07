@@ -22,7 +22,8 @@ import edu.wpi.first.math.util.Units;
 public final class Constants {
 
     public static class DriveConstants {
-        public static final double MAX_SPEED = Units.feetToMeters(15);
+        public static final double MAX_SPEED = Units.feetToMeters(15.0);
+        public static final double SPEED_MULTIPLIER = 0.15;
         public static final double kSlowDriveSpeedMultiplier = 0.5;
         public static final double kAutoAlignForwardBackwardSpeedMultiplier = 1.5;
     }
@@ -56,7 +57,7 @@ public final class Constants {
         public static double rightReefToAprilTagOffset = 0.210000;
 
         // PID Y Controller Constants
-        public static final TrapezoidProfile.Constraints yConstraints = new TrapezoidProfile.Constraints(60, 40);
+        public static final TrapezoidProfile.Constraints yConstraints = new TrapezoidProfile.Constraints(5, 3);
         public static double yControllerTolerance = 0;
         public static double kPY = 0.07;
         public static double kIY = 0;
@@ -134,6 +135,9 @@ public final class Constants {
 
         public static final int kIntakeVoltage = 12;
         public static final int kOuttakeVoltage = -12;
+
+        public static final double SPEED_MULTIPLIER = 0.5;
+
     }
 
     public static class CoralIndexerConstants {
@@ -141,6 +145,7 @@ public final class Constants {
         public static final double kRampRate = 0;
 
         public static final double kOuttakePower = 0.75;
+        public static final double SPEED_MULTIPLIER = 0.5;
         public static final double kL1OuttakePower = 0.4;
         public static final double kIntakePower = 1;
         public static final double kCorrectionPower = 0.2;
@@ -172,6 +177,7 @@ public final class Constants {
 
         // Motion Constraints
         public static final double kElevatorMaxVelocity = 1.5 / ElevatorConstants.kElevatorMetersPerMotorRotation;
+        public static final double SPEED_MULTIPLIER = 0.25;
         public static final double kElevatorMaxAcceleration = 160.0;
 
         // PID Constants
