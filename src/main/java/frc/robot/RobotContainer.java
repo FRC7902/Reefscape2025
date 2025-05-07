@@ -75,8 +75,8 @@ public class RobotContainer {
     // Replace with CommandPS4Controller or CommandJoystick if needed
     public static final CommandXboxController m_driverController = new CommandXboxController(
             OperatorConstants.kDriverControllerPort);
-    public static final CommandXboxController m_operatorController = new CommandXboxController(
-            OperatorConstants.kOperatorControllerPort);
+//     public static final CommandXboxController m_operatorController = new CommandXboxController(
+//             OperatorConstants.kOperatorControllerPort);
 
     public static final SwerveSubsystem m_swerveSubsystem = new SwerveSubsystem(
             new File(Filesystem.getDeployDirectory(), "swerve"));
@@ -232,7 +232,7 @@ public class RobotContainer {
     private final Command m_onTrueSelectIntakeCommand = new SelectCommand<>(
             Map.ofEntries(Map.entry(ElevatorPosition.CORAL_STATION_AND_PROCESSOR,
                     new ManualIntakeCoralCommand(
-                            Constants.CoralIndexerConstants.kIntakePower * CoralIndexerConstants.kIntakePower).withTimeout(5))),
+                            Constants.CoralIndexerConstants.kIntakePower * CoralIndexerConstants.SPEED_MULTIPLIER).withTimeout(5))),
             this::select);
 
     private final Command m_selectOuttakeCommand = new SelectCommand<>(Map.ofEntries(
@@ -294,7 +294,7 @@ public class RobotContainer {
         //                 }),
         //                 new InitiateClimbCommand().withTimeout(1),
         //                 new MoveClimbAttackAngleCommand(m_climbSubsystem)));
-        m_operatorController.back().whileTrue(m_swerveSubsystem.centerModulesCommand());
+        // m_driverController.povUp().whileTrue(m_swerveSubsystem.centerModulesCommand());
 
         // Raise elevator (by height of Algae diameter) while intaking algae
         // m_driverController.leftBumper().whileTrue(m_whileTrueSelectIntakeCommand);
@@ -312,8 +312,8 @@ public class RobotContainer {
         // m_driverController.rightTrigger(0.05).whileTrue(new
         // SequentialCommandGroup(new CheckForAprilTag(1), new AlignToReef(this, 1)));
 
-        m_driverController.a().whileTrue(new AlignToReef(m_cameraSubsystem, ReefSide.RIGHT)); // left
-        m_driverController.b().whileTrue(new AlignToReef(m_cameraSubsystem, ReefSide.LEFT)); // right
+        m_driverController.povRight().whileTrue(new AlignToReef(m_cameraSubsystem, ReefSide.RIGHT)); // left
+        m_driverController.povLeft().whileTrue(new AlignToReef(m_cameraSubsystem, ReefSide.LEFT)); // right
 
         // Climb controls
         // m_driverController.povUp()
@@ -337,27 +337,27 @@ public class RobotContainer {
                 new AutomaticIntakeCoralCommand(CoralIndexerConstants.kIntakePower * CoralIndexerConstants.SPEED_MULTIPLIER));
 
         // Elevator coral positions
-        m_operatorController.x().onTrue(new ConditionalCommand(
+        m_driverController.x().onTrue(new ConditionalCommand(
                 new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel1StartHeight),
                 new NullCommand(), m_indexSubsystem::hasCoral));
-        m_operatorController.a().onTrue(
+        m_driverController.a().onTrue(
                 new SetElevatorPositionCommand(
                         ElevatorConstants.kElevatorCoralStationAndProcessorHeight));
-        m_operatorController.b().onTrue(
+        m_driverController.b().onTrue(
                 new ConditionalCommand(
                         new SetElevatorPositionCommand(
                                 ElevatorConstants.kElevatorCoralLevel2Height),
                         new NullCommand(), m_indexSubsystem::hasCoral));
-        m_operatorController.y().onTrue(
+        m_driverController.y().onTrue(
                 new ConditionalCommand(
                         new SetElevatorPositionCommand(
                                 ElevatorConstants.kElevatorCoralLevel3Height),
                         new NullCommand(), m_indexSubsystem::hasCoral));
 
         // Elevator algae positions
-        m_operatorController.povDown()
+        m_driverController.povDown()
                 .onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeLowHeight));
-        m_operatorController.povUp()
+        m_driverController.povUp()
                 .onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeHighHeight));
 
         // ======= Test bindings =======
