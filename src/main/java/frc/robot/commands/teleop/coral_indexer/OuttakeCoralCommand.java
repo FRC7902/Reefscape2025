@@ -7,6 +7,7 @@ package frc.robot.commands.teleop.coral_indexer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
+import frc.robot.Constants.CoralIndexerConstants;
 
 public class OuttakeCoralCommand extends Command {
 
@@ -14,7 +15,7 @@ public class OuttakeCoralCommand extends Command {
 
     public OuttakeCoralCommand() {
         addRequirements(RobotContainer.m_indexSubsystem);
-        m_power = Constants.CoralIndexerConstants.kOuttakePower;
+        m_power = Constants.CoralIndexerConstants.kOuttakePower * CoralIndexerConstants.SPEED_MULTIPLIER;
     }
 
     public OuttakeCoralCommand(double power) {
