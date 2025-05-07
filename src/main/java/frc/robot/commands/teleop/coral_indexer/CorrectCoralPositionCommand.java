@@ -24,7 +24,7 @@ public class CorrectCoralPositionCommand extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    RobotContainer.m_operatorController.setRumble(GenericHID.RumbleType.kBothRumble, 1);
+    RobotContainer.m_driverController.setRumble(GenericHID.RumbleType.kBothRumble, 1);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -41,7 +41,7 @@ public class CorrectCoralPositionCommand extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    RobotContainer.m_operatorController.setRumble(GenericHID.RumbleType.kBothRumble, 0);
+    RobotContainer.m_driverController.setRumble(GenericHID.RumbleType.kBothRumble, 0);
     RobotContainer.m_indexSubsystem.stop();
   }
 
