@@ -23,7 +23,7 @@ public final class Constants {
 
     public static class DriveConstants {
         public static final double MAX_SPEED = Units.feetToMeters(15.0);
-        public static final double SPEED_MULTIPLIER = 0.15;
+        public static final double DRIVE_SPEED_MULTIPLIER = 0.15;
         public static final double kSlowDriveSpeedMultiplier = 0.5;
         public static final double kAutoAlignForwardBackwardSpeedMultiplier = 1.5;
     }
@@ -136,7 +136,7 @@ public final class Constants {
         public static final int kIntakeVoltage = 12;
         public static final int kOuttakeVoltage = -12;
 
-        public static final double SPEED_MULTIPLIER = 0.5;
+        public static final double ALGAE_MOTOR_SPEED_MULTIPLIER = 0.5;
 
     }
 
@@ -145,7 +145,7 @@ public final class Constants {
         public static final double kRampRate = 0;
 
         public static final double kOuttakePower = 0.75;
-        public static final double SPEED_MULTIPLIER = 0.5;
+        public static final double CORAL_INDEXER_SPEED_MULTIPLIER = 0.5;
         public static final double kL1OuttakePower = 0.4;
         public static final double kIntakePower = 1;
         public static final double kCorrectionPower = 0.2;
@@ -177,7 +177,7 @@ public final class Constants {
 
         // Motion Constraints
         public static final double kElevatorMaxVelocity = 1.5 / ElevatorConstants.kElevatorMetersPerMotorRotation;
-        public static final double SPEED_MULTIPLIER = 0.25;
+        public static final double ELEVATOR_SPEED_MULTIPLIER = 0.25;
         public static final double kElevatorMaxAcceleration = 160.0;
 
         // PID Constants

@@ -77,7 +77,7 @@ public class SwerveSubsystem extends SubsystemBase {
         // objects being created.
         SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
         try {
-            swerveDrive = new SwerveParser(directory).createSwerveDrive(DriveConstants.MAX_SPEED * DriveConstants.SPEED_MULTIPLIER,
+            swerveDrive = new SwerveParser(directory).createSwerveDrive(DriveConstants.MAX_SPEED * DriveConstants.DRIVE_SPEED_MULTIPLIER,
                     new Pose2d(new Translation2d(Meter.of(1), Meter.of(4)),
                             Rotation2d.fromDegrees(0)));
             // Alternative method if you don't want to supply the conversion factor via JSON
