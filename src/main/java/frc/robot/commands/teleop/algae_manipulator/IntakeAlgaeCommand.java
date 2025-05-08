@@ -24,14 +24,14 @@ public class IntakeAlgaeCommand extends Command {
     @Override
     public void initialize() {
         RobotContainer.m_algaeElevatorManipulatorSubsystem
-                .setIntakeVoltage(AlgaeManipulatorConstants.kIntakeVoltage * AlgaeManipulatorConstants.ALGAE_MOTOR_SPEED_MULTIPLIER);
+                .setIntakeVoltage(AlgaeManipulatorConstants.kIntakeVoltage);
     }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
         RobotContainer.m_algaeElevatorManipulatorSubsystem
-        .setIntakeVoltage(AlgaeManipulatorConstants.kIntakeVoltage * AlgaeManipulatorConstants.ALGAE_MOTOR_SPEED_MULTIPLIER);
+        .setIntakeVoltage(AlgaeManipulatorConstants.kIntakeVoltage);
     }
 
     // Called once the command ends or is interrupted.

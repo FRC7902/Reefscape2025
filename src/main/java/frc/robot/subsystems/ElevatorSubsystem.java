@@ -148,7 +148,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         // Set motion magic
         m_motorConfig.MotionMagic.MotionMagicCruiseVelocity =
-                ElevatorConstants.kElevatorMaxVelocity * ElevatorConstants.ELEVATOR_SPEED_MULTIPLIER;
+                ElevatorConstants.kElevatorMaxVelocity;
         m_motorConfig.MotionMagic.MotionMagicAcceleration = ElevatorConstants.kElevatorMaxAcceleration;
         // m_motorConfig.MotionMagic.MotionMagicJerk = 1600; // Target jerk of 1600
 
@@ -162,7 +162,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         // Set current limits
         m_motorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        m_motorConfig.CurrentLimits.StatorCurrentLimit = 125;
+        m_motorConfig.CurrentLimits.StatorCurrentLimit = 15;
 
         // Set current limits
         m_motorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;

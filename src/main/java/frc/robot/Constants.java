@@ -8,22 +8,27 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 
 /**
- * The Constants class provides a convenient place for teams to hold robot-wide
- * numerical or boolean
- * constants. This class should not be used for any other purpose. All constants
- * should be declared
+ * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
+ * constants. This class should not be used for any other purpose. All constants should be declared
  * globally (i.e. public static). Do not put anything functional in this class.
  *
  * <p>
- * It is advised to statically import this class (or one of its inner classes)
- * wherever the
+ * It is advised to statically import this class (or one of its inner classes) wherever the
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
 
+
+    public static class DemoConstants {
+        public static final double DRIVE_SPEED_MULTIPLIER = 0.1;
+        public static final double ALGAE_SHOOT_POWER_MULTIPLIER = 0.5;
+        public static final double CORAL_SHOOT_POWER_MULTIPLIER = 0.5;
+        public static final double ELEVATOR_SPEED_MULTIPLIER = 0.25;
+
+    }
+
     public static class DriveConstants {
-        public static final double MAX_SPEED = Units.feetToMeters(15.0);
-        public static final double DRIVE_SPEED_MULTIPLIER = 0.15;
+        public static final double MAX_SPEED = Units.feetToMeters(15.0) * DemoConstants.DRIVE_SPEED_MULTIPLIER;
         public static final double kSlowDriveSpeedMultiplier = 0.5;
         public static final double kAutoAlignForwardBackwardSpeedMultiplier = 1.5;
     }
@@ -35,7 +40,8 @@ public final class Constants {
         // x dist = 269.87 mm (forward back)
         // ground = 272.94 mm
 
-        public static final int[] acceptedTagIDs = new int[] { 2, 3, 6, 7, 8, 9, 10, 11, 17, 18, 19, 20, 21, 22 };
+        public static final int[] acceptedTagIDs =
+                new int[] {2, 3, 6, 7, 8, 9, 10, 11, 17, 18, 19, 20, 21, 22};
 
         public static final double kGroundToCamera = 0.27294; // meters
         public static final double kFowardToCamera = 0.26987; // meters
@@ -57,7 +63,8 @@ public final class Constants {
         public static double rightReefToAprilTagOffset = 0.210000;
 
         // PID Y Controller Constants
-        public static final TrapezoidProfile.Constraints yConstraints = new TrapezoidProfile.Constraints(5, 3);
+        public static final TrapezoidProfile.Constraints yConstraints =
+                new TrapezoidProfile.Constraints(5*DemoConstants.DRIVE_SPEED_MULTIPLIER, 3);
         public static double yControllerTolerance = 0;
         public static double kPY = 0.07;
         public static double kIY = 0;
@@ -134,9 +141,7 @@ public final class Constants {
         public static final int kbeamBreakPortId = 30;
 
         public static final int kIntakeVoltage = 12;
-        public static final int kOuttakeVoltage = -12;
-
-        public static final double ALGAE_MOTOR_SPEED_MULTIPLIER = 0.5;
+        public static final double kOuttakeVoltage = -12.0 * DemoConstants.ALGAE_SHOOT_POWER_MULTIPLIER;
 
     }
 
@@ -144,8 +149,7 @@ public final class Constants {
         public static int kIndexMotorCAN = 30;
         public static final double kRampRate = 0;
 
-        public static final double kOuttakePower = 0.75;
-        public static final double CORAL_INDEXER_SPEED_MULTIPLIER = 0.5;
+        public static final double kOuttakePower = 0.75 * DemoConstants.CORAL_SHOOT_POWER_MULTIPLIER;
         public static final double kL1OuttakePower = 0.4;
         public static final double kIntakePower = 1;
         public static final double kCorrectionPower = 0.2;
@@ -167,8 +171,8 @@ public final class Constants {
         public static final double kElevatorGearing = 7.5;
         public static final double kElevatorCarriageMass = Units.lbsToKilograms(20);
         public static final double kElevatorDrumRadius = Units.inchesToMeters(1.644 / 2);
-        public static final double kElevatorMetersPerMotorRotation = (kElevatorDrumRadius * 2 * Math.PI)
-                / kElevatorGearing;
+        public static final double kElevatorMetersPerMotorRotation =
+                (kElevatorDrumRadius * 2 * Math.PI) / kElevatorGearing;
 
         // Elevator Dimensions
         public static final double kElevatorHeightMeters = 0.0;
@@ -176,8 +180,9 @@ public final class Constants {
         public static final double kElevatorMaxHeightMeters = 0.90;
 
         // Motion Constraints
-        public static final double kElevatorMaxVelocity = 1.5 / ElevatorConstants.kElevatorMetersPerMotorRotation;
-        public static final double ELEVATOR_SPEED_MULTIPLIER = 0.25;
+        public static final double kElevatorMaxVelocity =
+                1.5 / ElevatorConstants.kElevatorMetersPerMotorRotation
+                        * DemoConstants.ELEVATOR_SPEED_MULTIPLIER;
         public static final double kElevatorMaxAcceleration = 160.0;
 
         // PID Constants
