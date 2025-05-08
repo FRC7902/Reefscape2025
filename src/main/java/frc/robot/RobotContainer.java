@@ -231,7 +231,7 @@ public class RobotContainer {
     private final Command m_onTrueSelectIntakeCommand = new SelectCommand<>(
             Map.ofEntries(Map.entry(ElevatorPosition.CORAL_STATION_AND_PROCESSOR,
                     new ManualIntakeCoralCommand(
-                            Constants.CoralIndexerConstants.kIntakePower * CoralIndexerConstants.CORAL_INDEXER_SPEED_MULTIPLIER).withTimeout(5))),
+                            Constants.CoralIndexerConstants.kIntakePower).withTimeout(5))),
             this::select);
 
     private final Command m_selectOuttakeCommand = new SelectCommand<>(Map.ofEntries(
@@ -311,8 +311,8 @@ public class RobotContainer {
         // m_driverController.rightTrigger(0.05).whileTrue(new
         // SequentialCommandGroup(new CheckForAprilTag(1), new AlignToReef(this, 1)));
 
-        m_driverController.povRight().whileTrue(new AlignToReef(m_cameraSubsystem, ReefSide.RIGHT)); // left
-        m_driverController.povLeft().whileTrue(new AlignToReef(m_cameraSubsystem, ReefSide.LEFT)); // right
+        // m_driverController.povRight().whileTrue(new AlignToReef(m_cameraSubsystem, ReefSide.RIGHT)); // left
+        // m_driverController.povLeft().whileTrue(new AlignToReef(m_cameraSubsystem, ReefSide.LEFT)); // right
 
         // Climb controls
         // m_driverController.povUp()
@@ -333,7 +333,7 @@ public class RobotContainer {
         m_driverController.rightTrigger(0.05).whileTrue(new StrafeRightCommand());
 
         m_indexSubsystem.setDefaultCommand(
-                new AutomaticIntakeCoralCommand(CoralIndexerConstants.kIntakePower * CoralIndexerConstants.CORAL_INDEXER_SPEED_MULTIPLIER));
+                new AutomaticIntakeCoralCommand(CoralIndexerConstants.kIntakePower));
 
         // Elevator coral positions
         m_driverController.x().onTrue(new ConditionalCommand(

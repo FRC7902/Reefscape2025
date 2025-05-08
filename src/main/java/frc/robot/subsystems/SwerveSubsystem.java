@@ -47,6 +47,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
+import frc.robot.Constants.DemoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.PathPlanner;
 import frc.robot.Constants.VisionConstants;
@@ -77,7 +78,7 @@ public class SwerveSubsystem extends SubsystemBase {
         // objects being created.
         SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
         try {
-            swerveDrive = new SwerveParser(directory).createSwerveDrive(DriveConstants.MAX_SPEED * DriveConstants.DRIVE_SPEED_MULTIPLIER,
+            swerveDrive = new SwerveParser(directory).createSwerveDrive(DriveConstants.MAX_SPEED,
                     new Pose2d(new Translation2d(Meter.of(1), Meter.of(4)),
                             Rotation2d.fromDegrees(0)));
             // Alternative method if you don't want to supply the conversion factor via JSON
@@ -119,7 +120,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
         swerveDrive.setChassisDiscretization(false, true, 0.03);
         swerveDrive.swerveController.addSlewRateLimiters(null, null, null);
-        swerveDrive.swerveController.setMaximumChassisAngularVelocity(20);
+        swerveDrive.swerveController.setMaximumChassisAngularVelocity(10 * DemoConstants.DRIVE_SPEED_MULTIPLIER);
 
         setupPathPlanner();
 

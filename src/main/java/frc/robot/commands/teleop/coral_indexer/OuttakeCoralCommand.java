@@ -15,7 +15,7 @@ public class OuttakeCoralCommand extends Command {
 
     public OuttakeCoralCommand() {
         addRequirements(RobotContainer.m_indexSubsystem);
-        m_power = Constants.CoralIndexerConstants.kOuttakePower * CoralIndexerConstants.CORAL_INDEXER_SPEED_MULTIPLIER;
+        m_power = Constants.CoralIndexerConstants.kOuttakePower;
     }
 
     public OuttakeCoralCommand(double power) {
