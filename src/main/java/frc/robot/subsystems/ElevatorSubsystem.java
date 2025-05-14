@@ -81,10 +81,6 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     /** Creates a new ElevatorSubsystem */
     public ElevatorSubsystem() {
-        if (RobotBase.isSimulation()) {
-            //SmartDashboard.putData("Elevator Sim", m_mech2d); commented out for testing
-            m_elevatorMech2d.setColor(new Color8Bit(Color.kAntiqueWhite));
-        }
 
         m_leaderMotor = new TalonFX(ElevatorConstants.kElevatorLeaderCAN);
 
@@ -129,6 +125,11 @@ public class ElevatorSubsystem extends SubsystemBase {
                 new SysIdRoutine.Mechanism(
                         (volts) -> m_leaderMotor.setControl(m_voltReq.withOutput(volts.in(Volts))),
                         null, this));
+
+        if (RobotBase.isSimulation()) {
+        //SmartDashboard.putData("Elevator Sim", m_mech2d); commented out for testing
+            m_elevatorMech2d.setColor(new Color8Bit(Color.kAntiqueWhite));
+        }
 
         // Set motor configuration
         m_motorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
