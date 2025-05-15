@@ -64,10 +64,10 @@ public class Robot extends TimedRobot {
     public static final AlgaeManipulatorSubsystem m_algaeElevatorManipulatorSubsystem =
             new AlgaeManipulatorSubsystem();
     // The robot's subsystems and commands are defined here...
+    public static final CoralIndexerSubsystem m_indexSubsystem = new CoralIndexerSubsystem();
     public static final ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
     public static final ClimbSubsystem m_climbSubsystem = new ClimbSubsystem();
 
-    public static final CoralIndexerSubsystem m_indexSubsystem = new CoralIndexerSubsystem();
 
     // Replace with CommandPS4Controller or CommandJoystick if needed
     public static final CommandXboxController m_driverController =
@@ -101,21 +101,15 @@ public class Robot extends TimedRobot {
 
     private void configureBindings() {
         // Swerve drive controls
-        Command driveFieldOrientedDirectAngle =
-                m_swerveSubsystem.driveFieldOriented(m_swerveSubsystem.driveDirectAngle);
-        Command driveFieldOrientedAnglularVelocity =
-                m_swerveSubsystem.driveFieldOriented(m_swerveSubsystem.driveAngularVelocity);
-        Command driveRobotOrientedAngularVelocity =
-                m_swerveSubsystem.driveFieldOriented(m_swerveSubsystem.driveRobotOriented);
-        Command driveFieldOrientedDirectAngleKeyboard =
-                m_swerveSubsystem.driveFieldOriented(m_swerveSubsystem.driveDirectAngleKeyboard);
-        Command driveFieldOrientedAnglularVelocityKeyboard =
-                m_swerveSubsystem.driveFieldOriented(m_swerveSubsystem.driveAngularVelocityKeyboard);
+
+
+        m_elevatorSubsystem.createElevatorCommands();
+        m_swerveSubsystem.createSwerveDriveCommands();
 
         // Default to field-centric swerve drive
         // m_swerveSubsystem.setDefaultCommand(driveFieldOrientedAnglularVelocity);
 
-        m_swerveSubsystem.setDefaultCommand(driveFieldOrientedAnglularVelocity);
+        m_swerveSubsystem.setDefaultCommand(m_swerveSubsystem.driveFieldOrientedAnglularVelocity);
 
         m_climbSubsystem.setDefaultCommand(new LockFunnelCommand());
 

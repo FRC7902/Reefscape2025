@@ -88,37 +88,15 @@ public class ElevatorSubsystem extends SubsystemBase {
     /** Array of songs to be played by the Phoenix Orchestra */
     private String[] m_songs = new String[] {"song1.chrp", "song2.chrp"};
 
-    public final Command m_whileTrueSelectIntakeCommand;
+    public Command m_whileTrueSelectIntakeCommand;
 
-    public final Command m_onTrueSelectIntakeCommand;
+    public Command m_onTrueSelectIntakeCommand;
 
-    public final Command m_selectOuttakeCommand;
+    public Command m_selectOuttakeCommand;
 
     /** Creates a new ElevatorSubsystem */
     public ElevatorSubsystem() {
 
-        m_whileTrueSelectIntakeCommand = new SelectCommand<>(
-            Map.ofEntries(Map.entry(ElevatorPosition.ALGAE_LOW, new IntakeAlgaeCommand()),
-                    Map.entry(ElevatorPosition.ALGAE_HIGH, new IntakeAlgaeCommand())),
-            this::select);
-
-        m_onTrueSelectIntakeCommand = new SelectCommand<>(
-            Map.ofEntries(Map.entry(ElevatorPosition.CORAL_STATION_AND_PROCESSOR,
-                    new ManualIntakeCoralCommand(
-                            CoralIndexerConstants.kIntakePower).withTimeout(5))),
-            this::select);
-
-        m_selectOuttakeCommand = new SelectCommand<>(Map.ofEntries(
-            Map.entry(ElevatorPosition.CORAL_L1,
-                    new ParallelCommandGroup(new OuttakeCoralCommand(
-                            CoralIndexerConstants.kL1OuttakePower),
-                            new SetElevatorPositionCommand(
-                                    ElevatorConstants.kElevatorCoralLevel1EndHeight))),
-            Map.entry(ElevatorPosition.CORAL_L2, new OuttakeCoralCommand()),
-            Map.entry(ElevatorPosition.CORAL_L3, new OuttakeCoralCommand()),
-            Map.entry(ElevatorPosition.CORAL_STATION_AND_PROCESSOR,
-                    new OuttakeAlgaeCommand())),
-            this::select);
 
         m_leaderMotor = new TalonFX(ElevatorConstants.kElevatorLeaderCAN);
 
@@ -240,6 +218,32 @@ public class ElevatorSubsystem extends SubsystemBase {
         m_homed = false;
     }
 
+
+    public void createElevatorCommands() {
+        m_whileTrueSelectIntakeCommand = new SelectCommand<>(
+            Map.ofEntries(Map.entry(ElevatorPosition.ALGAE_LOW, new IntakeAlgaeCommand()),
+                    Map.entry(ElevatorPosition.ALGAE_HIGH, new IntakeAlgaeCommand())),
+            this::select);
+
+        m_onTrueSelectIntakeCommand = new SelectCommand<>(
+            Map.ofEntries(Map.entry(ElevatorPosition.CORAL_STATION_AND_PROCESSOR,
+                    new ManualIntakeCoralCommand(
+                            CoralIndexerConstants.kIntakePower).withTimeout(5))),
+            this::select);
+
+        m_selectOuttakeCommand = new SelectCommand<>(Map.ofEntries(
+            Map.entry(ElevatorPosition.CORAL_L1,
+                    new ParallelCommandGroup(new OuttakeCoralCommand(
+                            CoralIndexerConstants.kL1OuttakePower),
+                            new SetElevatorPositionCommand(
+                                    ElevatorConstants.kElevatorCoralLevel1EndHeight))),
+            Map.entry(ElevatorPosition.CORAL_L2, new OuttakeCoralCommand()),
+            Map.entry(ElevatorPosition.CORAL_L3, new OuttakeCoralCommand()),
+            Map.entry(ElevatorPosition.CORAL_STATION_AND_PROCESSOR,
+                    new OuttakeAlgaeCommand())),
+            this::select);
+    }
+    
     private ElevatorPosition select() {
         return getElevatorEnumPosition();
     }

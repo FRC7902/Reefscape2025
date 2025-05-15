@@ -55,13 +55,13 @@ public class SwerveSubsystem extends SubsystemBase {
      * Swerve drive object.
      */
 
-    public final SwerveInputStream driveAngularVelocity;
 
     private final SwerveDrive swerveDrive;
-    public final SwerveInputStream driveRobotOriented;
-    public final SwerveInputStream driveDirectAngle;
-    public final SwerveInputStream driveDirectAngleKeyboard;
-    public final SwerveInputStream driveAngularVelocityKeyboard;
+    public SwerveInputStream driveRobotOriented;
+    public SwerveInputStream driveDirectAngle;
+    public SwerveInputStream driveDirectAngleKeyboard;
+    public SwerveInputStream driveAngularVelocityKeyboard;
+    public SwerveInputStream driveAngularVelocity;
 
     /** Creates a new SwerveSubsystem. */
     public SwerveSubsystem(File directory) {
@@ -114,7 +114,19 @@ public class SwerveSubsystem extends SubsystemBase {
         swerveDrive.swerveController.setMaximumChassisAngularVelocity(20);
 
         setupPathPlanner();
-        
+    
+
+        // RobotModeTriggers.autonomous().onTrue(Commands.runOnce(this::zeroGyro));
+    }
+
+    /**
+     * Setup the photon vision class.
+     */
+    // public void setupPhotonVision() {
+    // vision = new Vision(swerveDrive::getPose, swerveDrive.field);
+    // }
+
+    public void createSwerveDriveCommands() {
         driveAngularVelocity = SwerveInputStream
         .of(swerveDrive, () -> Robot.m_driverController.getLeftY() * -1,
                 () -> Robot.m_driverController.getLeftX() * -1)
@@ -151,16 +163,7 @@ public class SwerveSubsystem extends SubsystemBase {
                 () -> Math.sin(Robot.m_driverController.getRawAxis(2) * Math.PI) * (Math.PI * 2),
                 () -> Math.cos(Robot.m_driverController.getRawAxis(2) * Math.PI) * (Math.PI * 2))
         .headingWhile(true);
-
-        // RobotModeTriggers.autonomous().onTrue(Commands.runOnce(this::zeroGyro));
     }
-
-    /**
-     * Setup the photon vision class.
-     */
-    // public void setupPhotonVision() {
-    // vision = new Vision(swerveDrive::getPose, swerveDrive.field);
-    // }
 
     @Override
     public void periodic() {
@@ -490,5 +493,20 @@ public class SwerveSubsystem extends SubsystemBase {
                 0, false, false);
 
     }
+
+    public final Command driveFieldOrientedDirectAngle =
+        driveFieldOriented(driveDirectAngle);
+
+    public final Command driveFieldOrientedAnglularVelocity =
+        driveFieldOriented(driveAngularVelocity);
+
+    public final Command driveRobotOrientedAngularVelocity =
+        driveFieldOriented(driveRobotOriented);
+
+    public final Command driveFieldOrientedDirectAngleKeyboard =
+        driveFieldOriented(driveDirectAngleKeyboard);
+
+    public final Command driveFieldOrientedAnglularVelocityKeyboard =
+        driveFieldOriented(driveAngularVelocityKeyboard);
 
 }
