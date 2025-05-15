@@ -6,13 +6,12 @@ package frc.robot.commands.teleop.SwerveCommands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Robot;
-import frc.robot.RobotContainer;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class StrafeLeftCommand extends Command {
   /** Creates a new StrafeLeft. */
   public StrafeLeftCommand() {
-    addRequirements(RobotContainer.m_swerveSubsystem);
+    addRequirements(Robot.m_swerveSubsystem);
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
@@ -25,7 +24,7 @@ public class StrafeLeftCommand extends Command {
   @Override
   public void execute() {
     // RobotContainer.m_swerveSubsystem.strafe(-0.6, Math.PI * 2,0.5);
-    RobotContainer.m_swerveSubsystem.strafe(RobotContainer.m_driverController.getLeftTriggerAxis(), 0.25);
+    Robot.m_swerveSubsystem.strafe(Robot.m_driverController.getLeftTriggerAxis(), 0.25);
   }
 
   // Called once the command ends or is interrupted.

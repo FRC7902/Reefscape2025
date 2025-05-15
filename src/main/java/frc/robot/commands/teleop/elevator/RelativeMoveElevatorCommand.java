@@ -5,7 +5,7 @@
 package frc.robot.commands.teleop.elevator;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.RobotContainer;
+import frc.robot.Robot;
 
 /*
  * You should consider using the more terse Command factories API instead
@@ -19,15 +19,15 @@ public class RelativeMoveElevatorCommand extends Command {
   /** Creates a new RaiseElevatorCommand. */
   public RelativeMoveElevatorCommand(double meters) {
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(RobotContainer.m_elevatorSubsystem);
+    addRequirements(Robot.m_elevatorSubsystem);
     m_meters = meters;
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    double currPosition = RobotContainer.m_elevatorSubsystem.getPositionMeters();
-    RobotContainer.m_elevatorSubsystem.setPosition(currPosition + m_meters);
+    double currPosition = Robot.m_elevatorSubsystem.getPositionMeters();
+    Robot.m_elevatorSubsystem.setPosition(currPosition + m_meters);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

@@ -5,7 +5,7 @@
 package frc.robot.commands.teleop.elevator;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.RobotContainer;
+import frc.robot.Robot;
 
 /*
  * You should consider using the more terse Command factories API instead
@@ -20,14 +20,14 @@ public class SetElevatorPositionCommand extends Command {
     public SetElevatorPositionCommand(double targetHeight) {
         m_targetHeight = targetHeight;
 
-        addRequirements(RobotContainer.m_elevatorSubsystem);
+        addRequirements(Robot.m_elevatorSubsystem);
     }
 
     public SetElevatorPositionCommand(double targetHeight, boolean waitForCoral) {
         m_targetHeight = targetHeight;
         m_waitForCoral = waitForCoral;
 
-        addRequirements(RobotContainer.m_elevatorSubsystem);
+        addRequirements(Robot.m_elevatorSubsystem);
     }
 
     // Called when the command is initially scheduled.
@@ -40,9 +40,9 @@ public class SetElevatorPositionCommand extends Command {
     @Override
     public void execute() {
         if (!m_waitForCoral) {
-            RobotContainer.m_elevatorSubsystem.setPosition(m_targetHeight);
-        } else if (RobotContainer.m_indexSubsystem.hasCoral()) {
-            RobotContainer.m_elevatorSubsystem.setPosition(m_targetHeight);
+            Robot.m_elevatorSubsystem.setPosition(m_targetHeight);
+        } else if (Robot.m_indexSubsystem.hasCoral()) {
+            Robot.m_elevatorSubsystem.setPosition(m_targetHeight);
         }
     }
 
@@ -53,6 +53,6 @@ public class SetElevatorPositionCommand extends Command {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return RobotContainer.m_elevatorSubsystem.atHeight();
+        return Robot.m_elevatorSubsystem.atHeight();
     }
 }

@@ -5,21 +5,21 @@
 package frc.robot.commands.teleop.climb;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.RobotContainer;
+import frc.robot.Robot;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class InitiateClimbCommand extends Command {
   /** Creates a new InitiateClimbCommand. */
   public InitiateClimbCommand() {
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(RobotContainer.m_climbSubsystem);
+    addRequirements(Robot.m_climbSubsystem);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
     
-    RobotContainer.m_climbSubsystem.unlockFunnel();
+    Robot.m_climbSubsystem.unlockFunnel();
     // TODO: Move climber to 155
   }
 
@@ -30,7 +30,7 @@ public class InitiateClimbCommand extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    RobotContainer.m_climbSubsystem.stopFunnelServos();
+    Robot.m_climbSubsystem.stopFunnelServos();
   }
 
   // Returns true when the command should end.

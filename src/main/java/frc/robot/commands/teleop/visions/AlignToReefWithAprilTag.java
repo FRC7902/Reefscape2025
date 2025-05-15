@@ -10,11 +10,14 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Robot;
-import frc.robot.RobotContainer;
+import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.visions.CameraInterface;
 import frc.robot.visions.ReefSide;
+import swervelib.SwerveDrive;
+import swervelib.simulation.SwerveIMUSimulation;
 
 public class AlignToReefWithAprilTag extends Command {
   /** Creates a new AlignToReefCommand. */
@@ -34,11 +37,16 @@ public class AlignToReefWithAprilTag extends Command {
   private Pose2d currentRobotPose;
   private Pose2d aprilTagPose;  
 
-  public AlignToReefWithAprilTag(CameraInterface m_autoAlignCamera, ReefSide triggerPressed) {
+  private final SwerveSubsystem m_swerveSubsystem;
+  private final CommandXboxController m_driverController;
+
+  public AlignToReefWithAprilTag(CameraInterface m_autoAlignCamera, SwerveSubsystem m_swerveSubsystem, ReefSide triggerPressed, CommandXboxController m_driverController) {
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(RobotContainer.m_swerveSubsystem);
+    this.m_swerveSubsystem = m_swerveSubsystem;
     this.m_autoAlignCam = m_autoAlignCamera;
+    this.m_driverController = m_driverController;
     this.triggerPressed = triggerPressed;
+    addRequirements(m_swerveSubsystem);
   }
 
   // Called when the command is initially scheduled.
@@ -47,7 +55,7 @@ public class AlignToReefWithAprilTag extends Command {
 
     fidicualID = m_autoAlignCam.getAprilTagID();
 
-    currentRobotPose = RobotContainer.m_swerveSubsystem.getPose();
+    currentRobotPose = m_swerveSubsystem.getPose();
     aprilTagPose = m_autoAlignCam.getAprilTagFieldLayout().getTagPose(fidicualID).get().toPose2d();
 
     if (triggerPressed == ReefSide.RIGHT) {
@@ -80,7 +88,7 @@ public class AlignToReefWithAprilTag extends Command {
   @Override 
   public void execute() {
 
-    currentRobotPose = RobotContainer.m_swerveSubsystem.getPose();
+    currentRobotPose = m_swerveSubsystem.getPose();
 
     var ySpeed = yController.calculate(currentRobotPose.getY() + aprilTagDistanceToRobot);
     if (yController.atGoal()) {
@@ -102,10 +110,10 @@ public class AlignToReefWithAprilTag extends Command {
     boolean hasLargeRotationDifference = rotationDifference > Math.toRadians(17);   
 
     if (hasLargeRotationDifference) {
-      RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(aprilTagRotation, 0, 0);
+      m_swerveSubsystem.alignRobotToAprilTag(aprilTagRotation, 0, 0);
     }
     else if (!hasLargeRotationDifference) {
-      RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(aprilTagRotation, getDriverControllerLeftY(), -ySpeed);
+      m_swerveSubsystem.alignRobotToAprilTag(aprilTagRotation, getDriverControllerLeftY(), -ySpeed);
     }
   }
     
@@ -123,7 +131,7 @@ public class AlignToReefWithAprilTag extends Command {
   }
 
   private double getDriverControllerLeftY() {
-    return -RobotContainer.m_driverController.getLeftY();
+    return -m_driverController.getLeftY();
   }
 
   public void hawkTuah(String text, double key) {

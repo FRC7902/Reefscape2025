@@ -5,7 +5,7 @@
 package frc.robot.commands.teleop.algae_manipulator;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.RobotContainer;
+import frc.robot.Robot;
 
 /*
  * You should consider using the more terse Command factories API instead
@@ -16,13 +16,13 @@ public class StopAlgaeManipulatorCommand extends Command {
   /** Creates a new StopAlgaeManipulatorCommand. */
   public StopAlgaeManipulatorCommand() {
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(RobotContainer.m_algaeElevatorManipulatorSubsystem);
+    addRequirements(Robot.m_algaeElevatorManipulatorSubsystem);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    RobotContainer.m_algaeElevatorManipulatorSubsystem.stopIntake();
+    Robot.m_algaeElevatorManipulatorSubsystem.stopIntake();
   }
 
   // Called every time the scheduler runs while the command is scheduled.

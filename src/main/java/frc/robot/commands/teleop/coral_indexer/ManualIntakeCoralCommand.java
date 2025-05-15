@@ -5,7 +5,7 @@
 package frc.robot.commands.teleop.coral_indexer;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.RobotContainer;
+import frc.robot.Robot;
 
 /*
  * You should consider using the more terse Command factories API instead
@@ -18,7 +18,7 @@ public class ManualIntakeCoralCommand extends Command {
     /** Creates a new IntakeCoralCommand. */
     public ManualIntakeCoralCommand(double power) {
         // Use addRequirements() here to declare subsystem dependencies.
-        addRequirements(RobotContainer.m_indexSubsystem);
+        addRequirements(Robot.m_indexSubsystem);
         m_power = power;
     }
 
@@ -29,18 +29,18 @@ public class ManualIntakeCoralCommand extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        RobotContainer.m_indexSubsystem.setPower(m_power);
+        Robot.m_indexSubsystem.setPower(m_power);
     }
 
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-        RobotContainer.m_indexSubsystem.stop();
+        Robot.m_indexSubsystem.stop();
     }
 
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return RobotContainer.m_indexSubsystem.isDeepBeamBroken();
+        return Robot.m_indexSubsystem.isDeepBeamBroken();
     }
 }

@@ -7,8 +7,8 @@ package frc.robot.commands.teleop.climb;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.ClimbConstants;
+import frc.robot.Robot;
 import frc.robot.subsystems.ClimbSubsystem;
-import frc.robot.RobotContainer;
 
 public class ManualClimb extends Command {
 
@@ -16,7 +16,7 @@ public class ManualClimb extends Command {
     private ClimbSubsystem m_climbSubsystem;
     
     public ManualClimb(ClimbSubsystem m_climbSubsystem, double direction) {
-        addRequirements(RobotContainer.m_climbSubsystem);
+        addRequirements(Robot.m_climbSubsystem);
         this.m_climbSubsystem = m_climbSubsystem;
         this.direction = direction;
     }

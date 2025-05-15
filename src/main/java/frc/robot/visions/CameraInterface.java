@@ -9,8 +9,9 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.RobotContainer;
+import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.visions.LimelightHelpers.RawFiducial;
+import swervelib.SwerveDrive;
 import frc.robot.Constants.VisionConstants;
 
 public class CameraInterface extends SubsystemBase {
@@ -19,6 +20,7 @@ public class CameraInterface extends SubsystemBase {
     private final AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout
             .loadField(AprilTagFields.k2025ReefscapeWelded);
     private final List<Pose2d> reefPoses;
+    private final SwerveDrive m_swerveDrive;
 
     private double distanceToAprilTag = 0;
     private double poseAmbiguity;
@@ -31,8 +33,9 @@ public class CameraInterface extends SubsystemBase {
      * 
      * @param cameraName
      */
-    public CameraInterface(String cameraName) {
+    public CameraInterface(String cameraName, SwerveSubsystem m_swerveDrive) {
         camera = cameraName;
+        this.m_swerveDrive = m_swerveDrive.getSwerveDrive();
 
         SmartDashboard.putNumber("kPY Close", VisionConstants.kPY2);
         SmartDashboard.putNumber("kIY Close", VisionConstants.kIY2);
@@ -172,7 +175,7 @@ public class CameraInterface extends SubsystemBase {
 
     public boolean tagIsSigma(LimelightHelpers.PoseEstimate limelightMeasurement) {
         double rotationSpeed = Math
-                .abs(RobotContainer.m_swerveSubsystem.getSwerveDrive().getRobotVelocity().omegaRadiansPerSecond);
+                .abs(m_swerveDrive.getRobotVelocity().omegaRadiansPerSecond);
         // double xSpeed = Math
         //         .abs(RobotContainer.m_swerveSubsystem.getSwerveDrive().getRobotVelocity().vxMetersPerSecond);
         // double ySpeed = Math
@@ -209,7 +212,7 @@ public class CameraInterface extends SubsystemBase {
         }
 
         double rotationDifference = Math
-                .abs(RobotContainer.m_swerveSubsystem.getPose().getRotation().getRadians() - aprilTagRotation);
+                .abs(m_swerveDrive.getPose().getRotation().getRadians() - aprilTagRotation);
         return rotationDifference <= Math.toRadians(25);
     }
 
@@ -218,11 +221,11 @@ public class CameraInterface extends SubsystemBase {
             LimelightHelpers.PoseEstimate limelightMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue(camera);
 
             double rotationSpeed = Math
-                    .abs(RobotContainer.m_swerveSubsystem.getSwerveDrive().getRobotVelocity().omegaRadiansPerSecond);
+                    .abs(m_swerveDrive.getRobotVelocity().omegaRadiansPerSecond);
             boolean shouldRejectUpdate = rotationSpeed < 6.28319 && getAprilTagArea() > 50; // 360 degrees
 
             if (tagIsSigma(limelightMeasurement)) {
-                RobotContainer.m_swerveSubsystem.getSwerveDrive().addVisionMeasurement(
+                m_swerveDrive.addVisionMeasurement(
                         limelightMeasurement.pose,
                         limelightMeasurement.timestampSeconds,
                         VecBuilder.fill(.5, .5, 9999999));
@@ -238,17 +241,16 @@ public class CameraInterface extends SubsystemBase {
 
             if (limelightMeasurement != null) {
 
-                double rotationSpeed = Math.abs(
-                        RobotContainer.m_swerveSubsystem.getSwerveDrive().getRobotVelocity().omegaRadiansPerSecond);
+                double rotationSpeed = Math.abs(m_swerveDrive.getRobotVelocity().omegaRadiansPerSecond);
                 boolean shouldRejectUpdate = rotationSpeed < 6.28319 && getAprilTagArea() > 50; // 360 degrees
 
-                RobotContainer.m_swerveSubsystem.getSwerveDrive().setVisionMeasurementStdDevs(
+                m_swerveDrive.setVisionMeasurementStdDevs(
                         VecBuilder.fill(VisionConstants.kStdDevs, VisionConstants.kStdDevs, 9999999));
 
                 Pose2d cameraPose = limelightMeasurement.pose;
 
                 if (tagIsSigma(limelightMeasurement)) {
-                    RobotContainer.m_swerveSubsystem.getSwerveDrive().addVisionMeasurement(
+                    m_swerveDrive.addVisionMeasurement(
                             limelightMeasurement.pose,
                             limelightMeasurement.timestampSeconds);
                     // RobotContainer.m_swerveSubsystem.getSwerveDrive().updateOdometry();
@@ -287,6 +289,9 @@ public class CameraInterface extends SubsystemBase {
 
         // double robotYaw =
         // RobotContainer.m_swerveSubsystem.getSwerveDrive().getPose().getRotation().getDegrees();
-
+        m_swerveDrive.updateOdometry();
+        LimelightHelpers.SetRobotOrientation(VisionConstants.kCameraName,
+            m_swerveDrive.getPose().getRotation().getDegrees(), 0.0, 0.0, 0.0, 0.0, 0.0);
+        updateOdometryWithMegaTag2();
     }
 }

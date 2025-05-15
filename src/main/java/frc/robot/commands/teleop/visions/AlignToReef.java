@@ -9,9 +9,10 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.RobotContainer;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.VisionConstants;
+import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.visions.CameraInterface;
 import frc.robot.visions.ReefSide;
 import swervelib.SwerveController;
@@ -30,11 +31,16 @@ public class AlignToReef extends Command {
 
   private Transform2d aprilTagDistanceToRobot;
 
-  public AlignToReef(CameraInterface m_autoAlignCamera, ReefSide reefSide) {
+  private final SwerveSubsystem m_swerveSubsystem;
+  private final CommandXboxController m_driverController;
+
+  public AlignToReef(CameraInterface m_autoAlignCamera, SwerveSubsystem m_swerveSubsystem, CommandXboxController m_driverController, ReefSide reefSide) {
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(RobotContainer.m_swerveSubsystem);
+    this.m_swerveSubsystem = m_swerveSubsystem;
     this.m_autoAlignCam = m_autoAlignCamera;
+    this.m_driverController = m_driverController;
     this.reefSide = reefSide;
+    addRequirements(m_swerveSubsystem);
   }
 
   // Called when the command is initially scheduled.
@@ -42,7 +48,7 @@ public class AlignToReef extends Command {
   public void initialize() {
 
     // gets the pose of the robot and the nearest april tag
-    currentRobotPose = RobotContainer.m_swerveSubsystem.getPose();
+    currentRobotPose = m_swerveSubsystem.getPose();
     aprilTagPose = m_autoAlignCam.getNearestAprilTag(currentRobotPose);
 
     // finds the distance between the april tag and the robot
@@ -95,7 +101,7 @@ public class AlignToReef extends Command {
   public void execute() {
 
     // updates robot pose and distance to april tag
-    currentRobotPose = RobotContainer.m_swerveSubsystem.getPose();
+    currentRobotPose = m_swerveSubsystem.getPose();
     aprilTagDistanceToRobot = aprilTagPose.minus(currentRobotPose);
 
     // calculates the speed needed to get to the setpoint
@@ -133,7 +139,7 @@ public class AlignToReef extends Command {
     // RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(aprilTagRotation,
     // getDriverControllerLeftY(), -ySpeed);
     // }
-    RobotContainer.m_swerveSubsystem.alignRobotToAprilTag(aprilTagRotation,
+    m_swerveSubsystem.alignRobotToAprilTag(aprilTagRotation,
         getDriverControllerLeftY() * DriveConstants.kAutoAlignForwardBackwardSpeedMultiplier, -ySpeed);
 
   }
@@ -150,7 +156,7 @@ public class AlignToReef extends Command {
   }
 
   private double getDriverControllerLeftY() {
-    return -RobotContainer.m_driverController.getLeftY();
+    return -m_driverController.getLeftY();
   }
 
   public void hawkTuah(String text, double key) {

@@ -5,13 +5,13 @@
 package frc.robot.commands.teleop.coral_indexer;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.RobotContainer;
+import frc.robot.Robot;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class WaitForCoral extends Command {
   /** Creates a new WaitForCoral. */
   public WaitForCoral() {
-    addRequirements(RobotContainer.m_indexSubsystem);
+    addRequirements(Robot.m_indexSubsystem);
     }
 
   // Called when the command is initially scheduled.
@@ -29,6 +29,6 @@ public class WaitForCoral extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return RobotContainer.m_indexSubsystem.isShallowBeamBroken();
+    return Robot.m_indexSubsystem.isShallowBeamBroken();
   }
 }

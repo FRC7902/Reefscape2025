@@ -5,7 +5,7 @@
 package frc.robot.commands.teleop.climb;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.RobotContainer;
+import frc.robot.Robot;
 import frc.robot.subsystems.ClimbSubsystem;
 
 public class MoveClimbAttackAngleCommand extends Command {
@@ -13,7 +13,7 @@ public class MoveClimbAttackAngleCommand extends Command {
     private ClimbSubsystem m_climbSubsystem;
     
     public MoveClimbAttackAngleCommand(ClimbSubsystem m_climbSubsystem) {
-        addRequirements(RobotContainer.m_climbSubsystem);
+        addRequirements(Robot.m_climbSubsystem);
         this.m_climbSubsystem = m_climbSubsystem;
     }
 

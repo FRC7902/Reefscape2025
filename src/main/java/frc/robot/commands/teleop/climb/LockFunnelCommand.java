@@ -5,14 +5,14 @@
 package frc.robot.commands.teleop.climb;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.RobotContainer;
+import frc.robot.Robot;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class LockFunnelCommand extends Command {
   /** Creates a new LockFunnelCommand. */
   public LockFunnelCommand() {
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(RobotContainer.m_climbSubsystem);
+    addRequirements(Robot.m_climbSubsystem);
   }
 
   // Called when the command is initially scheduled.
@@ -23,7 +23,7 @@ public class LockFunnelCommand extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    RobotContainer.m_climbSubsystem.lockFunnel();
+    Robot.m_climbSubsystem.lockFunnel();
   }
 
   // Called once the command ends or is interrupted.
