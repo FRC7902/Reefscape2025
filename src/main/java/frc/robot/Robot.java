@@ -102,15 +102,15 @@ public class Robot extends TimedRobot {
     private void configureBindings() {
         // Swerve drive controls
         Command driveFieldOrientedDirectAngle =
-                m_swerveSubsystem.driveFieldOriented(driveDirectAngle);
+                m_swerveSubsystem.driveFieldOriented(m_swerveSubsystem.driveDirectAngle);
         Command driveFieldOrientedAnglularVelocity =
-                m_swerveSubsystem.driveFieldOriented(driveAngularVelocity);
+                m_swerveSubsystem.driveFieldOriented(m_swerveSubsystem.driveAngularVelocity);
         Command driveRobotOrientedAngularVelocity =
-                m_swerveSubsystem.driveFieldOriented(driveRobotOriented);
+                m_swerveSubsystem.driveFieldOriented(m_swerveSubsystem.driveRobotOriented);
         Command driveFieldOrientedDirectAngleKeyboard =
-                m_swerveSubsystem.driveFieldOriented(driveDirectAngleKeyboard);
+                m_swerveSubsystem.driveFieldOriented(m_swerveSubsystem.driveDirectAngleKeyboard);
         Command driveFieldOrientedAnglularVelocityKeyboard =
-                m_swerveSubsystem.driveFieldOriented(driveAngularVelocityKeyboard);
+                m_swerveSubsystem.driveFieldOriented(m_swerveSubsystem.driveAngularVelocityKeyboard);
 
         // Default to field-centric swerve drive
         // m_swerveSubsystem.setDefaultCommand(driveFieldOrientedAnglularVelocity);
@@ -130,7 +130,7 @@ public class Robot extends TimedRobot {
                 .onTrue(new SequentialCommandGroup(new SetElevatorPositionCommand(
                         ElevatorConstants.kElevatorCoralStationAndProcessorHeight).withTimeout(3),
                         new InstantCommand(() -> {
-                            driveAngularVelocity
+                        m_swerveSubsystem.driveAngularVelocity
                                     .scaleTranslation(DriveConstants.kSlowDriveSpeedMultiplier);
                         }), new InitiateClimbCommand().withTimeout(1),
                         new MoveClimbAttackAngleCommand(m_climbSubsystem)));
@@ -140,10 +140,10 @@ public class Robot extends TimedRobot {
         // m_driverController.leftBumper().whileTrue(m_whileTrueSelectIntakeCommand);
         m_driverController.leftBumper()
                 .onTrue(new ParallelCommandGroup(
-                        m_whileTrueSelectIntakeCommand
+                        m_elevatorSubsystem.m_whileTrueSelectIntakeCommand
                                 .until(() -> !m_driverController.leftBumper().getAsBoolean()),
-                        m_onTrueSelectIntakeCommand));
-        m_driverController.rightBumper().whileTrue(m_selectOuttakeCommand);
+                        m_elevatorSubsystem.m_onTrueSelectIntakeCommand));
+        m_driverController.rightBumper().whileTrue(m_elevatorSubsystem.m_selectOuttakeCommand);
 
         // Strafe controls
         // m_driverController.leftTrigger(0.05).whileTrue(new SequentialCommandGroup(new
@@ -284,70 +284,6 @@ public class Robot extends TimedRobot {
         // new PointTowardsZoneTrigger("Speaker").whileTrue(Commands.print("aiming at
         // speaker"));
     }
-
-    private ElevatorPosition select() {
-        return m_elevatorSubsystem.getElevatorEnumPosition();
-    }
-
-    private final Command m_whileTrueSelectIntakeCommand = new SelectCommand<>(
-            Map.ofEntries(Map.entry(ElevatorPosition.ALGAE_LOW, new IntakeAlgaeCommand()),
-                    Map.entry(ElevatorPosition.ALGAE_HIGH, new IntakeAlgaeCommand())),
-            this::select);
-
-    private final Command m_onTrueSelectIntakeCommand = new SelectCommand<>(
-            Map.ofEntries(Map.entry(ElevatorPosition.CORAL_STATION_AND_PROCESSOR,
-                    new ManualIntakeCoralCommand(
-                            Constants.CoralIndexerConstants.kIntakePower).withTimeout(5))),
-            this::select);
-
-    private final Command m_selectOuttakeCommand = new SelectCommand<>(Map.ofEntries(
-            Map.entry(ElevatorPosition.CORAL_L1,
-                    new ParallelCommandGroup(new OuttakeCoralCommand(
-                            Constants.CoralIndexerConstants.kL1OuttakePower),
-                            new SetElevatorPositionCommand(
-                                    ElevatorConstants.kElevatorCoralLevel1EndHeight))),
-            Map.entry(ElevatorPosition.CORAL_L2, new OuttakeCoralCommand()),
-            Map.entry(ElevatorPosition.CORAL_L3, new OuttakeCoralCommand()),
-            Map.entry(ElevatorPosition.CORAL_STATION_AND_PROCESSOR,
-                    new OuttakeAlgaeCommand())),
-            this::select);
-
-
-    public SwerveInputStream driveAngularVelocity = SwerveInputStream
-        .of(m_swerveSubsystem.getSwerveDrive(), () -> m_driverController.getLeftY() * -1,
-                () -> m_driverController.getLeftX() * -1)
-        .withControllerRotationAxis(() -> m_driverController.getRightX() * -1)
-        .deadband(OperatorConstants.DEADBAND).scaleTranslation(0.8)
-        .allianceRelativeControl(true);
-
-    /**
-     * Clone's the angular velocity input stream and converts it to a fieldRelative
-     * input stream.
-     */
-    SwerveInputStream driveDirectAngle = driveAngularVelocity.copy()
-            .withControllerHeadingAxis(m_driverController::getRightX, m_driverController::getRightY)
-            .headingWhile(true);
-
-    /**
-     * Clone's the angular velocity input stream and converts it to a robotRelative
-     * input stream.
-     */
-    public SwerveInputStream driveRobotOriented = driveAngularVelocity.copy().robotRelative(true)
-            .allianceRelativeControl(false);
-
-    SwerveInputStream driveAngularVelocityKeyboard = SwerveInputStream
-            .of(m_swerveSubsystem.getSwerveDrive(), () -> -m_driverController.getLeftY(),
-                    () -> -m_driverController.getLeftX())
-            .withControllerRotationAxis(() -> m_driverController.getRawAxis(2))
-            .deadband(OperatorConstants.DEADBAND).scaleTranslation(0.8)
-            .allianceRelativeControl(true);
-
-    // Derive the heading axis with math!
-    SwerveInputStream driveDirectAngleKeyboard = driveAngularVelocityKeyboard.copy()
-            .withControllerHeadingAxis(
-                    () -> Math.sin(m_driverController.getRawAxis(2) * Math.PI) * (Math.PI * 2),
-                    () -> Math.cos(m_driverController.getRawAxis(2) * Math.PI) * (Math.PI * 2))
-            .headingWhile(true);
 
     /**
      * This function is called every 20 ms, no matter the mode. Use this for items like diagnostics

@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Volts;
+import java.util.Map;
 import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -29,9 +30,17 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SelectCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.Constants.CoralIndexerConstants;
 import frc.robot.Constants.ElevatorConstants;
+import frc.robot.commands.teleop.algae_manipulator.IntakeAlgaeCommand;
+import frc.robot.commands.teleop.algae_manipulator.OuttakeAlgaeCommand;
+import frc.robot.commands.teleop.coral_indexer.ManualIntakeCoralCommand;
+import frc.robot.commands.teleop.coral_indexer.OuttakeCoralCommand;
+import frc.robot.commands.teleop.elevator.SetElevatorPositionCommand;
 
 public class ElevatorSubsystem extends SubsystemBase {
 
@@ -79,8 +88,37 @@ public class ElevatorSubsystem extends SubsystemBase {
     /** Array of songs to be played by the Phoenix Orchestra */
     private String[] m_songs = new String[] {"song1.chrp", "song2.chrp"};
 
+    public final Command m_whileTrueSelectIntakeCommand;
+
+    public final Command m_onTrueSelectIntakeCommand;
+
+    public final Command m_selectOuttakeCommand;
+
     /** Creates a new ElevatorSubsystem */
     public ElevatorSubsystem() {
+
+        m_whileTrueSelectIntakeCommand = new SelectCommand<>(
+            Map.ofEntries(Map.entry(ElevatorPosition.ALGAE_LOW, new IntakeAlgaeCommand()),
+                    Map.entry(ElevatorPosition.ALGAE_HIGH, new IntakeAlgaeCommand())),
+            this::select);
+
+        m_onTrueSelectIntakeCommand = new SelectCommand<>(
+            Map.ofEntries(Map.entry(ElevatorPosition.CORAL_STATION_AND_PROCESSOR,
+                    new ManualIntakeCoralCommand(
+                            CoralIndexerConstants.kIntakePower).withTimeout(5))),
+            this::select);
+
+        m_selectOuttakeCommand = new SelectCommand<>(Map.ofEntries(
+            Map.entry(ElevatorPosition.CORAL_L1,
+                    new ParallelCommandGroup(new OuttakeCoralCommand(
+                            CoralIndexerConstants.kL1OuttakePower),
+                            new SetElevatorPositionCommand(
+                                    ElevatorConstants.kElevatorCoralLevel1EndHeight))),
+            Map.entry(ElevatorPosition.CORAL_L2, new OuttakeCoralCommand()),
+            Map.entry(ElevatorPosition.CORAL_L3, new OuttakeCoralCommand()),
+            Map.entry(ElevatorPosition.CORAL_STATION_AND_PROCESSOR,
+                    new OuttakeAlgaeCommand())),
+            this::select);
 
         m_leaderMotor = new TalonFX(ElevatorConstants.kElevatorLeaderCAN);
 
@@ -200,6 +238,10 @@ public class ElevatorSubsystem extends SubsystemBase {
         m_orchestra.addInstrument(m_followerMotor);
 
         m_homed = false;
+    }
+
+    private ElevatorPosition select() {
+        return getElevatorEnumPosition();
     }
 
     /**

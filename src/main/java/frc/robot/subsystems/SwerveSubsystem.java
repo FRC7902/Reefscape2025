@@ -33,12 +33,14 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.PathPlanner;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.Robot;
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
 import swervelib.SwerveDriveTest;
+import swervelib.SwerveInputStream;
 import swervelib.math.SwerveMath;
 import swervelib.parser.SwerveDriveConfiguration;
 import swervelib.parser.SwerveParser;
@@ -52,7 +54,14 @@ public class SwerveSubsystem extends SubsystemBase {
     /**
      * Swerve drive object.
      */
+
+    public final SwerveInputStream driveAngularVelocity;
+
     private final SwerveDrive swerveDrive;
+    public final SwerveInputStream driveRobotOriented;
+    public final SwerveInputStream driveDirectAngle;
+    public final SwerveInputStream driveDirectAngleKeyboard;
+    public final SwerveInputStream driveAngularVelocityKeyboard;
 
     /** Creates a new SwerveSubsystem. */
     public SwerveSubsystem(File directory) {
@@ -105,6 +114,43 @@ public class SwerveSubsystem extends SubsystemBase {
         swerveDrive.swerveController.setMaximumChassisAngularVelocity(20);
 
         setupPathPlanner();
+        
+        driveAngularVelocity = SwerveInputStream
+        .of(swerveDrive, () -> Robot.m_driverController.getLeftY() * -1,
+                () -> Robot.m_driverController.getLeftX() * -1)
+        .withControllerRotationAxis(() -> Robot.m_driverController.getRightX() * -1)
+        .deadband(OperatorConstants.DEADBAND).scaleTranslation(0.8)
+        .allianceRelativeControl(true);
+
+
+        /**
+        * Clone's the angular velocity input stream and converts it to a fieldRelative
+        * input stream.
+        */        
+        driveDirectAngle = driveAngularVelocity.copy()
+        .withControllerHeadingAxis(Robot.m_driverController::getRightX, Robot.m_driverController::getRightY)
+        .headingWhile(true);
+
+        /**
+         * Clone's the angular velocity input stream and converts it to a robotRelative
+         * input stream.
+         */
+        driveRobotOriented = driveAngularVelocity.copy().robotRelative(true)
+        .allianceRelativeControl(false);
+        
+        driveAngularVelocityKeyboard = SwerveInputStream
+        .of(swerveDrive, () -> -Robot.m_driverController.getLeftY(),
+                () -> -Robot.m_driverController.getLeftX())
+        .withControllerRotationAxis(() -> Robot.m_driverController.getRawAxis(2))
+        .deadband(OperatorConstants.DEADBAND).scaleTranslation(0.8)
+        .allianceRelativeControl(true);
+
+        // Derive the heading axis with math!
+        driveDirectAngleKeyboard = driveAngularVelocityKeyboard.copy()
+        .withControllerHeadingAxis(
+                () -> Math.sin(Robot.m_driverController.getRawAxis(2) * Math.PI) * (Math.PI * 2),
+                () -> Math.cos(Robot.m_driverController.getRawAxis(2) * Math.PI) * (Math.PI * 2))
+        .headingWhile(true);
 
         // RobotModeTriggers.autonomous().onTrue(Commands.runOnce(this::zeroGyro));
     }
@@ -444,5 +490,5 @@ public class SwerveSubsystem extends SubsystemBase {
                 0, false, false);
 
     }
-    
+
 }
