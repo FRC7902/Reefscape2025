@@ -20,13 +20,14 @@ public final class Constants {
 
 
     public static class DemoConstants {
-        public static final double DRIVE_SPEED_MULTIPLIER = 0.1;
+        public static final double DRIVE_SPEED_MULTIPLIER = 0.2;
         public static final double ALGAE_SHOOT_POWER_MULTIPLIER = 0.5;
         public static final double CORAL_SHOOT_POWER_MULTIPLIER = 0.5;
         public static final double ELEVATOR_SPEED_MULTIPLIER = 0.25;
 
     }
 
+    
     public static class DriveConstants {
         public static final double MAX_SPEED = Units.feetToMeters(15.0) * DemoConstants.DRIVE_SPEED_MULTIPLIER;
         public static final double kSlowDriveSpeedMultiplier = 0.5;
