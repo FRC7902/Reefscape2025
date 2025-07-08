@@ -15,7 +15,7 @@ import frc.robot.Constants.VisionConstants;
 
 public class CameraInterface extends SubsystemBase {
 
-    private final String camera;
+    private final String camera; 
     private final AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout
             .loadField(AprilTagFields.k2025ReefscapeWelded);
     private final List<Pose2d> reefPoses;
@@ -33,53 +33,21 @@ public class CameraInterface extends SubsystemBase {
      */
     public CameraInterface(String cameraName) {
         camera = cameraName;
-
-        SmartDashboard.putNumber("kPY Close", VisionConstants.kPY2);
-        SmartDashboard.putNumber("kIY Close", VisionConstants.kIY2);
-        SmartDashboard.putNumber("kDY Close", VisionConstants.kDY2);
-
-        SmartDashboard.putNumber("kPY Far", VisionConstants.kPY);
-        SmartDashboard.putNumber("kIY Far", VisionConstants.kIY);
-        SmartDashboard.putNumber("kDY Far", VisionConstants.kDY);
-
-        SmartDashboard.putNumber("Y Controller Tolerance", VisionConstants.yControllerTolerance);
-
-        SmartDashboard.putNumber("Left Reef offset", VisionConstants.leftReefToAprilTagOffset);
-        SmartDashboard.putNumber("Right Reef offset", VisionConstants.rightReefToAprilTagOffset);
-
-        SmartDashboard.putNumber("April tag limit", VisionConstants.kLocalizationDisLim);
-
-        SmartDashboard.putNumber("STD DEVS", VisionConstants.kStdDevs);
-
-        // LimelightHelpers.SetFiducialIDFiltersOverride(camera,
-        // VisionConstants.acceptedTagIDs); // Only track these tag IDs
-
-        LimelightHelpers.setLEDMode_PipelineControl(camera);
-
-        /*
-         * LimelightHelpers.setCameraPose_RobotSpace(
-         * camera,
-         * VisionConstants.kFowardToCamera, // Forward offset (meters)
-         * VisionConstants.kSidewaysToCamera, // Side offset (meters)
-         * VisionConstants.kGroundToCamera, // Height offset (meters)
-         * 0.0, // Roll (degrees)
-         * 0.0, // Pitch (degrees)
-         * VisionConstants.kCameraRotation // Yaw (degrees)
-         * );
-         */
-
-        LimelightHelpers.SetIMUMode(camera, 1);
-        // LimelightHelpers.setStreamMode_Standard(camera);
+        LimelightHelpers.SetIMUMode(camera, 1); //ensures the limelight uses the IMU on the robot rather than on the Limelight for improved reliability and performance
         reefPoses = setReefPoses();
     }
 
     /**
-     * Gets the rotation of the April Tag relative to the field.
-     *
-     * @return The rotation of the April Tag relative to the field (in radians).
+     * Adds all of the reef April Tag poses (includes x, y, and rotation data relative to the field) into a list.
+     * This is done so that {@code nearest()} can be called on the robot's {@code Pose2d} object to determine which April tag is closest to the robot, and thus
+     * allowing the robot to auto align to the nearest reef.
+     * 
+     * <p>This method is called upon robot code instantiation, which is the only time the method should be called. 
+     *     
+     * @return A list of the poses of the April Tags on the reef.
      */
 
-    public List<Pose2d> setReefPoses() {
+    private List<Pose2d> setReefPoses() {
         List<Pose2d> poses = new ArrayList<>();
         for (int i = 6; i != 12; i++) {
             poses.add(aprilTagFieldLayout.getTagPose(i).get().toPose2d());
@@ -91,9 +59,13 @@ public class CameraInterface extends SubsystemBase {
         return poses;
     }
 
-    public List<Pose2d> getReefPoses() {
-        return reefPoses;
-    }
+    /**
+     * Determines the April Tag closest to the robot using the {@code Pose2d} data of the April Tag and of the Robot, and then returns the {@code Pose2d} data of the closest April Tag.  
+     * 
+     * @param robotPose
+     * 
+     * @return The {@code Pose2d} data of the closest April Tag to the robot
+     */
 
     public Pose2d getNearestAprilTag(Pose2d robotPose) {
         return robotPose.nearest(reefPoses);
@@ -158,17 +130,6 @@ public class CameraInterface extends SubsystemBase {
         LimelightHelpers.SetIMUMode(camera, mode);
     }
 
-    public void turnLEDOn() {
-        LimelightHelpers.setLEDMode_ForceOn(camera);
-    }
-
-    public void turnLEDOff() {
-        LimelightHelpers.setLEDMode_ForceOff(camera);
-    }
-
-    public void blinkLED() {
-        LimelightHelpers.setLEDMode_ForceBlink(camera);
-    }
 
     public boolean tagIsSigma(LimelightHelpers.PoseEstimate limelightMeasurement) {
         double rotationSpeed = Math
