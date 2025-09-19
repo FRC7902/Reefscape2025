@@ -339,21 +339,21 @@ public class RobotContainer {
         m_operatorController.back().whileTrue(m_swerveSubsystem.centerModulesCommand());
 
         // Go to L1 height
-        m_operatorController.x().onTrue(new ConditionalCommand(
+        m_operatorController.a().onTrue(new ConditionalCommand(
                 new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel1StartHeight),
                 new NullCommand(), m_indexSubsystem::hasCoral));
         // Go to processor/coral station height
-        m_operatorController.a().onTrue(
-                new SetElevatorPositionCommand(
-                        ElevatorConstants.kElevatorCoralStationAndProcessorHeight));
+//        m_operatorController.unknown().onTrue(
+//                new SetElevatorPositionCommand(
+//                        ElevatorConstants.kElevatorCoralStationAndProcessorHeight));
         // Go to L2 height
-        m_operatorController.b().onTrue(
+        m_operatorController.x().onTrue(
                 new ConditionalCommand(
                         new SetElevatorPositionCommand(
                                 ElevatorConstants.kElevatorCoralLevel2Height),
                         new NullCommand(), m_indexSubsystem::hasCoral));
         // Go to L3 height
-        m_operatorController.y().onTrue(
+        m_operatorController.b().onTrue(
                 new ConditionalCommand(
                         new SetElevatorPositionCommand(
                                 ElevatorConstants.kElevatorCoralLevel3Height),
