@@ -280,19 +280,19 @@ public class RobotContainer {
                 .whileTrue(Commands.parallel(new OuttakeAlgaeCommand(), new OuttakeCoralCommand()));
 
         // Intake command select
-        m_driverController.leftBumper()
+        m_driverController.leftTrigger()
                 .onTrue(new ParallelCommandGroup(
                         m_whileTrueSelectIntakeCommand
                                 .until(() -> !m_driverController.leftBumper()
                                         .getAsBoolean()),
                         m_onTrueSelectIntakeCommand));
         // Outtake command select
-        m_driverController.rightBumper().whileTrue(m_selectOuttakeCommand);
+        m_driverController.rightTrigger().whileTrue(m_selectOuttakeCommand);
 
         // Auto-align right (back-right paddle_
-        m_driverController.a().whileTrue(new AlignToReef(m_cameraSubsystem, ReefSide.RIGHT));
+        m_driverController.leftBumper().whileTrue(new AlignToReef(m_cameraSubsystem, ReefSide.RIGHT));
         // Auto-align left (back-left paddle)
-        m_driverController.b().whileTrue(new AlignToReef(m_cameraSubsystem, ReefSide.LEFT));
+        m_driverController.rightBumper().whileTrue(new AlignToReef(m_cameraSubsystem, ReefSide.LEFT));
 
         // Climb controls
         // Manually move climber up
