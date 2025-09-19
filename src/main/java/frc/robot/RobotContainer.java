@@ -13,12 +13,7 @@ import com.pathplanner.lib.events.EventTrigger;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.SelectCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.CoralIndexerConstants;
@@ -308,19 +303,50 @@ public class RobotContainer {
         m_driverController.povDown()
                 .whileTrue(new ConditionalCommand(new ManualClimb(m_climbSubsystem, -12),
                         new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
-        // Pull climber in/up
-        m_driverController.povLeft()
-                .onTrue(new ConditionalCommand(new MoveClimbUpCommand(m_climbSubsystem),
-                        new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
-        // Release climber to attack angle
-        m_driverController.povRight()
-                .onTrue(new ConditionalCommand(new MoveClimbAttackAngleCommand(m_climbSubsystem),
-                        new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
 
-        // Strafe left
-        m_driverController.leftTrigger(0.05).whileTrue(new StrafeLeftCommand());
-        // Strafe right
-        m_driverController.rightTrigger(0.05).whileTrue(new StrafeRightCommand());
+        m_driverController.povLeft()
+                .onTrue(new ParallelCommandGroup(
+                                // whileTrue()
+                                new ConditionalCommand(
+                                        new InstantCommand(),
+
+                                        // Strafe left whileTrue() if funnel is unlocked
+                                        new StrafeLeftCommand()
+                                                .until(() -> !m_driverController.povLeft()
+                                                        .getAsBoolean()),
+                                        m_climbSubsystem::isFunnelUnlocked
+                                ),
+                                // onTrue()
+                                new ConditionalCommand(
+                                        // Pull climber in/up
+                                        new MoveClimbUpCommand(m_climbSubsystem),
+                                        new InstantCommand(),
+                                        m_climbSubsystem::isFunnelUnlocked
+                                )
+                        )
+                );
+
+        m_driverController.povRight()
+                .onTrue(new ParallelCommandGroup(
+                                // whileTrue()
+                                new ConditionalCommand(
+                                        new InstantCommand(),
+
+                                        // Strafe left if funnel is unlocked
+                                        new StrafeRightCommand()
+                                                .until(() -> !m_driverController.povRight()
+                                                        .getAsBoolean()),
+                                        m_climbSubsystem::isFunnelUnlocked
+                                ),
+                                // onTrue()
+                                new ConditionalCommand(
+                                        // Release climber to attack angle
+                                        new MoveClimbAttackAngleCommand(m_climbSubsystem),
+                                        new InstantCommand(),
+                                        m_climbSubsystem::isFunnelUnlocked
+                                )
+                        )
+                );
 
         // Strafe controls
         // m_driverController.leftTrigger(0.05).whileTrue(new SequentialCommandGroup(new
