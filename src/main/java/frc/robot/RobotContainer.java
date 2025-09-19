@@ -343,9 +343,9 @@ public class RobotContainer {
                 new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel1StartHeight),
                 new NullCommand(), m_indexSubsystem::hasCoral));
         // Go to processor/coral station height
-//        m_operatorController.unknown().onTrue(
-//                new SetElevatorPositionCommand(
-//                        ElevatorConstants.kElevatorCoralStationAndProcessorHeight));
+        m_operatorController.povRight().onTrue(
+                new SetElevatorPositionCommand(
+                        ElevatorConstants.kElevatorCoralStationAndProcessorHeight));
         // Go to L2 height
         m_operatorController.x().onTrue(
                 new ConditionalCommand(
