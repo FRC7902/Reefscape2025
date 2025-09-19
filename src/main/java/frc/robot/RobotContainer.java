@@ -348,12 +348,6 @@ public class RobotContainer {
                         )
                 );
 
-        // Strafe controls
-        // m_driverController.leftTrigger(0.05).whileTrue(new SequentialCommandGroup(new
-        // CheckForAprilTag(0), new AlignToReef(this, 0)));
-        // m_driverController.rightTrigger(0.05).whileTrue(new
-        // SequentialCommandGroup(new CheckForAprilTag(1), new AlignToReef(this, 1)));
-
         // Initiate climbing sequence
         m_operatorController.start()
                 .onTrue(new SequentialCommandGroup(
