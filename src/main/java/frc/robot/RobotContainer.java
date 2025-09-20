@@ -11,11 +11,13 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.events.EventTrigger;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -51,6 +53,7 @@ import frc.robot.visions.ReefSide;
 import frc.robot.subsystems.SwerveSubsystem;
 import swervelib.SwerveInputStream;
 import frc.robot.commands.teleop.visions.AlignToReef;
+import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -71,9 +74,9 @@ public class RobotContainer {
     public static final CoralIndexerSubsystem m_indexSubsystem = new CoralIndexerSubsystem();
 
     // Replace with CommandPS4Controller or CommandJoystick if needed
-    public static final CommandXboxController m_driverController = new CommandXboxController(
-            OperatorConstants.kDriverControllerPort);
-    public static final CommandXboxController m_operatorController = new CommandXboxController(
+    public static final CommandPS5Controller m_driverController = new CommandPS5Controller(OperatorConstants.kDriverControllerPort);
+        
+    public static final CommandPS5Controller m_operatorController = new CommandPS5Controller(
             OperatorConstants.kOperatorControllerPort);
 
     public static final SwerveSubsystem m_swerveSubsystem = new SwerveSubsystem(
@@ -277,29 +280,28 @@ public class RobotContainer {
         m_climbSubsystem.setDefaultCommand(new LockFunnelCommand());
 
         // Zero gyro
-        m_driverController.start().onTrue((Commands.runOnce(m_swerveSubsystem::zeroGyro)));
+        m_driverController.L1().onTrue(new InstantCommand(() -> m_swerveSubsystem.zeroGyro()));
 
-        m_driverController.back()
-                .whileTrue(Commands.parallel(new OuttakeAlgaeCommand(), new OuttakeCoralCommand()));
+        m_driverController.L2().whileTrue(Commands.parallel(new OuttakeAlgaeCommand(), new OuttakeCoralCommand()));
 
         // m_operatorController.back().whileTrue(new InitiateClimbCommand());
-        m_operatorController.start()
+        m_operatorController.L1()
                 .onTrue(new SequentialCommandGroup(
                         new SetElevatorPositionCommand(
                                 ElevatorConstants.kElevatorCoralStationAndProcessorHeight),
                         new InitiateClimbCommand().withTimeout(1),
                         new MoveClimbAttackAngleCommand(m_climbSubsystem)));
-        m_operatorController.back().whileTrue(m_swerveSubsystem.centerModulesCommand());
+        m_operatorController.L2().whileTrue(m_swerveSubsystem.centerModulesCommand());
 
         // Raise elevator (by height of Algae diameter) while intaking algae
         // m_driverController.leftBumper().whileTrue(m_whileTrueSelectIntakeCommand);
-        m_driverController.leftBumper()
+        m_driverController.PS()
                 .onTrue(new ParallelCommandGroup(
                         m_whileTrueSelectIntakeCommand
-                                .until(() -> !m_driverController.leftBumper()
+                                .until(() -> !m_driverController.R2()
                                         .getAsBoolean()),
                         m_onTrueSelectIntakeCommand));
-        m_driverController.rightBumper().whileTrue(m_selectOuttakeCommand);
+        m_driverController.R1().whileTrue(m_selectOuttakeCommand);
 
         // Strafe controls
         // m_driverController.leftTrigger(0.05).whileTrue(new SequentialCommandGroup(new
@@ -307,8 +309,8 @@ public class RobotContainer {
         // m_driverController.rightTrigger(0.05).whileTrue(new
         // SequentialCommandGroup(new CheckForAprilTag(1), new AlignToReef(this, 1)));
 
-        m_driverController.a().whileTrue(new AlignToReef(m_cameraSubsystem, ReefSide.RIGHT)); // left
-        m_driverController.b().whileTrue(new AlignToReef(m_cameraSubsystem, ReefSide.LEFT)); // right
+        m_driverController.L3().whileTrue(new AlignToReef(m_cameraSubsystem, ReefSide.RIGHT)); // left
+        m_driverController.R3().whileTrue(new AlignToReef(m_cameraSubsystem, ReefSide.LEFT)); // right
 
         // Climb controls
         m_driverController.povUp()
@@ -325,25 +327,25 @@ public class RobotContainer {
                 .onTrue(new ConditionalCommand(new MoveClimbAttackAngleCommand(m_climbSubsystem),
                         new NullCommand(), m_climbSubsystem::isFunnelUnlocked));
 
-        m_driverController.leftTrigger(0.05).whileTrue(new StrafeLeftCommand());
-        m_driverController.rightTrigger(0.05).whileTrue(new StrafeRightCommand());
+        m_driverController.povUp().whileTrue(new StrafeLeftCommand()); // removed 0.5
+        m_driverController.cross().whileTrue(new StrafeRightCommand()); // removed 0.5
 
         m_indexSubsystem.setDefaultCommand(
                 new AutomaticIntakeCoralCommand(CoralIndexerConstants.kIntakePower));
 
         // Elevator coral positions
-        m_operatorController.x().onTrue(new ConditionalCommand(
+        m_operatorController.L1().onTrue(new ConditionalCommand(
                 new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel1StartHeight),
                 new NullCommand(), m_indexSubsystem::hasCoral));
-        m_operatorController.a().onTrue(
+        m_operatorController.L2().onTrue(
                 new SetElevatorPositionCommand(
                         ElevatorConstants.kElevatorCoralStationAndProcessorHeight));
-        m_operatorController.b().onTrue(
+        m_operatorController.L3().onTrue(
                 new ConditionalCommand(
                         new SetElevatorPositionCommand(
                                 ElevatorConstants.kElevatorCoralLevel2Height),
                         new NullCommand(), m_indexSubsystem::hasCoral));
-        m_operatorController.y().onTrue(
+        m_operatorController.R2().onTrue(
                 new ConditionalCommand(
                         new SetElevatorPositionCommand(
                                 ElevatorConstants.kElevatorCoralLevel3Height),
