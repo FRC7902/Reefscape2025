@@ -362,10 +362,6 @@ public class RobotContainer {
         m_operatorController.a().onTrue(new ConditionalCommand(
                 new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel1StartHeight),
                 new NullCommand(), m_indexSubsystem::hasCoral));
-        // Go to processor/coral station height
-        m_operatorController.povRight().onTrue(
-                new SetElevatorPositionCommand(
-                        ElevatorConstants.kElevatorCoralStationAndProcessorHeight));
         // Go to L2 height
         m_operatorController.x().onTrue(
                 new ConditionalCommand(
@@ -380,10 +376,20 @@ public class RobotContainer {
                         new NullCommand(), m_indexSubsystem::hasCoral));
 
         // Go to low algae height
-        m_operatorController.povDown()
+        m_operatorController.povUp().onTrue(
+                new SetElevatorPositionCommand(
+                        ElevatorConstants.kElevatorCoralStationAndProcessorHeight)
+        );
+        // Go to processor/coral station height
+        m_operatorController.povDown().onTrue(
+                new SetElevatorPositionCommand(
+                        ElevatorConstants.kElevatorCoralStationAndProcessorHeight)
+        );
+        // Go to low algae height
+        m_operatorController.povRight()
                 .onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeLowHeight));
         // Go to high algae height
-        m_operatorController.povUp()
+        m_operatorController.povLeft()
                 .onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeHighHeight));
     }
 
