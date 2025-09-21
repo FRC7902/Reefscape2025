@@ -332,28 +332,48 @@ public class RobotContainer {
                 new AutomaticIntakeCoralCommand(CoralIndexerConstants.kIntakePower));
 
         // Elevator coral positions
-        m_operatorController.x().onTrue(new ConditionalCommand(
+        m_operatorController.x().onTrue(new ConditionalCommand (
+                new NullCommand(),
+                new ConditionalCommand(
                 new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel1StartHeight),
-                new NullCommand(), m_indexSubsystem::hasCoral));
-        m_operatorController.a().onTrue(
-                new SetElevatorPositionCommand(
-                        ElevatorConstants.kElevatorCoralStationAndProcessorHeight));
+                new NullCommand(), m_indexSubsystem::hasCoral),
+                m_climbSubsystem :: isFunnelUnlocked));
+        m_operatorController.a().onTrue(new ConditionalCommand
+        (new NullCommand(), 
+        new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralStationAndProcessorHeight), 
+        m_climbSubsystem :: isFunnelUnlocked));
         m_operatorController.b().onTrue(
                 new ConditionalCommand(
+                        new NullCommand(), 
+                        new ConditionalCommand(
                         new SetElevatorPositionCommand(
                                 ElevatorConstants.kElevatorCoralLevel2Height),
-                        new NullCommand(), m_indexSubsystem::hasCoral));
+                        new NullCommand(), m_indexSubsystem::hasCoral), 
+                        m_climbSubsystem :: isFunnelUnlocked)
+                );
         m_operatorController.y().onTrue(
                 new ConditionalCommand(
+                        new NullCommand(), 
+                        new ConditionalCommand(
                         new SetElevatorPositionCommand(
                                 ElevatorConstants.kElevatorCoralLevel3Height),
-                        new NullCommand(), m_indexSubsystem::hasCoral));
+                        new NullCommand(), m_indexSubsystem::hasCoral), 
+                        m_climbSubsystem :: isFunnelUnlocked)
+                );
 
         // Elevator algae positions
         m_operatorController.povDown()
-                .onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeLowHeight));
+                .onTrue(new ConditionalCommand(
+                        new NullCommand(), 
+                        new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeLowHeight), 
+                        m_climbSubsystem :: isFunnelUnlocked)
+                        );
         m_operatorController.povUp()
-                .onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeHighHeight));
+                .onTrue(new ConditionalCommand(
+                        new NullCommand(),
+                        new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeHighHeight),
+                        m_climbSubsystem :: isFunnelUnlocked )
+                        );
 
         // ======= Test bindings =======
 
