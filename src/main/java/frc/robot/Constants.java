@@ -4,6 +4,13 @@
 
 package frc.robot;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 
@@ -66,7 +73,44 @@ public final class Constants {
 
         public static int kSecondPIDControllerStartingPoint = 13; // to change
 
-    }
+        public static final AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
+
+        public static List<Pose2d> algaePoses = new ArrayList<>();
+                
+        public enum WAYPOINT_LOCATIONS {
+            RED_FRONT,
+            RED_FRONT_LEFT,
+            RED_BACK_LEFT,
+            RED_BACK,
+            RED_FRONT_RIGHT,
+            RED_BACK_RIGHT,
+            BLUE_FRONT,
+            BLUE_FRONT_LEFT,
+            BLUE_FRONT_RIGHT,
+            BLUE_BACK_LEFT,
+            BLUE_BACK,
+            BLUE_BACK_RIGHT
+        }
+
+        public static final java.util.Map<WAYPOINT_LOCATIONS, Pose2d> RIGHT_WAYPOINTS = java.util.Map.ofEntries(
+            Map.entry(WAYPOINT_LOCATIONS.RED_FRONT_RIGHT, new Pose2d(13.65, 5, new Rotation2d(Math.toRadians(60)))),
+            Map.entry(WAYPOINT_LOCATIONS.RED_BACK_RIGHT, new Pose2d(12.50, 5, new Rotation2d(Math.toRadians(120)))),
+            Map.entry(WAYPOINT_LOCATIONS.BLUE_FRONT_RIGHT, new Pose2d(3.93, 3.06, new Rotation2d(Math.toRadians(60)))),
+            Map.entry(WAYPOINT_LOCATIONS.BLUE_BACK_RIGHT, new Pose2d(5.02, 3.07, new Rotation2d(Math.toRadians(120)))));
+
+        public static final java.util.Map<WAYPOINT_LOCATIONS, Pose2d> LEFT_WAYPOINTS = java.util.Map.ofEntries(
+            Map.entry(WAYPOINT_LOCATIONS.RED_FRONT_LEFT, new Pose2d(13.75, 3.03, new Rotation2d(Math.toRadians(300)))),
+            Map.entry(WAYPOINT_LOCATIONS.RED_BACK_LEFT, new Pose2d(12.39, 2.88, new Rotation2d(Math.toRadians(240)))),
+            Map.entry(WAYPOINT_LOCATIONS.BLUE_FRONT_LEFT, new Pose2d(3.94, 3.98, new Rotation2d(Math.toRadians(300)))),
+            Map.entry(WAYPOINT_LOCATIONS.BLUE_BACK_LEFT, new Pose2d(5.06, 4.99, new Rotation2d(Math.toRadians(240)))));
+
+        public static final java.util.Map<WAYPOINT_LOCATIONS, Pose2d> ALGAE_WAYPOINTS = java.util.Map.ofEntries(
+            Map.entry(WAYPOINT_LOCATIONS.RED_FRONT, aprilTagFieldLayout.getTagPose(7).get().toPose2d()),
+            Map.entry(WAYPOINT_LOCATIONS.RED_FRONT_LEFT, aprilTagFieldLayout.getTagPose(6).get().toPose2d()),
+            Map.entry(WAYPOINT_LOCATIONS.RED_FRONT_RIGHT, aprilTagFieldLayout.getTagPose(8).get().toPose2d()),
+            Map.entry(WAYPOINT_LOCATIONS.BLUE_BACK, new Pose2d(5.59, 4.01, new Rotation2d(Math.toRadians(180)))));
+        }
+
 
     public static class PathPlanner {
         public static final double kPDrive = 1.95;

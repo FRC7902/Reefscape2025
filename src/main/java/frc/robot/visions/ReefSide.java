@@ -2,6 +2,7 @@ package frc.robot.visions;
 
 public enum ReefSide {
         LEFT,
-        RIGHT
+        RIGHT,
+        MIDDLE
 }
 

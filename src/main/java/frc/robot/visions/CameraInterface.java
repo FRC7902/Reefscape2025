@@ -18,7 +18,7 @@ public class CameraInterface extends SubsystemBase {
     private final String camera;
     private final AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout
             .loadField(AprilTagFields.k2025ReefscapeWelded);
-    private final List<Pose2d> reefPoses;
+    private List<Pose2d> reefPoses;
 
     private double distanceToAprilTag = 0;
     private double poseAmbiguity;
@@ -70,7 +70,7 @@ public class CameraInterface extends SubsystemBase {
 
         LimelightHelpers.SetIMUMode(camera, 1);
         // LimelightHelpers.setStreamMode_Standard(camera);
-        reefPoses = setReefPoses();
+        VisionConstants.algaePoses = setReefPoses();
     }
 
     /**

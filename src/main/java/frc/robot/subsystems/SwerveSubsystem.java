@@ -144,8 +144,9 @@ public class SwerveSubsystem extends SubsystemBase {
         // When vision is enabled we must manually update odometry in SwerveDrive
         // if (visionDriveTest) {
         swerveDrive.updateOdometry();
-        LimelightHelpers.SetRobotOrientation(VisionConstants.kCameraName,
-                swerveDrive.getPose().getRotation().getDegrees(), 0.0, 0.0, 0.0, 0.0, 0.0);
+        // LimelightHelpers.SetRobotOrientation(VisionConstants.kCameraName,
+        //         swerveDrive.getPose().getRotation().getDegrees(), 0.0, 0.0, 0.0, 0.0, 0.0);
+        LimelightHelpers.SetRobotOrientation(VisionConstants.kCameraName, LimelightHelpers.getBotPoseEstimate_wpiBlue(VisionConstants.kCameraName).pose.getRotation().getDegrees(), 0, 0, 0, 0, 0);
         RobotContainer.m_cameraSubsystem.updateOdometryWithMegaTag2();
         // }
     }
@@ -748,35 +749,21 @@ public class SwerveSubsystem extends SubsystemBase {
                 && swerveDrive.getRobotVelocity().omegaRadiansPerSecond < 0.1);
     }
 
-    public void alignRobotToAprilTag(double radiansHeading, double xTranslation, double yTranslation) {
-        SwerveController controller = swerveDrive.getSwerveController();
-
-        /*
-         * swerveDrive.drive(ChassisSpeeds.fromRobotRelativeSpeeds(xTranslation,
-         * yTranslation,
-         * -controller.headingCalculate(swerveDrive.getOdometryHeading().unaryMinus().
-         * getRadians(), new Rotation2d(radiansHeading).getRadians()),
-         * swerveDrive.getPose().getRotation()));
-         * 
-         */
-        swerveDrive.drive(new Translation2d(xTranslation, yTranslation),
-                controller.headingCalculate(swerveDrive.getOdometryHeading().getRadians(), radiansHeading),
-                false, false);
-
-        SmartDashboard.putNumber("Odom Heading (rad)", swerveDrive.getOdometryHeading().unaryMinus().getRadians());
-        SmartDashboard.putNumber("Target Heading (rad)", radiansHeading);
-        SmartDashboard.putNumber("Error (rad)",
-                new Rotation2d(radiansHeading).minus(swerveDrive.getOdometryHeading().unaryMinus()).getRadians());
+    public Pose2d getNearestLeftWaypoint() {
+        Pose2d currPos = swerveDrive.getPose();
+        return currPos.nearest(List.copyOf(Constants.VisionConstants.LEFT_WAYPOINTS.values()));
     }
 
-    // NOTE!!! THIS IS NOT A CORRECT STRAFE COMMAND!!! THIS WILL CAUSE YOUR ROBOT TO
-    // SPIN VIGOROUSLY. DO NOT MISTAKE THIS FOR STRAFE!!!!!!!
-    public void strafe(double strafePower, double rotationalPower, double speedMultiplier) {
-        swerveDrive.drive(new Translation2d(
-                strafePower * Math.abs(speedMultiplier) * swerveDrive.getMaximumChassisVelocity(), 0),
-                rotationalPower, true, false);
-
+    public Pose2d getNearestRightWaypoint() {
+        Pose2d currPos = swerveDrive.getPose();
+        return currPos.nearest(List.copyOf(Constants.VisionConstants.RIGHT_WAYPOINTS.values()));
     }
+
+    public Pose2d getNearestMiddleWaypoint() {
+        Pose2d currPos = swerveDrive.getPose();
+        return currPos.nearest(VisionConstants.algaePoses);
+    }
+
 
     public void strafe(double strafePower, double speedMultiplier) {
         swerveDrive.drive(new Translation2d(0,

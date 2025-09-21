@@ -10,6 +10,10 @@ import java.util.Map;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.events.EventTrigger;
+import com.pathplanner.lib.path.PathConstraints;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -41,6 +45,7 @@ import frc.robot.commands.teleop.coral_indexer.ManualIntakeCoralCommand;
 import frc.robot.commands.teleop.coral_indexer.OuttakeCoralCommand;
 import frc.robot.commands.teleop.coral_indexer.WaitForCoral;
 import frc.robot.commands.teleop.elevator.SetElevatorPositionCommand;
+import frc.robot.commands.teleop.vision.AutoAlign;
 import frc.robot.subsystems.AlgaeManipulatorSubsystem;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.CoralIndexerSubsystem;
@@ -50,7 +55,6 @@ import frc.robot.visions.CameraInterface;
 import frc.robot.visions.ReefSide;
 import frc.robot.subsystems.SwerveSubsystem;
 import swervelib.SwerveInputStream;
-import frc.robot.commands.teleop.visions.AlignToReef;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -91,7 +95,7 @@ public class RobotContainer {
      * by angular
      * velocity.
      */
-    public SwerveInputStream driveAngularVelocity = SwerveInputStream
+    public static SwerveInputStream driveAngularVelocity = SwerveInputStream
             .of(m_swerveSubsystem.getSwerveDrive(), () -> m_driverController.getLeftY() * -1,
                     () -> m_driverController.getLeftX() * -1)
             .withControllerRotationAxis(() -> m_driverController.getRightX() * -1)
@@ -181,11 +185,6 @@ public class RobotContainer {
         new EventTrigger("highalgae")
                 .onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeHighHeight));
 
-        new EventTrigger("autoalignleft")
-                .whileTrue(new AlignToReef(m_cameraSubsystem, ReefSide.RIGHT).withTimeout(2));
-        new EventTrigger("autoalignright")
-                .whileTrue(new AlignToReef(m_cameraSubsystem, ReefSide.LEFT).withTimeout(2));
-
         new EventTrigger("ElevatorL1WithWait").onTrue(
                 new SetElevatorPositionCommand(ElevatorConstants.kElevatorCoralLevel1StartHeight,
                         true));
@@ -269,6 +268,7 @@ public class RobotContainer {
         Command driveFieldOrientedAnglularVelocityKeyboard = m_swerveSubsystem
                 .driveFieldOriented(driveAngularVelocityKeyboard);
 
+
         // Default to field-centric swerve drive
         // m_swerveSubsystem.setDefaultCommand(driveFieldOrientedAnglularVelocity);
 
@@ -306,9 +306,6 @@ public class RobotContainer {
         // CheckForAprilTag(0), new AlignToReef(this, 0)));
         // m_driverController.rightTrigger(0.05).whileTrue(new
         // SequentialCommandGroup(new CheckForAprilTag(1), new AlignToReef(this, 1)));
-
-        m_driverController.a().whileTrue(new AlignToReef(m_cameraSubsystem, ReefSide.RIGHT)); // left
-        m_driverController.b().whileTrue(new AlignToReef(m_cameraSubsystem, ReefSide.LEFT)); // right
 
         // Climb controls
         m_driverController.povUp()
@@ -354,6 +351,20 @@ public class RobotContainer {
                 .onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeLowHeight));
         m_operatorController.povUp()
                 .onTrue(new SetElevatorPositionCommand(ElevatorConstants.kElevatorAlgaeHighHeight));
+
+        m_driverController.x().whileTrue(new AutoAlign(m_swerveSubsystem, driveAngularVelocity, ReefSide.LEFT));
+        m_driverController.b().whileTrue(new AutoAlign(m_swerveSubsystem, driveAngularVelocity, ReefSide.RIGHT));
+        m_driverController.a().whileTrue(new AutoAlign(m_swerveSubsystem, driveAngularVelocity, ReefSide.MIDDLE));
+
+
+        // m_driverController.x().whileTrue(AutoBuilder.pathfindToPose(m_swerveSubsystem.getNearestLeftWaypoint(), new PathConstraints(10, 10, 10, 10)));
+        // m_driverController.b().whileTrue(AutoBuilder.pathfindToPose(m_swerveSubsystem.getNearestRightWaypoint(), new PathConstraints(10, 10, 10, 10)));
+        // m_driverController.a().whileTrue(AutoBuilder.pathfindToPose(m_swerveSubsystem.getNearestMiddleWaypoint(), new PathConstraints(10, 10, 10, 10)));
+
+        
+        SmartDashboard.putData("Auto Align Left", new AutoAlign(m_swerveSubsystem, driveAngularVelocity, ReefSide.LEFT));
+        SmartDashboard.putData("Auto Align Right", new AutoAlign(m_swerveSubsystem, driveAngularVelocity, ReefSide.RIGHT));
+        SmartDashboard.putData("Auto Align Middle", new AutoAlign(m_swerveSubsystem, driveAngularVelocity, ReefSide.MIDDLE));
 
         // ======= Test bindings =======
 
