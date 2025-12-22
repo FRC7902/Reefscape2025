@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
@@ -29,7 +30,9 @@ import com.pathplanner.lib.path.Waypoint;
 import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.swerve.SwerveSetpoint;
 import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
-
+import choreo.Choreo;
+import choreo.trajectory.SwerveSample;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -65,7 +68,10 @@ import frc.robot.RobotContainer;
 import frc.robot.visions.LimelightHelpers;
 
 public class SwerveSubsystem extends SubsystemBase {
-
+    private final PIDController xController = new PIDController(10.0, 0.0, 0.0);
+	private final PIDController yController = new PIDController(10.0, 0.0, 0.0);
+	private final PIDController headingController = new PIDController(7.5, 0.0, 0.0);
+	private final Optional<choreo.trajectory.Trajectory<SwerveSample>> trajectory = Choreo.loadTrajectory("myTrajectory");
     /**
      * Swerve drive object.
      */
@@ -124,6 +130,21 @@ public class SwerveSubsystem extends SubsystemBase {
         setupPathPlanner();
 
         // RobotModeTriggers.autonomous().onTrue(Commands.runOnce(this::zeroGyro));
+    }
+    //Choreo follow Trajectory Function
+    public void followTrajectory(SwerveSample sample) {
+        // Get the current pose of the robot
+        Pose2d pose = getPose();
+
+        // Generate the next speeds for the robot
+        ChassisSpeeds speeds = new ChassisSpeeds(
+                sample.vx + xController.calculate(pose.getX(), sample.x),
+                sample.vy + yController.calculate(pose.getY(), sample.y),
+                sample.omega + headingController.calculate(pose.getRotation().getRadians(), sample.heading)
+        );
+
+        // Apply the generated speedsTrajectory<SwerveSample>
+        driveFieldOriented(speeds);
     }
 
     /**

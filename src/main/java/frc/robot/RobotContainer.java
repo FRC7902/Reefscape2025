@@ -10,6 +10,12 @@ import java.util.Map;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.events.EventTrigger;
+
+import choreo.auto.AutoChooser;
+import choreo.auto.AutoFactory;
+import choreo.auto.AutoRoutine;
+import choreo.auto.AutoTrajectory;
+
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -20,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.CoralIndexerConstants;
 import frc.robot.Constants.ElevatorConstants;
@@ -79,7 +86,9 @@ public class RobotContainer {
     public static final SwerveSubsystem m_swerveSubsystem = new SwerveSubsystem(
             new File(Filesystem.getDeployDirectory(), "swerve"));
 
-    private final SendableChooser<Command> autoChooser;
+//     private final SendableChooser<Command> autoChooser;
+        private static AutoFactory autoFactory;
+        private static AutoChooser autoChooser;
 
     public static final CameraInterface m_cameraSubsystem = new CameraInterface(VisionConstants.kCameraName);
 
@@ -127,6 +136,27 @@ public class RobotContainer {
                     () -> Math.cos(m_driverController.getRawAxis(2) * Math.PI) * (Math.PI * 2))
             .headingWhile(true);
 
+        //Choreo Routine for bot to follow
+        private AutoRoutine followRoutineTest(){
+                AutoRoutine routine = autoFactory.newRoutine("move");
+                AutoTrajectory traj = routine.trajectory("test");
+                routine.active().onTrue(
+                                Commands.sequence(
+                                                traj.resetOdometry(),
+                                                traj.cmd()
+                                )
+                );
+                AutoTrajectory traj2 = routine.trajectory("abc");
+                traj.done().onTrue(
+                                Commands.sequence(
+                                                Commands.waitSeconds(2),
+                                                traj2.resetOdometry(),
+                                                traj2.cmd()
+                                )
+                );
+                return routine;
+        }
+
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
@@ -134,11 +164,17 @@ public class RobotContainer {
         // Configure the trigger bindings
 
         configureBindings();
+        setUpChoreo();
 
         NamedCommands.registerCommand("WaitForCoral", new WaitForCoral());
 
+        //choreo AutoChooser
+        autoChooser = new  AutoChooser();
+			autoChooser.addRoutine("routine", this::followRoutineTest);
+        SmartDashboard.putData("Auto Chooser", autoChooser);
+			RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler());
         // Build an auto chooser. This will use Commands.none() as the default option.
-        autoChooser = AutoBuilder.buildAutoChooser("DEFAULT");
+        // autoChooser = AutoBuilder.buildAutoChooser("DEFAULT");
 
         // Another option that allows you to specify the default auto by its name
         // autoChooser = AutoBuilder.buildAutoChooser("My Default Auto");
@@ -244,6 +280,16 @@ public class RobotContainer {
             Map.entry(ElevatorPosition.CORAL_STATION_AND_PROCESSOR,
                     new OuttakeAlgaeCommand())),
             this::select);
+
+            private void setUpChoreo(){
+		autoFactory = new AutoFactory(
+				m_swerveSubsystem::getPose, // A function that returns the current robot pose
+				m_swerveSubsystem::resetOdometry, // A function that resets the current robot pose to the provided Pose2d
+				m_swerveSubsystem::followTrajectory, // The drive subsystem trajectory follower
+				true, // If alliance flipping should be enabled
+				m_swerveSubsystem // The drive subsystem
+		);
+	}
 
     /**
      * Use this method to define your trigger->command mappings. Triggers can be
@@ -375,12 +421,12 @@ public class RobotContainer {
      *
      * @return the command to run in autonomous
      */
-    public Command getAutonomousCommand() {
-        // An example command will be run in autonomous
-        // return drivebase.getAutonomousCommand("New Auto");
+//     public Command getAutonomousCommand() {
+//         // An example command will be run in autonomous
+//         // return drivebase.getAutonomousCommand("New Auto");
 
-        return autoChooser.getSelected();
-    }
+//         return autoChooser.getSelected();
+//     }
 
     public void setMotorBrake(boolean brake) {
         m_swerveSubsystem.setMotorBrake(brake);
