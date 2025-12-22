@@ -81,11 +81,6 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     /** Creates a new ElevatorSubsystem */
     public ElevatorSubsystem() {
-        if (RobotBase.isSimulation()) {
-            //SmartDashboard.putData("Elevator Sim", m_mech2d); commented out for testing
-            m_elevatorMech2d.setColor(new Color8Bit(Color.kAntiqueWhite));
-        }
-
         m_leaderMotor = new TalonFX(ElevatorConstants.kElevatorLeaderCAN);
 
         /** TalonFX follower motor controller object */
@@ -122,6 +117,10 @@ public class ElevatorSubsystem extends SubsystemBase {
                 m_mech2dRoot.append(new MechanismLigament2d("Elevator",
                         m_elevatorSim.getPositionMeters(), 90, 7, new Color8Bit(Color.kAntiqueWhite)));
     
+        if (RobotBase.isSimulation()) {
+            //SmartDashboard.putData("Elevator Sim", m_mech2d); commented out for testing
+            m_elevatorMech2d.setColor(new Color8Bit(Color.kAntiqueWhite));
+        }
         /** Object of a system identification routine */
         m_sysIdRoutine = new SysIdRoutine(
                 new SysIdRoutine.Config(null, Volts.of(4), null,
