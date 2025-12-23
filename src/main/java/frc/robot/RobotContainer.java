@@ -139,18 +139,17 @@ public class RobotContainer {
         //Choreo Routine for bot to follow
         private AutoRoutine followRoutineTest(){
                 AutoRoutine routine = autoFactory.newRoutine("move");
-                AutoTrajectory traj = routine.trajectory("test");
+                AutoTrajectory traj = routine.trajectory("test1");
                 routine.active().onTrue(
                                 Commands.sequence(
                                                 traj.resetOdometry(),
                                                 traj.cmd()
                                 )
                 );
-                AutoTrajectory traj2 = routine.trajectory("abc");
+                AutoTrajectory traj2 = routine.trajectory("test2");
                 traj.done().onTrue(
                                 Commands.sequence(
                                                 Commands.waitSeconds(2),
-                                                traj2.resetOdometry(),
                                                 traj2.cmd()
                                 )
                 );
@@ -281,13 +280,13 @@ public class RobotContainer {
                     new OuttakeAlgaeCommand())),
             this::select);
 
-            private void setUpChoreo(){
-		autoFactory = new AutoFactory(
-				m_swerveSubsystem::getPose, // A function that returns the current robot pose
-				m_swerveSubsystem::resetOdometry, // A function that resets the current robot pose to the provided Pose2d
-				m_swerveSubsystem::followTrajectory, // The drive subsystem trajectory follower
-				true, // If alliance flipping should be enabled
-				m_swerveSubsystem // The drive subsystem
+        private void setUpChoreo(){
+            autoFactory = new AutoFactory(
+                    m_swerveSubsystem::getPose, // A function that returns the current robot pose
+                    m_swerveSubsystem::resetOdometry, // A function that resets the current robot pose to the provided Pose2d
+                    m_swerveSubsystem::followTrajectory, // The drive subsystem trajectory follower
+                    true, // If alliance flipping should be enabled
+                    m_swerveSubsystem // The drive subsystem
 		);
 	}
 
